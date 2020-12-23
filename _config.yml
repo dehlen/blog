@@ -1,7 +1,7 @@
-title: 'b2a3e8.github.io'
-description: "A jekyll theme inspired by linux consoles for hackers, developers and script kiddies."
-baseurl: "/jekyll-theme-console-demo-dark"
-url: "https://b2a3e8.github.io"
+title: 'Dev Blog'
+description: "A periodical on the art of modern Swift software engineering."
+baseurl: "/"
+url: "https://dehlen.github.io"
 
 header_pages:
   - index.md
@@ -10,8 +10,9 @@ header_pages:
   - contact.md
 
 style: dark
+listen_for_clients_preferred_style: true
 
-footer: 'follow us on <a href="https://twitter.com/">twitter</a>'
+footer: 'follow me on <a href="https://twitter.com/da_eh">twitter</a>'
 
 # Build settings
 markdown: kramdown
