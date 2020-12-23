@@ -4,7 +4,7 @@ layout: page
 permalink: /contact
 ---
 
-# Get in touch?
+# get in touch?
 
 
 If you’d like to get notified when I publish a new article, you can subscribe to my RSS feed.
