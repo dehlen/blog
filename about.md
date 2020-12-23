@@ -16,7 +16,7 @@ Here are some of my latest projects:
 * [Read Later iOS/macOS app](https://dehlen.github.io/readingtimeapp)
 * [Secret Ingredient (Recipe Manager)](https://dehlen.github.io/secretingredientapp/)
 * [SPM License Generator](https://github.com/dehlen/SPMLicenses)
-
+<br>
 If you’d like to get notified when I publish a new article, you can subscribe to my [RSS](https://dehlen.github.io/blog/feed.xml) feed.
 Also you can find contact/find me on various platforms:
 
