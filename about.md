@@ -17,7 +17,7 @@ Here are some of my latest projects:
 * [Secret Ingredient (Recipe Manager)](https://dehlen.github.io/secretingredientapp/)
 * [SPM License Generator](https://github.com/dehlen/SPMLicenses)
 
-If you’d like to get notified when I publish a new article, you can subscribe to my RSS feed.
+If you’d like to get notified when I publish a new article, you can subscribe to my [RSS](https://dehlen.github.io/blog/feed.xml) feed.
 Also you can find contact/find me on various platforms:
 
 * [Twitter](https://twitter.com/da_eh)
