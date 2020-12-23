@@ -14,7 +14,7 @@ header_pages:
 style: dark
 listen_for_clients_preferred_style: true
 
-footer: 'follow me on <a href="https://twitter.com/da_eh">twitter</a>'
+footer: 'follow me on <a href="https://twitter.com/da_eh">twitter</a> or subscribe to the <a href="https://dehlen.github.io/blog/feed.xml">rss feed</a>'
 
 # Build settings
 markdown: kramdown
