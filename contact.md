@@ -6,11 +6,10 @@ permalink: /contact
 
 # Get in touch?
 
-<form>
-  <input type="text" id="name" name="name" placeholder="name:" autocomplete="off">
-  <input type="text" id="email" name="email" placeholder="email:" autocomplete="off">
-  <textarea rows="5" id="message" name="message" placeholder="message:" autocomplete="off"></textarea>
-  <input type="submit" value="[ submit ]">
-</form>
 
-<br /><br />(This is a demo site, the form doesn't work - If you want to implement a form on your site, you need an external service)
+If you’d like to get notified when I publish a new article, you can subscribe to my RSS feed.
+Also you can find contact/find me on various platforms:
+
+* [Twitter](https://twitter.com/da_eh)
+* [GitHub](https://github.com/dehlen)
+* [E-Mail](mailto:dehlen@me.com)
