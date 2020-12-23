@@ -3,6 +3,9 @@ description: "A periodical on the art of modern Swift software engineering."
 baseurl: "/"
 url: "https://dehlen.github.io"
 
+plugins:
+  - jekyll-feed
+
 header_pages:
   - index.md
   - about.md
