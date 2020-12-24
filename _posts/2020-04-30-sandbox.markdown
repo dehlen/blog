@@ -13,7 +13,7 @@ While the sandbox is great for consumers and the overall security on Apples plat
 First things first you probably start by looking into the [FileManager](https://developer.apple.com/documentation/foundation/filemanager) API to access the file system. By quickly browsing through the available API it looks like we are in the right spot for our requirement. 🔋 Batteries included. To get a list of files in a specific folder one only has to write these simple couple of lines, right?:
 
 {% highlight swift %}
-let url = URL(fileURLWithPath: „/path/to/folder“) 
+let url = URL(fileURLWithPath: "/path/to/folder") 
 let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
     includingPropertiesForKeys: nil,
     options: .skipsHiddenFiles)
@@ -39,8 +39,8 @@ Xcode will now create an entitlements file and sets the correct .plist entries f
 {% highlight swift %}
 func requestPermission(then handler: @escaping (URL?) -> Void) {
     let openPanel = NSOpenPanel()
-    openPanel.message = „Choose your directory“
-    openPanel.prompt = „Choose“
+    openPanel.message = "Choose your directory"
+    openPanel.prompt = "Choose"
     openPanel.allowsMultipleSelection = false
     openPanel.canChooseDirectories = true
     openPanel.canCreateDirectories = true
@@ -104,7 +104,7 @@ When we’re ready to read files, we’ll have to wrap this in a pair of calls t
 {% highlight swift %}
 defer { url.stopAccessingSecurityScopedResource() }
 if !url.startAccessingSecurityScopedResource() {
-    print(„startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?“)
+    print("startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?")
 }
 // do your file operation
 {% endhighlight %}
