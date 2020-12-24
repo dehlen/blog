@@ -8,7 +8,7 @@ categories: swift, dev, macOS
 ## Executing work before the application quits
 
 A quick Google search on `NSApplication.TerminateReply` results in 328 results. I can't think of many search phrases which perform worse.
-![Google Search](/NSApplication-TerminateReply-Google-Search.png)
+![Google Search](/static/NSApplication-TerminateReply-Google-Search.png)
 
 In my Text Editor *Caret* I am not able to use Apples `NSDocument` class, or at least, I found, it probably isn't the best idea for my use case. However `NSDocument` comes with a neat little feature I knew I needed to support: **Autosaving changes**. Whenever a user edits text in the text editor the changes should be reflected on disk. Of course I do everything to coordinate these file changes and to have a reliable mechanism but to be extra sure I wanted to save all pending file changes before the application quits. Turns out this is what `NSApplication.TerminateReply` is for.
 
@@ -27,7 +27,7 @@ First you most certainly want to set the following key in your `Info.plist`:
 </plist>
 {% endhighlight %}
 
-Otherwise it can happen that `applicationShouldTerminate` won't being called and `NSApplicationWillTerminateNotification` won't being sent. With that out of our mind let's dive into using the above API.
+<br />Otherwise it can happen that `applicationShouldTerminate` won't being called and `NSApplicationWillTerminateNotification` won't being sent. With that out of our mind let's dive into using the above API.
 
 
 ### AppDelegate implementation
@@ -39,7 +39,7 @@ func applicationWillTerminate(_ aNotification: Notification) {
 } 
 {% endhighlight %}
 
-Unfortunately this won't work since, after all, the application will terminate. If your operation is taking enough time to finish you'll end up with a terminated process and no saved changes.
+<br />Unfortunately this won't work since, after all, the application will terminate. If your operation is taking enough time to finish you'll end up with a terminated process and no saved changes.
 
 To fix this we need to implement `applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply`.
 `NSApplication.TerminateReply` actually is an enum and can either be: 
@@ -47,7 +47,7 @@ To fix this we need to implement `applicationShouldTerminate(_ sender: NSApplica
 * terminateNow
 * terminateLater
 
-`terminateCancel` will stop the termination of the application. This isn't a pleasant user experience since the user wanted to quit you app. Interesting however is `terminateNow` and `terminateLater`. When you do not have any pending file changes you can quit right away by returning `terminateNow`, but when you do have changes `terminateLater` is what you want.
+<br />`terminateCancel` will stop the termination of the application. This isn't a pleasant user experience since the user wanted to quit you app. Interesting however is `terminateNow` and `terminateLater`. When you do not have any pending file changes you can quit right away by returning `terminateNow`, but when you do have changes `terminateLater` is what you want.
 
 Start by implementing something like the following logic in your AppDelegate:
 
@@ -62,7 +62,7 @@ func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.Termin
 }
 {% endhighlight %}
 
-When you run your app in this state and quit it with pending changes the application won't be terminated. Whats left is to tell the process when you actually finished your save operation in order to terminate the application.
+<br />When you run your app in this state and quit it with pending changes the application won't be terminated. Whats left is to tell the process when you actually finished your save operation in order to terminate the application.
 Luckily for us there is API to do exactly that: `NSApp.reply(toApplicationShouldTerminate: true)`.
 
 To round things up this is how your `savePendingChanges` method should look like:

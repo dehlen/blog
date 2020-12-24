@@ -19,20 +19,20 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
     options: .skipsHiddenFiles)
 {% endhighlight %}
 
-This works fine as long as you specify a folder outside of the applications sandbox. Every macOS application creates a sandbox with a dedicated *Documents* directory for example. 
-![Sandbox Directory](/Sandbox-Directory.png)
+<br />This works fine as long as you specify a folder outside of the applications sandbox. Every macOS application creates a sandbox with a dedicated *Documents* directory for example. 
+![Sandbox Directory](/static/Sandbox-Directory.png)
 But what about the users *Documents* directoy at `$HOME/Documents`? Trying to read files from this directory will yield an error. The user did not grant any permission to read this directory. This is great for us as a consumer but how do we deal with this from a developers perspective?
 
 ### Full-Disk Permission
 There are a handful of options we have right now. We could ask the user for Full-Disk Permission. This would certainly make our life easier, but lets be honest: We probably would delete the app right away as a consumer.
-![Full Disk Permission](/Full-Disk-Permission.png)
+![Full Disk Permission](/static/Full-Disk-Permission.png)
 
 ### Disabling Sandbox
 We could also disable the sandbox but then we won’t be able to sell our application through Apples Mac App Store (as stated above). So not a great option either.
 
 ### NSOpenPanel
 Next there is the possibility to ask the user for permission to access the specific folder before trying to read or write files. This actually is the right way to do it and `NSOpenPanel` already handles this for us. However to use this we need to configure our Xcode project first. Go to `General —> Target —> App Sandbox —> User Selected File` and select *Read/Write*.
-![Project Configuration](/Project-Configuration.png)
+![Project Configuration](/static/Project-Configuration.png)
 
 Xcode will now create an entitlements file and sets the correct .plist entries for you. To prompt the user to select a directory we now finally can request an `NSOpenPanel` like so:
 
@@ -53,7 +53,7 @@ func requestPermission(then handler: @escaping (URL?) -> Void) {
 }
 {% endhighlight %}
 
-Invoking the FileManager API after an user selected an URL in the presented `NSOpenPanel` will return the expected results. Yay!
+<br />Invoking the FileManager API after an user selected an URL in the presented `NSOpenPanel` will return the expected results. Yay!
 
 That’s it for todays post. Thank you very much for joining me on this and ... wait. Of course this wasn’t the whole thing. There has to be some caveat for making implementing sandbox on macOS a theme for a blog post, right? Actually the granted permission from the selected folder won’t be persisted. Whenever the application relaunches we will have to ask for permission again. The solution to this problem are `Security-Scoped Bookmarks`. At this point we probably already read the whole abstract on the macOS sandbox over at [App Sanbox Quick Start](https://developer.apple.com/library/archive/documentation/Security/Conceptual/AppSandboxDesignGuide/AboutAppSandbox/AboutAppSandbox.html), just to find this massive, complex abstract: 
 [App Sandbox in Depth](https://developer.apple.com/library/archive/documentation/Security/Conceptual/AppSandboxDesignGuide/AppSandboxInDepth/AppSandboxInDepth.html).
@@ -73,7 +73,7 @@ func saveBookmark(for url: URL) {
 }
 {% endhighlight %}
 
-You most certainly want to call this in the completion block of your `NSOpenPanel`. The returned data then can be stored in your persistent container. By calling this in the completion block of the `NSOpenPanel` we make sure the bookmark data will be written when we launch the application the next time.
+<br />You most certainly want to call this in the completion block of your `NSOpenPanel`. The returned data then can be stored in your persistent container. By calling this in the completion block of the `NSOpenPanel` we make sure the bookmark data will be written when we launch the application the next time.
 
 #### Reading and refreshing a bookmark
 Reading a bookmark is fairly simple as well. We can leverage an already existing initializer of `Foundation.URL`:
@@ -96,7 +96,7 @@ func restoreBookmark(with bookmarkData: Data) -> URL? {
 }
 {% endhighlight %}
 
-As I already mentioned a persisted bookmark can be marked as stale. When this happens we need to refresh it by invoking our `saveBookmark` function once again. At this point we are nearly finished, although the above solution still won’t work. In order to really access the bookmarked URL we need to start requesting access to it, before doing any read/write operation.
+<br />As I already mentioned a persisted bookmark can be marked as stale. When this happens we need to refresh it by invoking our `saveBookmark` function once again. At this point we are nearly finished, although the above solution still won’t work. In order to really access the bookmarked URL we need to start requesting access to it, before doing any read/write operation.
 
 ### Start / Stop Requesting Access
 When we’re ready to read files, we’ll have to wrap this in a pair of calls to signal that we want to access the resource:
@@ -109,13 +109,13 @@ if !url.startAccessingSecurityScopedResource() {
 // do your file operation
 {% endhighlight %}
 
-Here we call startAccessingSecurityScopedResource on the URL we’ve been given. This might return false  under a few conditions:
+<br />Here we call startAccessingSecurityScopedResource on the URL we’ve been given. This might return false  under a few conditions:
 
 * The user really doesn’t have access to this
 * The URL isn’t a security scoped URL
 * This directory doesn’t need it, f.e `$HOME/Downloads`
 
-In most situations, like accessing the Downloads folder, you are probably safe to just log the result, like in the code snippet above, and to continue.
+<br />In most situations, like accessing the Downloads folder, you are probably safe to just log the result, like in the code snippet above, and to continue.
 
 #### Providing a wrapper
 Of course we do not want to introduce code duplication into our perfectly structured, highly optimized codebase :) So it sounds like a good plan to introduce a wrapper in order to abstract this complexity away from our buisness logic. Also it might be a good idea to store bookmarks in a dictionary `[URL: Data]` to be able to store multiple bookmarks our application then has persisted access to. I published a gist at:
