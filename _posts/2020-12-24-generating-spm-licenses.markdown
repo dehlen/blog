@@ -2,7 +2,7 @@
 layout: post
 title:  "Generating licenses for SPM dependencies"
 date:   2020-12-24 22:15:00 +0100
-categories: swift, dev
+tags: ["swift", "dev"]
 ---
 
 # Generating licenses for SPM dependencies
