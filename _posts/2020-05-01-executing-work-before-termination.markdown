@@ -1,3 +1,4 @@
+---
 layout: post
 title:  "When your macOS application is about to quit"
 date:   2020-05-01 10:13:00 +0100
