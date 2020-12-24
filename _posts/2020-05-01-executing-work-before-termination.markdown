@@ -8,7 +8,7 @@ tags: ["swift", "dev", "macOS"]
 ## Executing work before the application quits
 
 A quick Google search on `NSApplication.TerminateReply` results in 328 results. I can't think of many search phrases which perform worse.
-![Google Search](/assets/NSApplication-TerminateReply-Google-Search.png)
+![Google Search]({{/assets/NSApplication-TerminateReply-Google-Search.png | absolute_url }})
 
 In my Text Editor *Caret* I am not able to use Apples `NSDocument` class, or at least, I found, it probably isn't the best idea for my use case. However `NSDocument` comes with a neat little feature I knew I needed to support: **Autosaving changes**. Whenever a user edits text in the text editor the changes should be reflected on disk. Of course I do everything to coordinate these file changes and to have a reliable mechanism but to be extra sure I wanted to save all pending file changes before the application quits. Turns out this is what `NSApplication.TerminateReply` is for.
 
