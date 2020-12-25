@@ -18,4 +18,4 @@ footer: 'follow me on <a href="https://twitter.com/da_eh">twitter</a><br>or subs
 
 # Build settings
 markdown: kramdown
-remote_theme: b2a3e8/jekyll-theme-console
+remote_theme: dehlen/jekyll-theme-console
