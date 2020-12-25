@@ -20,19 +20,29 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 {% endhighlight %}
 
 <br />This works fine as long as you specify a folder outside of the applications sandbox. Every macOS application creates a sandbox with a dedicated *Documents* directory for example. 
-![Sandbox Directory](/assets/Sandbox-Directory.png)
+
+{:refdef: style="text-align: center;"}
+![Sandbox Directory]({{ "/assets/Sandbox-Directory.png" | absolute_url }})
+{: refdef}
+
 But what about the users *Documents* directoy at `$HOME/Documents`? Trying to read files from this directory will yield an error. The user did not grant any permission to read this directory. This is great for us as a consumer but how do we deal with this from a developers perspective?
 
 ### Full-Disk Permission
 There are a handful of options we have right now. We could ask the user for Full-Disk Permission. This would certainly make our life easier, but lets be honest: We probably would delete the app right away as a consumer.
-![Full Disk Permission](/assets/Full-Disk-Permission.png)
+
+{:refdef: style="text-align: center;"}
+![Full Disk Permission]]({{ "/assets/Full-Disk-Permission.png" | absolute_url }})
+{: refdef}
 
 ### Disabling Sandbox
 We could also disable the sandbox but then we won’t be able to sell our application through Apples Mac App Store (as stated above). So not a great option either.
 
 ### NSOpenPanel
 Next there is the possibility to ask the user for permission to access the specific folder before trying to read or write files. This actually is the right way to do it and `NSOpenPanel` already handles this for us. However to use this we need to configure our Xcode project first. Go to `General —> Target —> App Sandbox —> User Selected File` and select *Read/Write*.
-![Project Configuration](/assets/Project-Configuration.png)
+
+{:refdef: style="text-align: center;"}
+![Project Configuration]({{ "/assets/Project-Configuration.png" | absolute_url }})
+{: refdef}
 
 Xcode will now create an entitlements file and sets the correct .plist entries for you. To prompt the user to select a directory we now finally can request an `NSOpenPanel` like so:
 
