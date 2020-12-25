@@ -31,7 +31,7 @@ But what about the users *Documents* directoy at `$HOME/Documents`? Trying to re
 There are a handful of options we have right now. We could ask the user for Full-Disk Permission. This would certainly make our life easier, but lets be honest: We probably would delete the app right away as a consumer.
 
 {:refdef: style="text-align: center;"}
-![Full Disk Permission]]({{ "/assets/Full-Disk-Permission.png" | absolute_url }})
+![Full Disk Permission]({{ "/assets/Full-Disk-Permission.png" | absolute_url }})
 {: refdef}
 
 ### Disabling Sandbox
