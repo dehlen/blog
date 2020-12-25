@@ -21,9 +21,7 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 
 <br />This works fine as long as you specify a folder outside of the applications sandbox. Every macOS application creates a sandbox with a dedicated *Documents* directory for example. 
 
-{:refdef: style="text-align: center;"}
-![Sandbox Directory]({{ "/assets/Sandbox-Directory.png" | absolute_url }})
-{: refdef}
+![Sandbox Directory]({{ "/assets/Sandbox-Directory.png" | absolute_url }}){:style="width: 100%"}
 
 But what about the users *Documents* directoy at `$HOME/Documents`? Trying to read files from this directory will yield an error. The user did not grant any permission to read this directory. This is great for us as a consumer but how do we deal with this from a developers perspective?
 
