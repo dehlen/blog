@@ -10,6 +10,7 @@ header_pages:
   - index.md
   - about.md
   - contact.md
+  - imprint.md
 
 style: dark
 listen_for_clients_preferred_style: true
