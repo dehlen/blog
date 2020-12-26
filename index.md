@@ -6,4 +6,4 @@ permalink: /
 
 # welcome
 
-I'm an iOS developer, I build [Secret Ingredient](https://dehlen.github.io/secretingredientapp/)! I also love sports and baking.
+My name is David and I work as an iOS developer. I build the [Secret Ingredient](https://dehlen.github.io/secretingredientapp/) app!
