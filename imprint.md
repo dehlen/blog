@@ -1,3 +1,9 @@
+---
+title: /imprint
+layout: page
+permalink: /imprint
+---
+
 # imprint
 
 David von Knobelsdorff
