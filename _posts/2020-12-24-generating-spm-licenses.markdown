@@ -54,7 +54,7 @@ $ mint install dehlen/SPMLicenses
 
 <br />
 {% highlight sh %}
-if which tribute >/dev/null; then
+if which spm-licenses >/dev/null; then
  spm-licenses <path to .xcworkspace> <output.json> <optional GitHub client id> <optional GitHub client secret>
 else
   echo "warning: SPMLicenses not installed, download from https://github.com/dehlen/SPMLicenses"
