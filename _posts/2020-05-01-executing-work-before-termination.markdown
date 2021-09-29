@@ -71,7 +71,7 @@ To round things up this is how your `savePendingChanges` method should look like
 
 {% highlight swift %}
 func savePendingChanges() {
-    doSomeWork() {
+    doSomeWork {
         NSApp.reply(toApplicationShouldTerminate: true)
     }
 }
