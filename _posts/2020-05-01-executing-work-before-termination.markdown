@@ -55,12 +55,12 @@ Start by implementing something like the following logic in your AppDelegate:
 
 {% highlight swift %}
 func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-	if hasPendingChanges {
-	  savePendingChanges()
-		return .terminateLater
-	}
+    if hasPendingChanges {
+        savePendingChanges()
+	return .terminateLater
+    }
 
-	return .terminateNow
+    return .terminateNow
 }
 {% endhighlight %}
 
@@ -71,8 +71,9 @@ To round things up this is how your `savePendingChanges` method should look like
 
 {% highlight swift %}
 func savePendingChanges() {
-	doSomeWork()
-	NSApp.reply(toApplicationShouldTerminate: true)
+    doSomeWork() {
+        NSApp.reply(toApplicationShouldTerminate: true)
+    }
 }
 {% endhighlight %}
 
