@@ -281,6 +281,7 @@ DEPENDENCIES
   github-pages
   jekyll-feed (~> 0.6)
   jekyll-theme-console (> 0)
+  nokogiri (>= 1.13.4)
   tzinfo-data
 
 BUNDLED WITH
