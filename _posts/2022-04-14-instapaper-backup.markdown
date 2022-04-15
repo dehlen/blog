@@ -7,11 +7,11 @@ tags: [dev", "instapaper", "reading"]
 
 ## What and why?
 
-I try to follow a lot of newsfeeds during a typical week. Most of these are of technical nature but I also enjoy some chess content as well. Typically I do not have enough time to dive deep into an article whenever I discover something interesting. Therefore I am a long time user of Instapaper, a read-it-later service you probably already have heard of. In the course of the last few years I saved multiple thousand articles there. When GDPR came around Instapaper was not accessible for a long time in Europe which led me to look around for different solutions. However none of the other solutions really did it for me (Pocket f.e) which is why I started to create my own project. Couple of years forward and I have multiple GitHub repositories with better and worse implementations of a read-it-later app. One of these implementations (Reading Time) even was available on the App Store for a couple of months but I realized that it was to much effort for me to maintain this app. Meanwhile Instapaper became available in Europe again and I figured there wasn't an alternative I liked better. Since Instapaper has an export feature and I wanted to prevent to lose all my saved articles whenever Instapaper would close its doors I would regularly login to the Instapaper website, download a csv dump of my saved articles and persist this in a private GitHub repository of mine. This however was a cumbersome process to say the least. 
+<br />I try to follow a lot of newsfeeds during a typical week. Most of these are of technical nature but I also enjoy some chess content as well. Typically I do not have enough time to dive deep into an article whenever I discover something interesting. Therefore I am a long time user of Instapaper, a read-it-later service you probably already have heard of. In the course of the last few years I saved multiple thousand articles there. When GDPR came around Instapaper was not accessible for a long time in Europe which led me to look around for different solutions. However none of the other solutions really did it for me (Pocket f.e) which is why I started to create my own project. Couple of years forward and I have multiple GitHub repositories with better and worse implementations of a read-it-later app. One of these implementations (Reading Time) even was available on the App Store for a couple of months but I realized that it was to much effort for me to maintain this app. Meanwhile Instapaper became available in Europe again and I figured there wasn't an alternative I liked better. Since Instapaper has an export feature and I wanted to prevent to lose all my saved articles whenever Instapaper would close its doors I would regularly login to the Instapaper website, download a csv dump of my saved articles and persist this in a private GitHub repository of mine. This however was a cumbersome process to say the least. 
 
 ## The Solution
 
-So I knew I wanted to use Instapaper and I wanted to export my saved articles on a regular basis to make sure I wouldn't loose any of my link history. I figured GitHub Actions would be ideal to do exactly that and as a bonus are completely free. To create a GitHub action you need to create a new yaml configuration in `your-repo/.github/workflows/your-workflow-name.yml`. For me this looks like this:
+<br />So I knew I wanted to use Instapaper and I wanted to export my saved articles on a regular basis to make sure I wouldn't loose any of my link history. I figured GitHub Actions would be ideal to do exactly that and as a bonus are completely free. To create a GitHub action you need to create a new yaml configuration in `your-repo/.github/workflows/your-workflow-name.yml`. For me this looks like this:<br />
 
 {% highlight yml %}
 name: Instapaper Export
@@ -50,14 +50,14 @@ jobs:
         git push origin master
 {% endhighlight %}
 
-The cron parameter specifies that this action runs daily at midnight. To login into Instapaper I need my password which is passed via a secret environment variable. You can specifiy those in your repos settings. Last but not least the workflow runs my python script export-instapaper.py and pushes any changed files to remote.
+<br />The cron parameter specifies that this action runs daily at midnight. To login into Instapaper I need my password which is passed via a secret environment variable. You can specifiy those in your repos settings. Last but not least the workflow runs my python script export-instapaper.py and pushes any changed files to remote.<br />
 
-GitHub Actions made this automation super simple and I highly recommend checking it out if you haven't. You even get an E-Mail notification if an action should fail.
+<br />GitHub Actions made this automation super simple and I highly recommend checking it out if you haven't. You even get an E-Mail notification if an action should fail.
 
 ## The actual script & archiving
 
-What is left is the implementation of the actual Script. Probably this is what you came for, right?
-Without any further ado here it is:
+<br />What is left is the implementation of the actual Script. Probably this is what you came for, right?
+Without any further ado here it is:<br />
 
 {% highlight python %}
 #!/usr/bin/env python3
@@ -155,9 +155,10 @@ file.write(new_content)
 file.close()    
 {% endhighlight %}
 
-Basically this authenticates on the Instapaper website and triggers the export endpoint via HTTP POST. 
+<br />Basically this authenticates on the Instapaper website and triggers the export endpoint via HTTP POST. 
 
-As a bonus I added a command line argument "archive". If present the script will compare the exported links to links exported previously. All newly added urls are saved to the [Internet Archive](https://archive.org) via the third-party library [waybackpy](https://github.com/akamhy/waybackpy). This way even if Instapaper shuts down I have a complete list of all articles I read or want to read and I will also find a snapshot of the website on the internet archive if one of the articles isn't reachable anymore.
+<br />As a bonus I added a command line argument "archive". If present the script will compare the exported links to links exported previously. All newly added urls are saved to the [Internet Archive](https://archive.org) via the third-party library [waybackpy](https://github.com/akamhy/waybackpy). This way even if Instapaper shuts down I have a complete list of all articles I read or want to read and I will also find a snapshot of the website on the internet archive if one of the articles isn't reachable anymore.
 
 ## Conclusion
-This script is running for a couple of days now and I had no trouble since. I am pretty happy with the workflow now and use Instapaper on a daily basis without worrying over loosing all my links or being unable to read an article because the website shut down or the article was deleted. If you want to try it yourself I am happy to hear from you. 
+
+<br />This script is running for a couple of days now and I had no trouble since. I am pretty happy with the workflow now and use Instapaper on a daily basis without worrying over loosing all my links or being unable to read an article because the website shut down or the article was deleted. If you want to try it yourself I am happy to hear from you. 
