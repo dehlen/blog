@@ -153,13 +153,18 @@ if args.archive:
 
 file = open('instapaper-export.csv', 'w')
 file.write(new_content)
-file.close()    
+file.close()
+
+html_file = open('instapaper-export.html', 'w')
+html_file.write(export_instapaper(fmt='html'))
+html_file.close()
 {% endhighlight %}
 
-<br />Basically this authenticates on the Instapaper website and triggers the export endpoint via HTTP POST. 
+<br />Basically this authenticates on the Instapaper website, grabs the form field "form_key" (some csrf token) and triggers the export endpoint via HTTP POST. 
 
 <br />As a bonus I added a command line argument "archive". If present the script will compare the exported links to links exported previously. All newly added urls are saved to the [Internet Archive](https://archive.org) via the third-party library [waybackpy](https://github.com/akamhy/waybackpy). This way even if Instapaper shuts down I have a complete list of all articles I read or want to read and I will also find a snapshot of the website on the internet archive if one of the articles isn't reachable anymore.
 
+Last but not least I also export all links in the HTML format Instapaper offers to maximize compatibility with other services (f.e Pocker only allows to import Instapaper articles from an HTML export).
 ## Conclusion
 
 <br />This script is running for a couple of days now and I had no trouble since. I am pretty happy with the workflow now and use Instapaper on a daily basis without worrying over loosing all my links or being unable to read an article because the website shut down or the article was deleted. If you want to try it yourself I am happy to hear from you. 
