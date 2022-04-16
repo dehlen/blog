@@ -48,8 +48,7 @@ jobs:
     - name: commit
       run: |
         git add -A
-        git commit -m "update instapaper export"
-        git push origin master
+        (git commit -m "update instapaper export" && git push origin master) || echo "No changes to commit"
 {% endhighlight %}
 
 <br />The cron parameter specifies that this action runs daily at midnight. To login into Instapaper I need my password which is passed via a secret environment variable. You can specifiy those in your repos settings. Last but not least the workflow runs my python script export-instapaper.py and pushes any changed files to remote.<br />
