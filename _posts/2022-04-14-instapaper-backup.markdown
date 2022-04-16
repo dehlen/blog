@@ -53,11 +53,11 @@ jobs:
 
 <br />The cron parameter specifies that this action runs daily at midnight. To login into Instapaper I need my password which is passed via a secret environment variable. You can specifiy those in your repos settings. Last but not least the workflow runs my python script export-instapaper.py and pushes any changed files to remote.<br />
 
-<br />GitHub Actions made this automation super simple and I highly recommend checking it out if you haven't. You even get an E-Mail notification if an action should fail.
+<br />GitHub Actions made this automation super simple and I highly recommend checking it out if you haven't. You even get an E-Mail notification should an action fail.
 
 ## The actual script & archiving
 
-<br />What is left is the implementation of the actual Script. Probably this is what you came for, right?
+<br />What is left is the implementation of the actual script. Probably this is what you came for, right?
 Without any further ado here it is:<br />
 
 {% highlight python %}
