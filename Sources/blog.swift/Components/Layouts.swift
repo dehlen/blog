@@ -49,6 +49,20 @@ extension Layout {
                     meta(content: "width=device-width, initial-scale=1.0", name: "viewport")
 
                     meta(content: "interest-cohort=()", httpEquiv: "Permissions-Policy")
+                    
+                    (page as? Post).map { post -> Node in
+                        return .fragment([
+                            meta(content: "summary", name: "twitter:card"),
+                            meta(content: "@da_eh", name: "twitter:site"),
+                            meta(content: post.title, name: "twitter:title"),
+                            post.image.map {
+                                meta(content: "https://davidvonk.dev" + $0, name: "twitter:image")
+                            },
+                            post.description.map {
+                                meta(content: $0, name: "twitter:description")
+                            }
+                        ].compactMap { $0 })
+                    } ?? []
 
                     link(href: "/atom.xml", rel: "alternate", title: "RSS Feed for davidvonk.dev", type: "application/atom+xml")
                     link(href: "https://chaos.social/@dvk", rel: "me")
