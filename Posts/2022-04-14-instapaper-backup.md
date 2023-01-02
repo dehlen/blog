@@ -1,7 +1,7 @@
 ---
 color: 1392DB
 date: 2022-04-14T13:48:00Z
-description: A quick overview how to generate licenses for SPM dependencies
+description: Describing my workflow how to automate backing up my saved articles from Instapaper
 project: true
 title: Backing up my saved articles
 category: automation
