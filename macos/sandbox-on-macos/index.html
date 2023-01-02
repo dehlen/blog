@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<title>
+			Sandbox on macOS
+			– davidvonk.dev
+		</title>
+		<style>
+			* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: -apple-system, BlinkMacSystemFont, "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif;
+    font-weight: 300;
+    font-size: 20px;
+    line-height: 40px;
+
+    color: rgba(13, 13, 13, 1);
+    background-color: rgba(250, 250, 250, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        color: rgba(250, 250, 250, 1);
+        background-color: rgba(74, 74, 77, 1);
+    }
+
+    a {
+        color: rgba(118, 199, 245, 1);
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+        line-height: 30px;
+    }
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    -webkit-text-size-adjust: 100%;
+}
+
+article header, h1, h2, h3, h4 {
+    font-weight: 400;
+    color: rgba(64, 64, 64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    article header, h1, h2, h3, h4 {
+        color: rgba(240, 240, 240, 1);
+    }
+}
+
+article header, h1 {
+    font-size: 1.5rem;
+}
+
+article header h1 {
+    display: inline;
+}
+
+h2 {
+    font-size: 1.4rem;
+}
+
+article header, h1, h2 {
+    margin: 1.25rem 0;
+    line-height: 2.5rem;
+}
+
+h3 {
+    line-height: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.625rem;
+}
+
+h1 a, h2 a, h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover {
+    color: rgba(13, 13, 13, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    h1 a:hover, h2 a:hover, h3 a:hover {
+        color: rgba(250, 250, 250, 1);
+    }
+}
+
+p, blockquote, ul, ol, details {
+    -webkit-hyphens: auto;
+    hanging-punctuation: first;
+    hyphens: auto;
+    margin-bottom: 1.25rem;
+}
+
+details {
+    background-color: rgba(0, 0, 0, 0.1);
+    background-blend-mode: darken;
+
+    padding: 1rem;
+    margin: -0.5rem 0 1.25rem -0.5rem;
+    border-radius: 4px;
+}
+
+details summary {
+    cursor: pointer;
+}
+
+details summary + * {
+    margin-top: 0.75rem;
+}
+
+li {
+    margin-bottom: 0.625rem;
+}
+
+p:last-child, blockquote:last-child, ul:last-child, ol:last-child, li:last-child, details:last-child {
+    margin-bottom: 0;
+}
+
+blockquote {
+    border-left: 0.25rem solid rgba(13, 13, 13, 0.5);
+    padding-left: 0.75rem;
+    padding-right: 1.5rem;
+}
+
+/* Layout */
+
+#header {
+    margin-top: 1.25rem;
+}
+
+#content {
+    margin-bottom: 2.5rem;
+}
+
+#header, #content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+}
+
+#header > *, #content > * {
+    width: 40rem;
+    max-width: 100vw;
+    max-width: calc(100vw - 2.5rem);
+}
+
+/* Articles */
+
+article {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin-bottom: 5rem;
+}
+
+article:last-child {
+    margin-bottom: 0;
+}
+
+article .image, article img {
+    align-self: center;
+    max-width: 100vw;
+}
+
+article .embed {
+    display: block;
+    align-self: center;
+
+    background-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 3px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    display: inline-block;
+    margin: 1.25rem 0;
+    position: relative;
+    width: 100%;
+}
+
+article .embed:after {
+    padding-top: 56.25%;
+    display: block;
+    content: '';
+}
+
+article .embed iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+article .spotify.embed {
+    width: 80%;
+}
+
+article .spotify.embed:after {
+    padding-top: calc(80px);
+}
+
+article .large.spotify.embed:after {
+    padding-top: calc(100% + 80px);
+}
+
+article .left {
+    float: left;
+    margin-right: 1.25rem;
+}
+
+article .right {
+    float: right;
+    margin-left: 1.25rem;
+}
+
+article ul {
+    list-style: none;
+}
+
+article ul li {
+    position: relative;
+}
+
+article ul li:before {
+    color: inherit;
+    content: "‣";
+    display: inline-block;
+    left: -0.7rem;
+    width: 0.7rem;
+
+    position: absolute;
+    top: -1px;
+}
+
+article ol {
+    counter-reset: list-counter 0;
+}
+
+article ol li {
+    counter-increment: list-counter;
+    list-style-type: none;
+    margin-left: 2rem;
+    position: relative;
+}
+
+article ol li:before {
+    text-align: right;
+    content: counter(list-counter) ".";
+    font-variant-numeric: tabular-nums;
+    left: -3.0rem;
+    width: 2.7rem;
+    overflow: visible;
+
+    position: absolute;
+}
+
+article code, article pre {
+    font-family: "SF Mono", monospace;
+    font-weight: 300;
+    font-size: 0.85rem;
+    line-height: 1.25rem !important;
+}
+
+article .highlight {
+    background-color: rgba(30, 30, 30, 1);
+    border-radius: 4px;
+    overflow-x: scroll;
+    padding: 1rem;
+    color: white;
+    margin: -0.5rem 0 1.25rem -0.5rem;
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<header id="header">
+			<nav id="navigation">
+				<style>
+					#navigation {
+    margin: 1.25rem 0;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+#navigation h1, #navigation li {
+    font-size: 1rem;
+    display: inline-block;
+    line-height: 2rem;
+    margin: 0;
+}
+
+#navigation li {
+    list-style-type: none;
+    margin-left: 0.625rem;
+}
+
+#navigation a {
+    text-decoration: none;
+}
+
+				</style>
+				<h1>
+					<a href="/">davidvonk.dev</a>
+				</h1>
+				<ul>
+					<li>
+						<a href="/about">About Me</a>
+					</li>
+					<li>
+						<a href="/archive">Archive</a>
+					</li>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+		<section id="content">
+			<article>
+				<header>
+					<h1>
+						<a href="/macos/sandbox-on-macos">Sandbox on macOS</a>
+					</h1>
+				</header>
+				<h2>
+					File System access in a sandboxed macOS application
+				</h2>
+				<p>
+					While the sandbox is great for consumers and the overall security on Apples platforms it can be quite frustrating to deal with. On macOS, in comparison to iOS, this gets even worse since you are more likely to deal with the file system and other sandbox related resources of the system. Unfortunately as soon as you plan to sell your application in the Mac App Store this is the only option you have. Part of developing my upcoming Text Editor <em>Caret</em> was to read and write markdown and plain text files from/to disk so doing the whole sandbox dance was without any alternative.
+				</p>
+				<h3>
+					How hard can it be?
+				</h3>
+				<p>
+					First things first you probably start by looking into the <a href="https://developer.apple.com/documentation/foundation/filemanager">FileManager</a> API to access the file system. By quickly browsing through the available API it looks like we are in the right spot for our requirement. 🔋 Batteries included. To get a list of files in a specific folder one only has to write these simple couple of lines, right?:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">let url = URL(fileURLWithPath: &amp;quot;/path/to/folder&amp;quot;) 
+let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
+    includingPropertiesForKeys: nil,
+    options: .skipsHiddenFiles)
+</code></pre>
+				</figure>
+				<p>
+					This works fine as long as you specify a folder outside of the applications sandbox. Every macOS application creates a sandbox with a dedicated <em>Documents</em> directory for example.
+				</p>
+				<div class="image">
+					<img alt="An image of a Finder window showing the sandbox directories content." loading="lazy" src="/img/sandbox/Sandbox-Directory.png" width="463.5"/>
+				</div>
+				<p>
+					But what about the users <em>Documents</em> directoy at <code>$HOME/Documents</code>? Trying to read files from this directory will yield an error. The user did not grant any permission to read this directory. This is great for us as a consumer but how do we deal with this from a developers perspective?
+				</p>
+				<h3>
+					Full-Disk Permission
+				</h3>
+				<p>
+					There are a handful of options we have right now. We could ask the user for Full-Disk Permission. This would certainly make our life easier, but lets be honest: We probably would delete the app right away as a consumer.
+				</p>
+				<div class="image">
+					<img alt="An image of System settings showing how to configure the full disk permission setting." loading="lazy" src="/img/sandbox/Full-Disk-Permission.png" width="463.5"/>
+				</div>
+				<h3>
+					Disabling Sandbox
+				</h3>
+				<p>
+					We could also disable the sandbox but then we won’t be able to sell our application through Apples Mac App Store (as stated above). So not a great option either.
+				</p>
+				<h3>
+					NSOpenPanel
+				</h3>
+				<p>
+					Next there is the possibility to ask the user for permission to access the specific folder before trying to read or write files. This actually is the right way to do it and <code>NSOpenPanel</code> already handles this for us. However to use this we need to configure our Xcode project first. Go to <code>General —&amp;gt; Target —&amp;gt; App Sandbox —&amp;gt; User Selected File</code> and select <em>Read/Write</em>.
+				</p>
+				<div class="image">
+					<img alt="An image of an Xcode project showing how to configure the project to read and write files." loading="lazy" src="/img/sandbox/Project-Configuration.png" width="463.5"/>
+				</div>
+				<p>
+					Xcode will now create an entitlements file and sets the correct .plist entries for you. To prompt the user to select a directory we now finally can request an <code>NSOpenPanel</code> like so:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">func requestPermission(then handler: @escaping (URL?) -&amp;gt; Void) {
+    let openPanel = NSOpenPanel()
+    openPanel.message = &amp;quot;Choose your directory&amp;quot;
+    openPanel.prompt = &amp;quot;Choose&amp;quot;
+    openPanel.allowsMultipleSelection = false
+    openPanel.canChooseDirectories = true
+    openPanel.canCreateDirectories = true
+    openPanel.canChooseFiles = false
+    openPanel.begin { (result) -&amp;gt; Void in
+        if result == .OK {
+            handler(openPanel.urls.first)
+        }
+    }
+}
+</code></pre>
+				</figure>
+				<p>
+					Invoking the FileManager API after an user selected an URL in the presented <code>NSOpenPanel</code> will return the expected results. Yay!
+				</p>
+				<p>
+					That’s it for todays post. Thank you very much for joining me on this and ... wait. Of course this wasn’t the whole thing. There has to be some caveat for making implementing sandbox on macOS a theme for a blog post, right? Actually the granted permission from the selected folder won’t be persisted. Whenever the application relaunches we will have to ask for permission again. The solution to this problem are <code>Security-Scoped Bookmarks</code>. At this point we probably already read the whole abstract on the macOS sandbox over at <a href="https://developer.apple.com/library/archive/documentation/Security/Conceptual/AppSandboxDesignGuide/AboutAppSandbox/AboutAppSandbox.html">App Sanbox Quick Start</a>, just to find this massive, complex abstract:
+					<a href="https://developer.apple.com/library/archive/documentation/Security/Conceptual/AppSandboxDesignGuide/AppSandboxInDepth/AppSandboxInDepth.html">App Sandbox in Depth</a>.
+				</p>
+				<p>
+					Luckily for you, you can just proceed reading this blog post to get the gist of it and to finally implement macOS sandboxing (for real!).
+				</p>
+				<h3>
+					Security-Scoped Bookmarks
+				</h3>
+				<p>
+					The concept is fairly simple. Whenever you get access to a new location outside of your apps sandbox you want to store the URL as serialized data in a persistent store(UserDefaults/.plist are good options here). When the application is launched we try to read back the saved data. In practice URL bookmarks can be marked as stale and they need to be refreshed. Your implementation will need to handle this case, otherwise the bookmark will be unusable at some point.
+				</p>
+				<h4>
+					Storing a bookmark
+				</h4>
+				<p>
+					To store a bookmark we will use
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">func saveBookmark(for url: URL) {
+    let data = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+    // persist data somewhere
+}
+</code></pre>
+				</figure>
+				<p>
+					You most certainly want to call this in the completion block of your <code>NSOpenPanel</code>. The returned data then can be stored in your persistent container. By calling this in the completion block of the <code>NSOpenPanel</code> we make sure the bookmark data will be written when we launch the application the next time.
+				</p>
+				<h4>
+					Reading and refreshing a bookmark
+				</h4>
+				<p>
+					Reading a bookmark is fairly simple as well. We can leverage an already existing initializer of <code>Foundation.URL</code>:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">func restoreBookmark(with bookmarkData: Data) -&amp;gt; URL? {
+	do {
+		var isStale = false
+		let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &amp;amp;isStale)
+
+		if isStale {
+	  	saveBookmark(for: url)
+		}
+		
+		return url
+	} catch {
+		debugPrint(error)
+		return nil
+	}
+}
+</code></pre>
+				</figure>
+				<p>
+					As I already mentioned a persisted bookmark can be marked as stale. When this happens we need to refresh it by invoking our <code>saveBookmark</code> function once again. At this point we are nearly finished, although the above solution still won’t work. In order to really access the bookmarked URL we need to start requesting access to it, before doing any read/write operation.
+				</p>
+				<h3>
+					Start / Stop Requesting Access
+				</h3>
+				<p>
+					When we’re ready to read files, we’ll have to wrap this in a pair of calls to signal that we want to access the resource:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">defer { url.stopAccessingSecurityScopedResource() }
+if !url.startAccessingSecurityScopedResource() {
+    print(&amp;quot;startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?&amp;quot;)
+}
+// do your file operation
+</code></pre>
+				</figure>
+				<p>
+					Here we call startAccessingSecurityScopedResource on the URL we’ve been given. This might return false  under a few conditions:
+				</p>
+				<ul>
+					<li>
+						<p>
+							The user really doesn’t have access to this
+						</p>
+					</li>
+					<li>
+						<p>
+							The URL isn’t a security scoped URL
+						</p>
+					</li>
+					<li>
+						<p>
+							This directory doesn’t need it, f.e <code>$HOME/Downloads</code></p>
+					</li>
+				</ul>
+				<p>
+					In most situations, like accessing the Downloads folder, you are probably safe to just log the result, like in the code snippet above, and to continue.
+				</p>
+				<h4>
+					Providing a wrapper
+				</h4>
+				<p>
+					Of course we do not want to introduce code duplication into our perfectly structured, highly optimized codebase :) So it sounds like a good plan to introduce a wrapper in order to abstract this complexity away from our buisness logic. Also it might be a good idea to store bookmarks in a dictionary <code>[URL: Data]</code> to be able to store multiple bookmarks our application then has persisted access to. I published a gist at:
+					<a href="https://gist.github.com/dehlen/1fce47792bc4ef676557947895be2ccd">SandboxDirectoryAccess.swift</a> and I invite you to use it, no questions asked.
+				</p>
+				<h3>
+					Conclusion
+				</h3>
+				<p>
+					When you made it that far, congratulations. You earned yourself some time to take a break.
+					
+					However at some point you probably want to start to comply with Apples recommendation and wrap all your file system calls in a <a href="https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileCoordinators/FileCoordinators.html">FileCoordinator</a> to make sure your read and write operations are properly coordinated throughout the system. I’ll provide an extensive guide on this topic on another day.
+				</p>
+				<small>Posted
+					<time><time datetime="2020-04-30">April 30, 2020</time></time>
+					in
+					<a href="/macos">macos</a></small>
+			</article>
+		</section>
+	</body>
+</html>

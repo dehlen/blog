@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<title>
+			When your macOS application is about to quit
+			– davidvonk.dev
+		</title>
+		<style>
+			* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-family: -apple-system, BlinkMacSystemFont, "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif;
+    font-weight: 300;
+    font-size: 20px;
+    line-height: 40px;
+
+    color: rgba(13, 13, 13, 1);
+    background-color: rgba(250, 250, 250, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+        color: rgba(250, 250, 250, 1);
+        background-color: rgba(74, 74, 77, 1);
+    }
+
+    a {
+        color: rgba(118, 199, 245, 1);
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+        line-height: 30px;
+    }
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    -webkit-text-size-adjust: 100%;
+}
+
+article header, h1, h2, h3, h4 {
+    font-weight: 400;
+    color: rgba(64, 64, 64, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    article header, h1, h2, h3, h4 {
+        color: rgba(240, 240, 240, 1);
+    }
+}
+
+article header, h1 {
+    font-size: 1.5rem;
+}
+
+article header h1 {
+    display: inline;
+}
+
+h2 {
+    font-size: 1.4rem;
+}
+
+article header, h1, h2 {
+    margin: 1.25rem 0;
+    line-height: 2.5rem;
+}
+
+h3 {
+    line-height: 1.25rem;
+    margin-top: 1.25rem;
+    margin-bottom: 0.625rem;
+}
+
+h1 a, h2 a, h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover {
+    color: rgba(13, 13, 13, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    h1 a:hover, h2 a:hover, h3 a:hover {
+        color: rgba(250, 250, 250, 1);
+    }
+}
+
+p, blockquote, ul, ol, details {
+    -webkit-hyphens: auto;
+    hanging-punctuation: first;
+    hyphens: auto;
+    margin-bottom: 1.25rem;
+}
+
+details {
+    background-color: rgba(0, 0, 0, 0.1);
+    background-blend-mode: darken;
+
+    padding: 1rem;
+    margin: -0.5rem 0 1.25rem -0.5rem;
+    border-radius: 4px;
+}
+
+details summary {
+    cursor: pointer;
+}
+
+details summary + * {
+    margin-top: 0.75rem;
+}
+
+li {
+    margin-bottom: 0.625rem;
+}
+
+p:last-child, blockquote:last-child, ul:last-child, ol:last-child, li:last-child, details:last-child {
+    margin-bottom: 0;
+}
+
+blockquote {
+    border-left: 0.25rem solid rgba(13, 13, 13, 0.5);
+    padding-left: 0.75rem;
+    padding-right: 1.5rem;
+}
+
+/* Layout */
+
+#header {
+    margin-top: 1.25rem;
+}
+
+#content {
+    margin-bottom: 2.5rem;
+}
+
+#header, #content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+}
+
+#header > *, #content > * {
+    width: 40rem;
+    max-width: 100vw;
+    max-width: calc(100vw - 2.5rem);
+}
+
+/* Articles */
+
+article {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin-bottom: 5rem;
+}
+
+article:last-child {
+    margin-bottom: 0;
+}
+
+article .image, article img {
+    align-self: center;
+    max-width: 100vw;
+}
+
+article .embed {
+    display: block;
+    align-self: center;
+
+    background-color: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 3px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    display: inline-block;
+    margin: 1.25rem 0;
+    position: relative;
+    width: 100%;
+}
+
+article .embed:after {
+    padding-top: 56.25%;
+    display: block;
+    content: '';
+}
+
+article .embed iframe {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+article .spotify.embed {
+    width: 80%;
+}
+
+article .spotify.embed:after {
+    padding-top: calc(80px);
+}
+
+article .large.spotify.embed:after {
+    padding-top: calc(100% + 80px);
+}
+
+article .left {
+    float: left;
+    margin-right: 1.25rem;
+}
+
+article .right {
+    float: right;
+    margin-left: 1.25rem;
+}
+
+article ul {
+    list-style: none;
+}
+
+article ul li {
+    position: relative;
+}
+
+article ul li:before {
+    color: inherit;
+    content: "‣";
+    display: inline-block;
+    left: -0.7rem;
+    width: 0.7rem;
+
+    position: absolute;
+    top: -1px;
+}
+
+article ol {
+    counter-reset: list-counter 0;
+}
+
+article ol li {
+    counter-increment: list-counter;
+    list-style-type: none;
+    margin-left: 2rem;
+    position: relative;
+}
+
+article ol li:before {
+    text-align: right;
+    content: counter(list-counter) ".";
+    font-variant-numeric: tabular-nums;
+    left: -3.0rem;
+    width: 2.7rem;
+    overflow: visible;
+
+    position: absolute;
+}
+
+article code, article pre {
+    font-family: "SF Mono", monospace;
+    font-weight: 300;
+    font-size: 0.85rem;
+    line-height: 1.25rem !important;
+}
+
+article .highlight {
+    background-color: rgba(30, 30, 30, 1);
+    border-radius: 4px;
+    overflow-x: scroll;
+    padding: 1rem;
+    color: white;
+    margin: -0.5rem 0 1.25rem -0.5rem;
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<header id="header">
+			<nav id="navigation">
+				<style>
+					#navigation {
+    margin: 1.25rem 0;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
+#navigation h1, #navigation li {
+    font-size: 1rem;
+    display: inline-block;
+    line-height: 2rem;
+    margin: 0;
+}
+
+#navigation li {
+    list-style-type: none;
+    margin-left: 0.625rem;
+}
+
+#navigation a {
+    text-decoration: none;
+}
+
+				</style>
+				<h1>
+					<a href="/">davidvonk.dev</a>
+				</h1>
+				<ul>
+					<li>
+						<a href="/about">About Me</a>
+					</li>
+					<li>
+						<a href="/archive">Archive</a>
+					</li>
+					<li>
+						<a href="/atom.xml">RSS</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+		<section id="content">
+			<article>
+				<header>
+					<h1>
+						<a href="/macos/when-your-macos-application-is-about-to-quit">When your macOS application is about to quit</a>
+					</h1>
+				</header>
+				<h2>
+					Executing work before the application quits
+				</h2>
+				<p>
+					A quick Google search on <code>NSApplication.TerminateReply</code> results in 328 results. I can't think of many search phrases which perform worse.
+				</p>
+				<div class="image">
+					<img alt="An image showing a google search for NSApplication.TerminateReply." loading="lazy" src="/img/terminate-reply/NSApplication-TerminateReply-Google-Search.png" width="463.5"/>
+				</div>
+				<p>
+					In my Text Editor <em>Caret</em> I am not able to use Apples <code>NSDocument</code> class, or at least, I found, it probably isn't the best idea for my use case. However <code>NSDocument</code> comes with a neat little feature I knew I needed to support: <strong>Autosaving changes</strong>. Whenever a user edits text in the text editor the changes should be reflected on disk. Of course I do everything to coordinate these file changes and to have a reliable mechanism but to be extra sure I wanted to save all pending file changes before the application quits. Turns out this is what <code>NSApplication.TerminateReply</code> is for.
+				</p>
+				<h3>
+					Info.plist setup
+				</h3>
+				<p>
+					First you most certainly want to set the following key in your <code>Info.plist</code>:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-xml">&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;
+&amp;lt;plist version=&amp;quot;1.0&amp;quot;&amp;gt;
+&amp;lt;dict&amp;gt;
+	&amp;lt;key&amp;gt;NSSupportsSuddenTermination&amp;lt;/key&amp;gt;
+	&amp;lt;false/&amp;gt;
+&amp;lt;/dict&amp;gt;
+&amp;lt;/plist&amp;gt;
+</code></pre>
+				</figure>
+				<p>
+					Otherwise it can happen that <code>applicationShouldTerminate</code> won't being called and <code>NSApplicationWillTerminateNotification</code> won't being sent. With that out of our mind let's dive into using the above API.
+				</p>
+				<h3>
+					AppDelegate implementation
+				</h3>
+				<p>
+					You might start by doing all your saving logic in
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">func applicationWillTerminate(_ aNotification: Notification) {
+  // Insert code here to tear down your application
+} 
+</code></pre>
+				</figure>
+				<p>
+					Unfortunately this won't work since, after all, the application will terminate. If your operation is taking enough time to finish you'll end up with a terminated process and no saved changes.
+				</p>
+				<p>
+					To fix this we need to implement <code>applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply</code>.
+					<code>NSApplication.TerminateReply</code> actually is an enum and can either be:
+				</p>
+				<ul>
+					<li>
+						<p>
+							terminateCancel
+						</p>
+					</li>
+					<li>
+						<p>
+							terminateNow
+						</p>
+					</li>
+					<li>
+						<p>
+							terminateLater
+						</p>
+					</li>
+				</ul>
+				<p><code>terminateCancel</code> will stop the termination of the application. This isn't a pleasant user experience since the user wanted to quit you app. Interesting however is <code>terminateNow</code> and <code>terminateLater</code>. When you do not have any pending file changes you can quit right away by returning <code>terminateNow</code>, but when you do have changes <code>terminateLater</code> is what you want.
+				</p>
+				<p>
+					Start by implementing something like the following logic in your AppDelegate:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">func applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply {
+    if hasPendingChanges {
+        savePendingChanges()
+	return .terminateLater
+    }
+
+    return .terminateNow
+}
+</code></pre>
+				</figure>
+				<p>
+					When you run your app in this state and quit it with pending changes the application won't be terminated. Whats left is to tell the process when you actually finished your save operation in order to terminate the application.
+					
+					Luckily for us there is API to do exactly that: <code>NSApp.reply(toApplicationShouldTerminate: true)</code>.
+				</p>
+				<p>
+					To round things up this is how your <code>savePendingChanges</code> method should look like:
+				</p>
+				<figure class="highlight">
+					<pre><code class="language-swift">func savePendingChanges() {
+    doSomeWork {
+        NSApp.reply(toApplicationShouldTerminate: true)
+    }
+}
+``
+
+### Conclusion
+Doing work just before the application quits actually is pretty straightforward to implement on macOS. One common pitfall is to miss the Info.plist entry I mentioned at the beginning of the post. Of course, just because this option exists, you probably do not want to run operations which take a long time. This inevitably will lead to bad UX for your customers. Try to save as often as you can without sacrificing performance or user experience of your application. By implementing the pattern explained in this blog post you will make sure to provide a reliable experience for your users.
+</code></pre>
+				</figure>
+				<small>Posted
+					<time><time datetime="2020-05-01">May 1, 2020</time></time>
+					in
+					<a href="/macos">macos</a></small>
+			</article>
+		</section>
+	</body>
+</html>
