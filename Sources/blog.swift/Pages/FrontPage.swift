@@ -56,7 +56,7 @@ struct FrontPage: Page {
             p {
                 "You can read about my latest project:"
                 a(href: highlight.path) { highlight.title }
-                "or look for a post in the"
+                "or browse through the"
                 a(href: "/archive") {
                     "archive"
                 } %% "."
