@@ -39,7 +39,7 @@
 
 on:
   schedule:
-    - cron: &amp;amp;quot;0 0 * * *&amp;amp;quot;
+    - cron: &amp;quot;0 0 * * *&amp;quot;
   workflow_dispatch:
 
 jobs:
@@ -52,22 +52,22 @@ jobs:
     - name: Set up Python 3.9.12
       uses: actions/setup-python@v3
       with:
-        python-version: &amp;amp;quot;3.9.12&amp;amp;quot;
+        python-version: &amp;quot;3.9.12&amp;quot;
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: setup git config
       run: |
-        git config user.name &amp;amp;quot;David v.Knobelsdorff&amp;amp;quot;
-        git config user.email &amp;amp;quot;youremail@email-address.com&amp;amp;quot;
+        git config user.name &amp;quot;David v.Knobelsdorff&amp;quot;
+        git config user.email &amp;quot;youremail@email-address.com&amp;quot;
     - name: run export script
       run: |
         INSTAPAPER_PASSWORD=${{ secrets.INSTAPAPER_PASSWORD }} python export-instapaper.py --archive
     - name: commit
       run: |
         git add -A
-        (git commit -m &amp;amp;quot;update instapaper export&amp;amp;quot; &amp;amp;amp;&amp;amp;amp; git push origin master) || echo &amp;amp;quot;No changes to commit&amp;amp;quot;
+        (git commit -m &amp;quot;update instapaper export&amp;quot; &amp;amp;&amp;amp; git push origin master) || echo &amp;quot;No changes to commit&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/figure&gt;
 &lt;p&gt;
@@ -101,17 +101,17 @@ import io
 from html.parser import HTMLParser
 from waybackpy import WaybackMachineSaveAPI
 
-parser = argparse.ArgumentParser(description=&amp;amp;apos;export instapaper bookmarks&amp;amp;apos;)
-parser.add_argument(&amp;amp;quot;--archive&amp;amp;quot;, action=&amp;amp;quot;store_true&amp;amp;quot;)
+parser = argparse.ArgumentParser(description=&amp;apos;export instapaper bookmarks&amp;apos;)
+parser.add_argument(&amp;quot;--archive&amp;quot;, action=&amp;quot;store_true&amp;quot;)
 args = parser.parse_args()
 
 
 class GetFormkeyParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
-        if tag == &amp;amp;apos;input&amp;amp;apos;:
+        if tag == &amp;apos;input&amp;apos;:
             attrs = dict(attrs)
-            if attrs.get(&amp;amp;apos;name&amp;amp;apos;) == &amp;amp;apos;form_key&amp;amp;apos;:
-                self.form_key = attrs[&amp;amp;apos;value&amp;amp;apos;]
+            if attrs.get(&amp;apos;name&amp;apos;) == &amp;apos;form_key&amp;apos;:
+                self.form_key = attrs[&amp;apos;value&amp;apos;]
 
     @classmethod
     def get_form_key(cls, html):
@@ -120,41 +120,41 @@ class GetFormkeyParser(HTMLParser):
         return parser.form_key
 
 
-def export_instapaper(fmt=&amp;amp;apos;csv&amp;amp;apos;):
-    assert fmt in (&amp;amp;apos;html&amp;amp;apos;, &amp;amp;apos;csv&amp;amp;apos;)
+def export_instapaper(fmt=&amp;apos;csv&amp;apos;):
+    assert fmt in (&amp;apos;html&amp;apos;, &amp;apos;csv&amp;apos;)
 
     s = requests.Session()
-    username = &amp;amp;apos;your username&amp;amp;apos;
-    password = keyring.get_password(&amp;amp;apos;https://instapaper.com&amp;amp;apos;, username) or os.environ[&amp;amp;apos;INSTAPAPER_PASSWORD&amp;amp;apos;]
+    username = &amp;apos;your username&amp;apos;
+    password = keyring.get_password(&amp;apos;https://instapaper.com&amp;apos;, username) or os.environ[&amp;apos;INSTAPAPER_PASSWORD&amp;apos;]
 
     if password is None:
-        raise Exception(&amp;amp;quot;you need to set a password&amp;amp;quot;)
+        raise Exception(&amp;quot;you need to set a password&amp;quot;)
 
-    req = s.post(&amp;amp;quot;https://www.instapaper.com/user/login&amp;amp;quot;,
-                 data={&amp;amp;apos;username&amp;amp;apos;: username,
-                       &amp;amp;apos;password&amp;amp;apos;: password})
-
-    if req.status_code != 200:
-        req.raise_for_status()
-
-    req = s.get(&amp;amp;quot;https://www.instapaper.com/user&amp;amp;quot;)
+    req = s.post(&amp;quot;https://www.instapaper.com/user/login&amp;quot;,
+                 data={&amp;apos;username&amp;apos;: username,
+                       &amp;apos;password&amp;apos;: password})
 
     if req.status_code != 200:
         req.raise_for_status()
 
-    form_key = GetFormkeyParser.get_form_key(req.content.decode(&amp;amp;apos;utf8&amp;amp;apos;))
-
-    req = s.post(&amp;amp;quot;https://www.instapaper.com/export/{}&amp;amp;quot;.format(fmt), data={&amp;amp;apos;form_key&amp;amp;apos;:form_key})
+    req = s.get(&amp;quot;https://www.instapaper.com/user&amp;quot;)
 
     if req.status_code != 200:
         req.raise_for_status()
 
-    return req.content.decode(&amp;amp;apos;utf8&amp;amp;apos;)
+    form_key = GetFormkeyParser.get_form_key(req.content.decode(&amp;apos;utf8&amp;apos;))
+
+    req = s.post(&amp;quot;https://www.instapaper.com/export/{}&amp;quot;.format(fmt), data={&amp;apos;form_key&amp;apos;:form_key})
+
+    if req.status_code != 200:
+        req.raise_for_status()
+
+    return req.content.decode(&amp;apos;utf8&amp;apos;)
 
 new_content = export_instapaper()
 
 if args.archive:
-    old_file = open(&amp;amp;apos;instapaper-export.csv&amp;amp;apos;, &amp;amp;apos;r&amp;amp;apos;)
+    old_file = open(&amp;apos;instapaper-export.csv&amp;apos;, &amp;apos;r&amp;apos;)
     old = csv.DictReader(old_file)
     new = csv.DictReader(io.StringIO(new_content))
 
@@ -162,26 +162,26 @@ if args.archive:
     new_urls = []
 
     for col in old:
-        old_urls.append(col[&amp;amp;apos;URL&amp;amp;apos;])
+        old_urls.append(col[&amp;apos;URL&amp;apos;])
 
     for col in new:
-        new_urls.append(col[&amp;amp;apos;URL&amp;amp;apos;])
+        new_urls.append(col[&amp;apos;URL&amp;apos;])
 
     urls_to_save = set(new_urls) - set(old_urls)
-    user_agent = &amp;amp;quot;Mozilla/5.0 (Windows NT 5.1; rv:40.0) Gecko/20100101 Firefox/40.0&amp;amp;quot;
+    user_agent = &amp;quot;Mozilla/5.0 (Windows NT 5.1; rv:40.0) Gecko/20100101 Firefox/40.0&amp;quot;
 
     # You might want to filter urls even further. f.e do not try to archive youtube urls
     for url in urls_to_save:
-        print(&amp;amp;quot;Archiving {}&amp;amp;quot;.format(url))
+        print(&amp;quot;Archiving {}&amp;quot;.format(url))
         save_api = WaybackMachineSaveAPI(url, user_agent)
         save_api.save()
 
-file = open(&amp;amp;apos;instapaper-export.csv&amp;amp;apos;, &amp;amp;apos;w&amp;amp;apos;)
+file = open(&amp;apos;instapaper-export.csv&amp;apos;, &amp;apos;w&amp;apos;)
 file.write(new_content)
 file.close()
 
-html_file = open(&amp;amp;apos;instapaper-export.html&amp;amp;apos;, &amp;amp;apos;w&amp;amp;apos;)
-html_file.write(export_instapaper(fmt=&amp;amp;apos;html&amp;amp;apos;))
+html_file = open(&amp;apos;instapaper-export.html&amp;apos;, &amp;apos;w&amp;apos;)
+html_file.write(export_instapaper(fmt=&amp;apos;html&amp;apos;))
 html_file.close()
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/figure&gt;
@@ -268,7 +268,7 @@ html_file.close()
 	All of the above is expressed by a single call on your command line:
 &lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;$ swift run spm-licenses &amp;amp;lt;path to .xcworkspace&amp;amp;gt; &amp;amp;lt;output.json&amp;amp;gt; &amp;amp;lt;optional GitHub client id&amp;amp;gt; &amp;amp;lt;optional GitHub client secret&amp;amp;gt;
+	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;$ swift run spm-licenses &amp;lt;path to .xcworkspace&amp;gt; &amp;lt;output.json&amp;gt; &amp;lt;optional GitHub client id&amp;gt; &amp;lt;optional GitHub client secret&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/figure&gt;
 &lt;p&gt;
@@ -303,10 +303,10 @@ $ cp -f spm-licenses /usr/local/bin/spm-licenses
 	&lt;/li&gt;
 &lt;/ol&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;if which spm-licenses &amp;amp;gt;/dev/null; then
- spm-licenses &amp;amp;lt;path to .xcworkspace&amp;amp;gt; &amp;amp;lt;output.json&amp;amp;gt; &amp;amp;lt;optional GitHub client id&amp;amp;gt; &amp;amp;lt;optional GitHub client secret&amp;amp;gt;
+	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;if which spm-licenses &amp;gt;/dev/null; then
+ spm-licenses &amp;lt;path to .xcworkspace&amp;gt; &amp;lt;output.json&amp;gt; &amp;lt;optional GitHub client id&amp;gt; &amp;lt;optional GitHub client secret&amp;gt;
 else
-  echo &amp;amp;quot;warning: SPMLicenses not installed, download from https://github.com/dehlen/SPMLicenses&amp;amp;quot;
+  echo &amp;quot;warning: SPMLicenses not installed, download from https://github.com/dehlen/SPMLicenses&amp;quot;
 fi
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/figure&gt;
@@ -327,18 +327,18 @@ struct License: Codable, Identifiable {
 }
 
 extension License {
-    static let mock: License = .init(licenseName: &amp;amp;quot;MIT&amp;amp;quot;, licenseText: &amp;amp;quot;MIT license text&amp;amp;quot;, packageName: &amp;amp;quot;Test Dependency&amp;amp;quot;)
+    static let mock: License = .init(licenseName: &amp;quot;MIT&amp;quot;, licenseText: &amp;quot;MIT license text&amp;quot;, packageName: &amp;quot;Test Dependency&amp;quot;)
 }
 
 final class LicensesViewModel: ObservableObject {
     @Published private(set) var licenses: [License] = []
-    #warning(&amp;amp;quot;update subsystem string&amp;amp;quot;)
-    private let logger = Logger(subsystem: &amp;amp;quot;com.sample.app&amp;amp;quot;, category: String(describing: LicensesViewModel.self))
+    #warning(&amp;quot;update subsystem string&amp;quot;)
+    private let logger = Logger(subsystem: &amp;quot;com.sample.app&amp;quot;, category: String(describing: LicensesViewModel.self))
 
     init() {
-        #warning(&amp;amp;quot;make sure licenses.json is added to the project&amp;amp;quot;)
-        guard let url = Bundle.main.url(forResource: &amp;amp;quot;licenses&amp;amp;quot;, withExtension: &amp;amp;quot;json&amp;amp;quot;) else {
-            logger.debug(&amp;amp;quot;Could not read licenses because file does not exist.&amp;amp;quot;)
+        #warning(&amp;quot;make sure licenses.json is added to the project&amp;quot;)
+        guard let url = Bundle.main.url(forResource: &amp;quot;licenses&amp;quot;, withExtension: &amp;quot;json&amp;quot;) else {
+            logger.debug(&amp;quot;Could not read licenses because file does not exist.&amp;quot;)
             return
         }
 
@@ -346,7 +346,7 @@ final class LicensesViewModel: ObservableObject {
             let data = try Data(contentsOf: url)
             self.licenses = try JSONDecoder().decode([License].self, from: data)
         } catch {
-            logger.debug(&amp;amp;quot;Could not read licenses: \(error.localizedDescription, privacy: .public)&amp;amp;quot;)
+            logger.debug(&amp;quot;Could not read licenses: \(error.localizedDescription, privacy: .public)&amp;quot;)
         }
     }
 }
@@ -357,7 +357,7 @@ struct LicensesView: View {
     var body: some View {
         List(viewModel.licenses) { license in
             LicenseView(license: license)
-        }.navigationBarTitle(Text(&amp;amp;quot;Licenses&amp;amp;quot;), displayMode: .inline)
+        }.navigationBarTitle(Text(&amp;quot;Licenses&amp;quot;), displayMode: .inline)
     }
 }
 
@@ -440,14 +440,14 @@ struct LicenseDetailView_Previews: PreviewProvider {
 	First you most certainly want to set the following key in your &lt;code&gt;Info.plist&lt;/code&gt;:
 &lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;amp;lt;?xml version=&amp;amp;quot;1.0&amp;amp;quot; encoding=&amp;amp;quot;UTF-8&amp;amp;quot;?&amp;amp;gt;
-&amp;amp;lt;!DOCTYPE plist PUBLIC &amp;amp;quot;-//Apple//DTD PLIST 1.0//EN&amp;amp;quot; &amp;amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;amp;quot;&amp;amp;gt;
-&amp;amp;lt;plist version=&amp;amp;quot;1.0&amp;amp;quot;&amp;amp;gt;
-&amp;amp;lt;dict&amp;amp;gt;
-	&amp;amp;lt;key&amp;amp;gt;NSSupportsSuddenTermination&amp;amp;lt;/key&amp;amp;gt;
-	&amp;amp;lt;false/&amp;amp;gt;
-&amp;amp;lt;/dict&amp;amp;gt;
-&amp;amp;lt;/plist&amp;amp;gt;
+	&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
+&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;
+&amp;lt;plist version=&amp;quot;1.0&amp;quot;&amp;gt;
+&amp;lt;dict&amp;gt;
+	&amp;lt;key&amp;gt;NSSupportsSuddenTermination&amp;lt;/key&amp;gt;
+	&amp;lt;false/&amp;gt;
+&amp;lt;/dict&amp;gt;
+&amp;lt;/plist&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/figure&gt;
 &lt;p&gt;
@@ -495,7 +495,7 @@ struct LicenseDetailView_Previews: PreviewProvider {
 	Start by implementing something like the following logic in your AppDelegate:
 &lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func applicationShouldTerminate(_ sender: NSApplication) -&amp;amp;gt; NSApplication.TerminateReply {
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply {
     if hasPendingChanges {
         savePendingChanges()
 	return .terminateLater
@@ -550,7 +550,7 @@ Doing work just before the application quits actually is pretty straightforward 
 	First things first you probably start by looking into the &lt;a href=&quot;https://developer.apple.com/documentation/foundation/filemanager&quot;&gt;FileManager&lt;/a&gt; API to access the file system. By quickly browsing through the available API it looks like we are in the right spot for our requirement. 🔋 Batteries included. To get a list of files in a specific folder one only has to write these simple couple of lines, right?:
 &lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;let url = URL(fileURLWithPath: &amp;amp;quot;/path/to/folder&amp;amp;quot;) 
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;let url = URL(fileURLWithPath: &amp;quot;/path/to/folder&amp;quot;) 
 let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
     includingPropertiesForKeys: nil,
     options: .skipsHiddenFiles)
@@ -593,15 +593,15 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 	Xcode will now create an entitlements file and sets the correct .plist entries for you. To prompt the user to select a directory we now finally can request an &lt;code&gt;NSOpenPanel&lt;/code&gt; like so:
 &lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func requestPermission(then handler: @escaping (URL?) -&amp;amp;gt; Void) {
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func requestPermission(then handler: @escaping (URL?) -&amp;gt; Void) {
     let openPanel = NSOpenPanel()
-    openPanel.message = &amp;amp;quot;Choose your directory&amp;amp;quot;
-    openPanel.prompt = &amp;amp;quot;Choose&amp;amp;quot;
+    openPanel.message = &amp;quot;Choose your directory&amp;quot;
+    openPanel.prompt = &amp;quot;Choose&amp;quot;
     openPanel.allowsMultipleSelection = false
     openPanel.canChooseDirectories = true
     openPanel.canCreateDirectories = true
     openPanel.canChooseFiles = false
-    openPanel.begin { (result) -&amp;amp;gt; Void in
+    openPanel.begin { (result) -&amp;gt; Void in
         if result == .OK {
             handler(openPanel.urls.first)
         }
@@ -648,10 +648,10 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 	Reading a bookmark is fairly simple as well. We can leverage an already existing initializer of &lt;code&gt;Foundation.URL&lt;/code&gt;:
 &lt;/p&gt;
 &lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func restoreBookmark(with bookmarkData: Data) -&amp;amp;gt; URL? {
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func restoreBookmark(with bookmarkData: Data) -&amp;gt; URL? {
 	do {
 		var isStale = false
-		let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &amp;amp;amp;isStale)
+		let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &amp;amp;isStale)
 
 		if isStale {
 	  	saveBookmark(for: url)
@@ -677,7 +677,7 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 &lt;figure class=&quot;highlight&quot;&gt;
 	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;defer { url.stopAccessingSecurityScopedResource() }
 if !url.startAccessingSecurityScopedResource() {
-    print(&amp;amp;quot;startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?&amp;amp;quot;)
+    print(&amp;quot;startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?&amp;quot;)
 }
 // do your file operation
 &lt;/code&gt;&lt;/pre&gt;

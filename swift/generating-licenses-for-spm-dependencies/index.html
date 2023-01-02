@@ -402,7 +402,7 @@ article .highlight {
 					All of the above is expressed by a single call on your command line:
 				</p>
 				<figure class="highlight">
-					<pre><code class="language-sh">$ swift run spm-licenses &amp;lt;path to .xcworkspace&amp;gt; &amp;lt;output.json&amp;gt; &amp;lt;optional GitHub client id&amp;gt; &amp;lt;optional GitHub client secret&amp;gt;
+					<pre><code class="language-sh">$ swift run spm-licenses &lt;path to .xcworkspace&gt; &lt;output.json&gt; &lt;optional GitHub client id&gt; &lt;optional GitHub client secret&gt;
 </code></pre>
 				</figure>
 				<p>
@@ -437,10 +437,10 @@ $ cp -f spm-licenses /usr/local/bin/spm-licenses
 					</li>
 				</ol>
 				<figure class="highlight">
-					<pre><code class="language-sh">if which spm-licenses &amp;gt;/dev/null; then
- spm-licenses &amp;lt;path to .xcworkspace&amp;gt; &amp;lt;output.json&amp;gt; &amp;lt;optional GitHub client id&amp;gt; &amp;lt;optional GitHub client secret&amp;gt;
+					<pre><code class="language-sh">if which spm-licenses &gt;/dev/null; then
+ spm-licenses &lt;path to .xcworkspace&gt; &lt;output.json&gt; &lt;optional GitHub client id&gt; &lt;optional GitHub client secret&gt;
 else
-  echo &amp;quot;warning: SPMLicenses not installed, download from https://github.com/dehlen/SPMLicenses&amp;quot;
+  echo &quot;warning: SPMLicenses not installed, download from https://github.com/dehlen/SPMLicenses&quot;
 fi
 </code></pre>
 				</figure>
@@ -461,18 +461,18 @@ struct License: Codable, Identifiable {
 }
 
 extension License {
-    static let mock: License = .init(licenseName: &amp;quot;MIT&amp;quot;, licenseText: &amp;quot;MIT license text&amp;quot;, packageName: &amp;quot;Test Dependency&amp;quot;)
+    static let mock: License = .init(licenseName: &quot;MIT&quot;, licenseText: &quot;MIT license text&quot;, packageName: &quot;Test Dependency&quot;)
 }
 
 final class LicensesViewModel: ObservableObject {
     @Published private(set) var licenses: [License] = []
-    #warning(&amp;quot;update subsystem string&amp;quot;)
-    private let logger = Logger(subsystem: &amp;quot;com.sample.app&amp;quot;, category: String(describing: LicensesViewModel.self))
+    #warning(&quot;update subsystem string&quot;)
+    private let logger = Logger(subsystem: &quot;com.sample.app&quot;, category: String(describing: LicensesViewModel.self))
 
     init() {
-        #warning(&amp;quot;make sure licenses.json is added to the project&amp;quot;)
-        guard let url = Bundle.main.url(forResource: &amp;quot;licenses&amp;quot;, withExtension: &amp;quot;json&amp;quot;) else {
-            logger.debug(&amp;quot;Could not read licenses because file does not exist.&amp;quot;)
+        #warning(&quot;make sure licenses.json is added to the project&quot;)
+        guard let url = Bundle.main.url(forResource: &quot;licenses&quot;, withExtension: &quot;json&quot;) else {
+            logger.debug(&quot;Could not read licenses because file does not exist.&quot;)
             return
         }
 
@@ -480,7 +480,7 @@ final class LicensesViewModel: ObservableObject {
             let data = try Data(contentsOf: url)
             self.licenses = try JSONDecoder().decode([License].self, from: data)
         } catch {
-            logger.debug(&amp;quot;Could not read licenses: \(error.localizedDescription, privacy: .public)&amp;quot;)
+            logger.debug(&quot;Could not read licenses: \(error.localizedDescription, privacy: .public)&quot;)
         }
     }
 }
@@ -491,7 +491,7 @@ struct LicensesView: View {
     var body: some View {
         List(viewModel.licenses) { license in
             LicenseView(license: license)
-        }.navigationBarTitle(Text(&amp;quot;Licenses&amp;quot;), displayMode: .inline)
+        }.navigationBarTitle(Text(&quot;Licenses&quot;), displayMode: .inline)
     }
 }
 

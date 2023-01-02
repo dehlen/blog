@@ -366,7 +366,7 @@ article .highlight {
 
 on:
   schedule:
-    - cron: &amp;quot;0 0 * * *&amp;quot;
+    - cron: &quot;0 0 * * *&quot;
   workflow_dispatch:
 
 jobs:
@@ -379,22 +379,22 @@ jobs:
     - name: Set up Python 3.9.12
       uses: actions/setup-python@v3
       with:
-        python-version: &amp;quot;3.9.12&amp;quot;
+        python-version: &quot;3.9.12&quot;
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: setup git config
       run: |
-        git config user.name &amp;quot;David v.Knobelsdorff&amp;quot;
-        git config user.email &amp;quot;youremail@email-address.com&amp;quot;
+        git config user.name &quot;David v.Knobelsdorff&quot;
+        git config user.email &quot;youremail@email-address.com&quot;
     - name: run export script
       run: |
         INSTAPAPER_PASSWORD=${{ secrets.INSTAPAPER_PASSWORD }} python export-instapaper.py --archive
     - name: commit
       run: |
         git add -A
-        (git commit -m &amp;quot;update instapaper export&amp;quot; &amp;amp;&amp;amp; git push origin master) || echo &amp;quot;No changes to commit&amp;quot;
+        (git commit -m &quot;update instapaper export&quot; &amp;&amp; git push origin master) || echo &quot;No changes to commit&quot;
 </code></pre>
 				</figure>
 				<p>
@@ -428,17 +428,17 @@ import io
 from html.parser import HTMLParser
 from waybackpy import WaybackMachineSaveAPI
 
-parser = argparse.ArgumentParser(description=&amp;apos;export instapaper bookmarks&amp;apos;)
-parser.add_argument(&amp;quot;--archive&amp;quot;, action=&amp;quot;store_true&amp;quot;)
+parser = argparse.ArgumentParser(description=&apos;export instapaper bookmarks&apos;)
+parser.add_argument(&quot;--archive&quot;, action=&quot;store_true&quot;)
 args = parser.parse_args()
 
 
 class GetFormkeyParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
-        if tag == &amp;apos;input&amp;apos;:
+        if tag == &apos;input&apos;:
             attrs = dict(attrs)
-            if attrs.get(&amp;apos;name&amp;apos;) == &amp;apos;form_key&amp;apos;:
-                self.form_key = attrs[&amp;apos;value&amp;apos;]
+            if attrs.get(&apos;name&apos;) == &apos;form_key&apos;:
+                self.form_key = attrs[&apos;value&apos;]
 
     @classmethod
     def get_form_key(cls, html):
@@ -447,41 +447,41 @@ class GetFormkeyParser(HTMLParser):
         return parser.form_key
 
 
-def export_instapaper(fmt=&amp;apos;csv&amp;apos;):
-    assert fmt in (&amp;apos;html&amp;apos;, &amp;apos;csv&amp;apos;)
+def export_instapaper(fmt=&apos;csv&apos;):
+    assert fmt in (&apos;html&apos;, &apos;csv&apos;)
 
     s = requests.Session()
-    username = &amp;apos;your username&amp;apos;
-    password = keyring.get_password(&amp;apos;https://instapaper.com&amp;apos;, username) or os.environ[&amp;apos;INSTAPAPER_PASSWORD&amp;apos;]
+    username = &apos;your username&apos;
+    password = keyring.get_password(&apos;https://instapaper.com&apos;, username) or os.environ[&apos;INSTAPAPER_PASSWORD&apos;]
 
     if password is None:
-        raise Exception(&amp;quot;you need to set a password&amp;quot;)
+        raise Exception(&quot;you need to set a password&quot;)
 
-    req = s.post(&amp;quot;https://www.instapaper.com/user/login&amp;quot;,
-                 data={&amp;apos;username&amp;apos;: username,
-                       &amp;apos;password&amp;apos;: password})
-
-    if req.status_code != 200:
-        req.raise_for_status()
-
-    req = s.get(&amp;quot;https://www.instapaper.com/user&amp;quot;)
+    req = s.post(&quot;https://www.instapaper.com/user/login&quot;,
+                 data={&apos;username&apos;: username,
+                       &apos;password&apos;: password})
 
     if req.status_code != 200:
         req.raise_for_status()
 
-    form_key = GetFormkeyParser.get_form_key(req.content.decode(&amp;apos;utf8&amp;apos;))
-
-    req = s.post(&amp;quot;https://www.instapaper.com/export/{}&amp;quot;.format(fmt), data={&amp;apos;form_key&amp;apos;:form_key})
+    req = s.get(&quot;https://www.instapaper.com/user&quot;)
 
     if req.status_code != 200:
         req.raise_for_status()
 
-    return req.content.decode(&amp;apos;utf8&amp;apos;)
+    form_key = GetFormkeyParser.get_form_key(req.content.decode(&apos;utf8&apos;))
+
+    req = s.post(&quot;https://www.instapaper.com/export/{}&quot;.format(fmt), data={&apos;form_key&apos;:form_key})
+
+    if req.status_code != 200:
+        req.raise_for_status()
+
+    return req.content.decode(&apos;utf8&apos;)
 
 new_content = export_instapaper()
 
 if args.archive:
-    old_file = open(&amp;apos;instapaper-export.csv&amp;apos;, &amp;apos;r&amp;apos;)
+    old_file = open(&apos;instapaper-export.csv&apos;, &apos;r&apos;)
     old = csv.DictReader(old_file)
     new = csv.DictReader(io.StringIO(new_content))
 
@@ -489,26 +489,26 @@ if args.archive:
     new_urls = []
 
     for col in old:
-        old_urls.append(col[&amp;apos;URL&amp;apos;])
+        old_urls.append(col[&apos;URL&apos;])
 
     for col in new:
-        new_urls.append(col[&amp;apos;URL&amp;apos;])
+        new_urls.append(col[&apos;URL&apos;])
 
     urls_to_save = set(new_urls) - set(old_urls)
-    user_agent = &amp;quot;Mozilla/5.0 (Windows NT 5.1; rv:40.0) Gecko/20100101 Firefox/40.0&amp;quot;
+    user_agent = &quot;Mozilla/5.0 (Windows NT 5.1; rv:40.0) Gecko/20100101 Firefox/40.0&quot;
 
     # You might want to filter urls even further. f.e do not try to archive youtube urls
     for url in urls_to_save:
-        print(&amp;quot;Archiving {}&amp;quot;.format(url))
+        print(&quot;Archiving {}&quot;.format(url))
         save_api = WaybackMachineSaveAPI(url, user_agent)
         save_api.save()
 
-file = open(&amp;apos;instapaper-export.csv&amp;apos;, &amp;apos;w&amp;apos;)
+file = open(&apos;instapaper-export.csv&apos;, &apos;w&apos;)
 file.write(new_content)
 file.close()
 
-html_file = open(&amp;apos;instapaper-export.html&amp;apos;, &amp;apos;w&amp;apos;)
-html_file.write(export_instapaper(fmt=&amp;apos;html&amp;apos;))
+html_file = open(&apos;instapaper-export.html&apos;, &apos;w&apos;)
+html_file.write(export_instapaper(fmt=&apos;html&apos;))
 html_file.close()
 </code></pre>
 				</figure>

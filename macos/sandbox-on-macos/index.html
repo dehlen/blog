@@ -359,7 +359,7 @@ article .highlight {
 					First things first you probably start by looking into the <a href="https://developer.apple.com/documentation/foundation/filemanager">FileManager</a> API to access the file system. By quickly browsing through the available API it looks like we are in the right spot for our requirement. 🔋 Batteries included. To get a list of files in a specific folder one only has to write these simple couple of lines, right?:
 				</p>
 				<figure class="highlight">
-					<pre><code class="language-swift">let url = URL(fileURLWithPath: &amp;quot;/path/to/folder&amp;quot;) 
+					<pre><code class="language-swift">let url = URL(fileURLWithPath: &quot;/path/to/folder&quot;) 
 let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
     includingPropertiesForKeys: nil,
     options: .skipsHiddenFiles)
@@ -402,15 +402,15 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 					Xcode will now create an entitlements file and sets the correct .plist entries for you. To prompt the user to select a directory we now finally can request an <code>NSOpenPanel</code> like so:
 				</p>
 				<figure class="highlight">
-					<pre><code class="language-swift">func requestPermission(then handler: @escaping (URL?) -&amp;gt; Void) {
+					<pre><code class="language-swift">func requestPermission(then handler: @escaping (URL?) -&gt; Void) {
     let openPanel = NSOpenPanel()
-    openPanel.message = &amp;quot;Choose your directory&amp;quot;
-    openPanel.prompt = &amp;quot;Choose&amp;quot;
+    openPanel.message = &quot;Choose your directory&quot;
+    openPanel.prompt = &quot;Choose&quot;
     openPanel.allowsMultipleSelection = false
     openPanel.canChooseDirectories = true
     openPanel.canCreateDirectories = true
     openPanel.canChooseFiles = false
-    openPanel.begin { (result) -&amp;gt; Void in
+    openPanel.begin { (result) -&gt; Void in
         if result == .OK {
             handler(openPanel.urls.first)
         }
@@ -457,10 +457,10 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 					Reading a bookmark is fairly simple as well. We can leverage an already existing initializer of <code>Foundation.URL</code>:
 				</p>
 				<figure class="highlight">
-					<pre><code class="language-swift">func restoreBookmark(with bookmarkData: Data) -&amp;gt; URL? {
+					<pre><code class="language-swift">func restoreBookmark(with bookmarkData: Data) -&gt; URL? {
 	do {
 		var isStale = false
-		let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &amp;amp;isStale)
+		let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &amp;isStale)
 
 		if isStale {
 	  	saveBookmark(for: url)
@@ -486,7 +486,7 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 				<figure class="highlight">
 					<pre><code class="language-swift">defer { url.stopAccessingSecurityScopedResource() }
 if !url.startAccessingSecurityScopedResource() {
-    print(&amp;quot;startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?&amp;quot;)
+    print(&quot;startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?&quot;)
 }
 // do your file operation
 </code></pre>

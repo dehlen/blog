@@ -365,14 +365,14 @@ article .highlight {
 					First you most certainly want to set the following key in your <code>Info.plist</code>:
 				</p>
 				<figure class="highlight">
-					<pre><code class="language-xml">&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
-&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;
-&amp;lt;plist version=&amp;quot;1.0&amp;quot;&amp;gt;
-&amp;lt;dict&amp;gt;
-	&amp;lt;key&amp;gt;NSSupportsSuddenTermination&amp;lt;/key&amp;gt;
-	&amp;lt;false/&amp;gt;
-&amp;lt;/dict&amp;gt;
-&amp;lt;/plist&amp;gt;
+					<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
+&lt;plist version=&quot;1.0&quot;&gt;
+&lt;dict&gt;
+	&lt;key&gt;NSSupportsSuddenTermination&lt;/key&gt;
+	&lt;false/&gt;
+&lt;/dict&gt;
+&lt;/plist&gt;
 </code></pre>
 				</figure>
 				<p>
@@ -420,7 +420,7 @@ article .highlight {
 					Start by implementing something like the following logic in your AppDelegate:
 				</p>
 				<figure class="highlight">
-					<pre><code class="language-swift">func applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply {
+					<pre><code class="language-swift">func applicationShouldTerminate(_ sender: NSApplication) -&gt; NSApplication.TerminateReply {
     if hasPendingChanges {
         savePendingChanges()
 	return .terminateLater
