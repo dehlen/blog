@@ -29,6 +29,7 @@ jobs:
       - name: Set Public Folder
         run: |
           mkdir .public
+          touch .nojekyll
           cp -r Site/* .public
           mv .public public
 
