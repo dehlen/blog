@@ -237,7 +237,7 @@ private final class MarkdownParser {
     func visit(code node: OpaquePointer) -> Node? {
         let content = String(cString: cmark_node_get_literal(node))
 
-        return %code { content.addingXMLEncoding() }%
+        return %code { content/*.addingXMLEncoding()*/ }%
     }
 
     func visit(htmlInline node: OpaquePointer) -> Node? {
