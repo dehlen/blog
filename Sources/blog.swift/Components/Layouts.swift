@@ -50,6 +50,9 @@ extension Layout {
 
                     meta(content: "interest-cohort=()", httpEquiv: "Permissions-Policy")
 
+                    link(href: "/atom.xml", rel: "alternate", title: "RSS Feed for davidvonk.dev", type: "application/atom+xml")
+                    link(href: "https://chaos.social/@dvk", rel: "me")
+
                     title {
                         page.title; "– davidvonk.dev"
                     }
