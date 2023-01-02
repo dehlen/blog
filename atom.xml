@@ -469,7 +469,7 @@ struct LicenseDetailView_Previews: PreviewProvider {
 	Unfortunately this won&apos;t work since, after all, the application will terminate. If your operation is taking enough time to finish you&apos;ll end up with a terminated process and no saved changes.
 &lt;/p&gt;
 &lt;p&gt;
-	To fix this we need to implement &lt;code&gt;applicationShouldTerminate(_ sender: NSApplication) -&amp;amp;gt; NSApplication.TerminateReply&lt;/code&gt;.
+	To fix this we need to implement &lt;code&gt;applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply&lt;/code&gt;.
 	&lt;code&gt;NSApplication.TerminateReply&lt;/code&gt; actually is an enum and can either be:
 &lt;/p&gt;
 &lt;ul&gt;
@@ -584,7 +584,7 @@ let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
 	NSOpenPanel
 &lt;/h3&gt;
 &lt;p&gt;
-	Next there is the possibility to ask the user for permission to access the specific folder before trying to read or write files. This actually is the right way to do it and &lt;code&gt;NSOpenPanel&lt;/code&gt; already handles this for us. However to use this we need to configure our Xcode project first. Go to &lt;code&gt;General —&amp;amp;gt; Target —&amp;amp;gt; App Sandbox —&amp;amp;gt; User Selected File&lt;/code&gt; and select &lt;em&gt;Read/Write&lt;/em&gt;.
+	Next there is the possibility to ask the user for permission to access the specific folder before trying to read or write files. This actually is the right way to do it and &lt;code&gt;NSOpenPanel&lt;/code&gt; already handles this for us. However to use this we need to configure our Xcode project first. Go to &lt;code&gt;General —&amp;gt; Target —&amp;gt; App Sandbox —&amp;gt; User Selected File&lt;/code&gt; and select &lt;em&gt;Read/Write&lt;/em&gt;.
 &lt;/p&gt;
 &lt;div class=&quot;image&quot;&gt;
 	&lt;img alt=&quot;An image of an Xcode project showing how to configure the project to read and write files.&quot; loading=&quot;lazy&quot; src=&quot;/img/sandbox/Project-Configuration.png&quot; width=&quot;463.5&quot;/&gt;
