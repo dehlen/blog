@@ -10,7 +10,7 @@ Here are some of my latest projects:
 * [git-tree-zsh](https://github.com/dehlen/git-tree-zsh)
 
 <br />If you’d like to get notified when I publish a new article, you can subscribe to my [RSS](https://dehlen.github.io/blog/feed.xml) feed.
-Also you can find contact/find me on various platforms:
+Also you can find/contact me on various platforms:
 
 * [Mastodon](https://chaos.social/@dvk)
 * [GitHub](https://github.com/dehlen)
