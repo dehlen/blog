@@ -33,12 +33,9 @@ jobs:
           cp -r Site/* .public
           mv .public public
 
-      - name: GH Pages deploy
-        uses: Cecilapp/GitHub-Pages-deploy@3.2.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          email: dehlen@me.com
-          build_dir: public
-          cname: davidvonk.dev
-          jekyll: no
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          enable_jekyll: false
