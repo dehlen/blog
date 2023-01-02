@@ -58,7 +58,7 @@ extension Layout {
                         InlineFilter.inline(file: "css/base.css")
                     }
                 }
-                body {
+                body(class: "line-numbers") {
                     content()
                 }
             }
