@@ -2,6 +2,7 @@
 /.build
 /Packages
 /*.xcodeproj
+xcuserdata/
 
 config.json
 
