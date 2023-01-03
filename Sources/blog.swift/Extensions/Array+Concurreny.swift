@@ -1,5 +1,4 @@
 import Foundation
-import Future
 
 public extension Array {
     func concurrentMap<B>(_ transform: @escaping (Element) -> B) -> [B] {
