@@ -42,7 +42,7 @@ struct FrontPage: Page {
                     .raw("I&nbsp;")
                     %%
                         token(summary: "live in Landau") {
-                        "live in Landau, Germany with my wife and my son"
+                        "live in Landau, Germany with my wife and my two sons"
                     }
                     %%
                     .raw(".&nbsp;")
