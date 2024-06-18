@@ -11,7 +11,7 @@ struct Archive: Page {
     func content() -> Node {
         let nodes: [Node] = posts.sliced(by: [.year], for: \.date).map { (key: Date, value: [Post]) -> Node in
             [
-                h2 { "\(key.formatted(.year()))" },
+                h2 { "\(key.formatted(.dateTime.year()))" },
                 ul {
                     value
                         .reversed()
