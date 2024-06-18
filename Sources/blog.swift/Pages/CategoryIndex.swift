@@ -36,3 +36,15 @@ struct CategoryIndex: Page {
         }
     }
 }
+
+private extension String {
+    func titlecased() -> String {
+        split(separator: "-")
+            .map {
+                guard $0.count > 1 else { return String($0) }
+
+                return $0.prefix(1) + $0.dropFirst().lowercased()
+            }
+            .joined(separator: " ")
+    }
+}
