@@ -14,17 +14,14 @@ public struct Site {
     public func generate() throws -> Set<Resource> {
         let posts = try Post.jekyllPosts(in: baseURL / "Posts")
 
-        let highlight = posts
-            .max(by: \.date)!
-
         let indexedPages: [Page] = [
             posts,
             posts.categoryIndices,
             [
-                About(),
-                Archive(posts: posts),
                 AtomFeed(baseURL: URL(string: "https://davidvonk.dev")!, posts: posts.suffix(10)),
-                FrontPage(highlight: highlight)
+                About(),
+                FrontPage(posts: posts),
+                WebFinger()
             ]
         ].flatMap { $0 }
 
@@ -41,8 +38,7 @@ public struct Site {
             XMLEncodingFilter(),
         ]
 
-        let renderedPages = allPages.concurrentMap { $0.render(filters: filters) }
-
+        let renderedPages = allPages.map { $0.render(filters: filters) }
         return renderedPages.reduce([]) { $0.union($1) }
     }
 }

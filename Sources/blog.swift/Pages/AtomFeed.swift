@@ -10,8 +10,6 @@ struct AtomFeed: Page {
 
     let dateFormatter = ISO8601DateFormatter()
 
-    let markdownFilter = MarkdownFilter()
-
     let pathComponents = [ "atom.xml" ]
 
     let posts: [Post]

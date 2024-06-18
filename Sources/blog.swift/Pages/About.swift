@@ -7,8 +7,10 @@ struct About: Page {
     let pathComponents = [ "about" ]
 
     func content() -> Node {
-        MarkdownFilter.markdown {
-            InlineFilter.inline(file: "md/about.md")
+        article {
+            MarkdownFilter.markdown {
+                InlineFilter.inline(file: "md/about.md")
+            }
         }
     }
 }

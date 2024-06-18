@@ -11,7 +11,7 @@ struct Build: ParsableCommand {
         let resources = try Array(site.generate())
 
         resources
-            .concurrentForEach { resource in
+            .forEach { resource in
                 do {
                     try resource.write(relativeTo: site.outputDirectory)
                 } catch {

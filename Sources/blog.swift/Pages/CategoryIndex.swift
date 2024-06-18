@@ -22,9 +22,8 @@ struct CategoryIndex: Page {
                 .reversed()
                 .map { post in
                     li {
+                        "[ \(format(post.date)) ] "
                         a(href: post.path) {
-                            format(post.date)
-                            " – "
                             post.title
                         }
 

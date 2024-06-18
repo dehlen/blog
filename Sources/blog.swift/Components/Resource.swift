@@ -56,9 +56,8 @@ extension Resource {
             try data.write(to: url)
         case let .file(source):
             if fileManager.fileExists(atPath: url.path) {
-                try fileManager.removeItem(at: url)
+                try fileManager.removeItem(atPath: url.path)
             }
-
             try fileManager.copyItem(at: source, to: url)
         }
     }

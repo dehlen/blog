@@ -79,7 +79,7 @@ func savePendingChanges() {
         NSApp.reply(toApplicationShouldTerminate: true)
     }
 }
-``
+```
 
 ### Conclusion
 Doing work just before the application quits actually is pretty straightforward to implement on macOS. One common pitfall is to miss the Info.plist entry I mentioned at the beginning of the post. Of course, just because this option exists, you probably do not want to run operations which take a long time. This inevitably will lead to bad UX for your customers. Try to save as often as you can without sacrificing performance or user experience of your application. By implementing the pattern explained in this blog post you will make sure to provide a reliable experience for your users.

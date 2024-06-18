@@ -26,6 +26,10 @@ private final class ResourceGatheringVisitor: Visitor {
         "link": "href",
         "script": "src"
     ]
+    
+    let excludedValues = [
+        "/atom.xml"
+    ]
 
     init(baseURL: URL) {
         self.baseURL = baseURL
@@ -36,7 +40,7 @@ private final class ResourceGatheringVisitor: Visitor {
             return .element(name, attributes, child.map(visitNode))
         }
 
-        guard let value = attributes[attribute] else {
+        guard let value = attributes[attribute], !excludedValues.contains(value) else {
             return .element(name, attributes, child.map(visitNode))
         }
 

@@ -7,7 +7,7 @@ extension Post {
         try FileManager.default
             .contentsOfDirectory(atPath: directory.path)
             .map { directory / $0 }
-            .concurrentMap {
+            .map {
                 try? Post(contentsOfJekyllPost: $0)
             }
             .compactMap { $0 }
