@@ -8,8 +8,6 @@ category: swift
 slug: generating-licenses-for-spm-dependencies
 ---
 
-# Generating licenses for SPM dependencies
-
 Chances are your are using Swift Package Manager, at least to some degree, in your (i(Pad)?\|mac\|tv\|watch)OS app. Since the first class support in Xcode was added it definetly is my favourite tool to handle dependencies for apps in the Apple ecosystem.
 
 As app developers we have to deal with a lot of stuff besides the actual development of features like setting up CI, supporting our customers etc. If you happen to use third party dependencies one of these tasks probably will be to include various Open Source licenses in your application. Having used well known alternatives like Carthage and Cocoapods before SPM was a thing I encountered plugins for these tools to automate this for me. Not only is this approach keeping work from me for every new project I fire up in Xcode, it also won’t forget to include a license for every dependency that is added. I can’t say that confidently about myself.
