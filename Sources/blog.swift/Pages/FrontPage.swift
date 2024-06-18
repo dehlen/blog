@@ -2,12 +2,6 @@ import Foundation
 import HTML
 import Swim
 
-fileprivate func token(summary: String, @NodeBuilder children: () -> NodeConvertible = { Node.fragment([]) }) -> Node {
-    span(class: "token", customAttributes: ["data-summary": summary]) {
-        children()
-    }
-}
-
 struct FrontPage: Page {
     static let defaultLayout: Layout = .page
 
