@@ -13,7 +13,7 @@ struct FrontPage: Page {
 
     func content() -> Node {
         [
-            h1 { "Latest posts" },
+            h2 { "Latest posts" },
             ul {
                 posts
                     .reversed()
