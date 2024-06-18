@@ -12,6 +12,10 @@
 		<changefreq>weekly</changefreq>
 	</url>
 	<url>
+		<loc>https://davidvonk.dev/archive</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
 		<loc>https://davidvonk.dev/atom.xml</loc>
 		<changefreq>weekly</changefreq>
 	</url>
