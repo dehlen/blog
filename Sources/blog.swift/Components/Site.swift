@@ -20,6 +20,7 @@ public struct Site {
             [
                 AtomFeed(baseURL: URL(string: "https://davidvonk.dev")!, posts: posts.suffix(10)),
                 About(),
+                Archive(posts: posts),
                 FrontPage(posts: posts.suffix(10)),
                 WebFinger()
             ]
