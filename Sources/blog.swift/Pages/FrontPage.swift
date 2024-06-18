@@ -12,18 +12,20 @@ struct FrontPage: Page {
     var posts: [Post]
 
     func content() -> Node {
-        h2 { "Latest posts" }
-        ul {
-            posts
-                .reversed()
-                .map { post in
-                    li {
-                        "[ \(format(post.date)) ] "
-                        a(href: post.path) {
-                            post.title
+        [
+            h2 { "Latest posts" },
+            ul {
+                posts
+                    .reversed()
+                    .map { post in
+                        li {
+                            "[ \(format(post.date)) ] "
+                            a(href: post.path) {
+                                post.title
+                            }
                         }
                     }
-                }
-        }
+            }
+        ]
     }
 }
