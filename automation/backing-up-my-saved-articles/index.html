@@ -8,10 +8,6 @@
 		<meta content="David v.Knobelsdorff" name="copyright"/>
 		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
-		<meta content="summary" name="twitter:card"/>
-		<meta content="@da_eh" name="twitter:site"/>
-		<meta content="Backing up my saved articles" name="twitter:title"/>
-		<meta content="Describing my workflow how to automate backing up my saved articles from Instapaper" name="twitter:description"/>
 		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
 		<link href="https://chaos.social/@dvk" rel="me"/>
 		<title>
@@ -19,279 +15,267 @@
 			– davidvonk.dev
 		</title>
 		<style>
-			* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
 }
 
-html {
-    font-family: -apple-system, BlinkMacSystemFont, "HelveticaNeueLight", "HelveticaNeue-Light", "Helvetica Neue Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Helvetica", "Tahoma", "Geneva", "Arial", sans-serif;
-    font-weight: 300;
-    font-size: 20px;
-    line-height: 40px;
-
-    color: rgba(13, 13, 13, 1);
-    background-color: rgba(250, 250, 250, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-    html {
-        color: rgba(250, 250, 250, 1);
-        background-color: rgba(74, 74, 77, 1);
-    }
-
-    a {
-        color: rgba(118, 199, 245, 1);
-    }
-}
-
-@media (max-width: 768px) {
-    html {
-        font-size: 15px;
-        line-height: 30px;
-    }
-}
-
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
 body {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: center;
-    -webkit-text-size-adjust: 100%;
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
 }
 
-article header, h1, h2, h3, h4 {
-    font-weight: 400;
-    color: rgba(64, 64, 64, 1);
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
 }
 
-@media (prefers-color-scheme: dark) {
-    article header, h1, h2, h3, h4 {
-        color: rgba(240, 240, 240, 1);
-    }
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
 }
 
-article header, h1 {
-    font-size: 1.5rem;
+a {
+  text-decoration: underline;
+  color: var(--link-color);
 }
 
-article header h1 {
-    display: inline;
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
 }
 
-h2 {
-    font-size: 1.4rem;
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
 }
 
-article header, h1, h2 {
-    margin: 1.25rem 0;
-    line-height: 2.5rem;
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
-h3 {
-    line-height: 1.25rem;
-    margin-top: 1.25rem;
-    margin-bottom: 0.625rem;
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
 }
 
-h1 a, h2 a, h3 a {
-    color: inherit;
-    text-decoration: none;
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
 }
 
-h1 a:hover, h2 a:hover, h3 a:hover {
-    color: rgba(13, 13, 13, 1);
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
 }
 
-@media (prefers-color-scheme: dark) {
-    h1 a:hover, h2 a:hover, h3 a:hover {
-        color: rgba(250, 250, 250, 1);
-    }
+header p {
+  text-align: left;
+  margin: 0;
 }
 
-p, blockquote, ul, ol, details {
-    -webkit-hyphens: auto;
-    hanging-punctuation: first;
-    hyphens: auto;
-    margin-bottom: 1.25rem;
+footer {
+  margin-bottom: 20px;
 }
 
-details {
-    background-color: rgba(0, 0, 0, 0.1);
-    background-blend-mode: darken;
-
-    padding: 1rem;
-    margin: -0.5rem 0 1.25rem -0.5rem;
-    border-radius: 4px;
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
 }
 
-details summary {
-    cursor: pointer;
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
 }
 
-details summary + * {
-    margin-top: 0.75rem;
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
 }
 
-li {
-    margin-bottom: 0.625rem;
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
 }
 
-p:last-child, blockquote:last-child, ul:last-child, ol:last-child, li:last-child, details:last-child {
-    margin-bottom: 0;
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
 }
 
-blockquote {
-    border-left: 0.25rem solid rgba(13, 13, 13, 0.5);
-    padding-left: 0.75rem;
-    padding-right: 1.5rem;
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
 }
 
-/* Layout */
-
-#header {
-    margin-top: 1.25rem;
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
 }
 
-#content {
-    margin-bottom: 2.5rem;
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
 }
 
-#header, #content {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
 }
 
-#header > *, #content > * {
-    width: 40rem;
-    max-width: 100vw;
-    max-width: calc(100vw - 2.5rem);
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
 }
 
-/* Articles */
-
-article {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    margin-bottom: 5rem;
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
 }
 
-article:last-child {
-    margin-bottom: 0;
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
 }
 
-article .image, article img {
-    align-self: center;
-    max-width: 100vw;
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
 }
 
-article .embed {
-    display: block;
-    align-self: center;
-
-    background-color: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 3px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
-    display: inline-block;
-    margin: 1.25rem 0;
-    position: relative;
-    width: 100%;
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
 }
 
-article .embed:after {
-    padding-top: 56.25%;
-    display: block;
-    content: '';
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
 }
 
-article .embed iframe {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
 }
 
-article .spotify.embed {
-    width: 80%;
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
 }
 
-article .spotify.embed:after {
-    padding-top: calc(80px);
+*:focus {
+  outline: none;
 }
 
-article .large.spotify.embed:after {
-    padding-top: calc(100% + 80px);
+textarea {
+  vertical-align: top;
 }
 
-article .left {
-    float: left;
-    margin-right: 1.25rem;
-}
-
-article .right {
-    float: right;
-    margin-left: 1.25rem;
-}
-
-article ul {
-    list-style: none;
-}
-
-article ul li {
-    position: relative;
-}
-
-article ul li:before {
-    color: inherit;
-    content: "‣";
-    display: inline-block;
-    left: -0.7rem;
-    width: 0.7rem;
-
-    position: absolute;
-    top: -1px;
-}
-
-article ol {
-    counter-reset: list-counter 0;
-}
-
-article ol li {
-    counter-increment: list-counter;
-    list-style-type: none;
-    margin-left: 2rem;
-    position: relative;
-}
-
-article ol li:before {
-    text-align: right;
-    content: counter(list-counter) ".";
-    font-variant-numeric: tabular-nums;
-    left: -3.0rem;
-    width: 2.7rem;
-    overflow: visible;
-
-    position: absolute;
-}
-
+/**
+* Code
+*/
 article code, article pre {
-    font-family: "SF Mono", monospace;
-    font-weight: 300;
-    font-size: 0.85rem;
-    line-height: 1.25rem !important;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
 }
 
 article .highlight {
-    background-color: rgba(30, 30, 30, 1);
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
     border-radius: 4px;
     overflow-x: scroll;
-    padding: 1rem;
-    color: white;
-    margin: -0.5rem 0 1.25rem -0.5rem;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
 }
 
 		</style>
@@ -300,75 +284,47 @@ article .highlight {
 		<link href="/css/prism.css" rel="stylesheet"/>
 	</head>
 	<body>
-		<header id="header">
-			<nav id="navigation">
-				<style>
-					#navigation {
-    margin: 1.25rem 0;
-
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-}
-
-#navigation h1, #navigation li {
-    font-size: 1rem;
-    display: inline-block;
-    line-height: 2rem;
-    margin: 0;
-}
-
-#navigation li {
-    list-style-type: none;
-    margin-left: 0.625rem;
-}
-
-#navigation a {
-    text-decoration: none;
-}
-
-				</style>
-				<h1>
-					<a href="/">davidvonk.dev</a>
-				</h1>
-				<ul>
-					<li>
-						<a href="/about">About Me</a>
-					</li>
-					<li>
-						<a href="/archive">Archive</a>
-					</li>
-					<li>
-						<a href="/atom.xml">RSS</a>
-					</li>
-				</ul>
-			</nav>
-		</header>
-		<section id="content">
-			<article>
-				<header>
-					<h1>
-						<a href="/automation/backing-up-my-saved-articles">Backing up my saved articles</a>
-					</h1>
-				</header>
-				<h2>
-					What and why?
-				</h2>
-				<p>
-					I try to follow a lot of newsfeeds during a typical week. Most of these are of technical nature but I also enjoy some chess content as well. Typically I do not have enough time to dive deep into an article whenever I discover something interesting. Therefore I am a long time user of Instapaper, a read-it-later service you probably already have heard of. In the course of the last few years I saved multiple thousand articles there. When GDPR came around Instapaper was not accessible for a long time in Europe which led me to look around for different solutions. However none of the other solutions really did it for me (Pocket f.e) which is why I started to create my own project. Couple of years forward and I have multiple GitHub repositories with better and worse implementations of a read-it-later app. One of these implementations (Reading Time) even was available on the App Store for a couple of months but I realized that it was to much effort for me to maintain this app.
-				</p>
-				<p>
-					Meanwhile Instapaper became available in Europe again and I figured there wasn't an alternative I liked better. Since Instapaper has an export feature and I wanted to prevent to lose all my saved articles whenever Instapaper would close its doors I would regularly login to the Instapaper website, download a csv dump of my saved articles and persist this in a private GitHub repository of mine. This however was a cumbersome process to say the least.
-				</p>
-				<h2>
-					The Solution
-				</h2>
-				<p>
-					So I knew I wanted to use Instapaper and I wanted to export my saved articles on a regular basis to make sure I wouldn't loose any of my link history. I figured GitHub Actions would be ideal to do exactly that and as a bonus are completely free. To create a GitHub action you need to create a new yaml configuration in <code>your-repo/.github/workflows/your-workflow-name.yml</code>. For me this looks like this:
-				</p>
-				<figure class="highlight">
-					<pre><code class="language-yml">name: Instapaper Export
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/automation/backing-up-my-saved-articles">Backing up my saved articles</a>
+							</h1>
+						</header>
+						<h2>
+							What and why?
+						</h2>
+						<p>
+							I try to follow a lot of newsfeeds during a typical week. Most of these are of technical nature but I also enjoy some chess content as well. Typically I do not have enough time to dive deep into an article whenever I discover something interesting. Therefore I am a long time user of Instapaper, a read-it-later service you probably already have heard of. In the course of the last few years I saved multiple thousand articles there. When GDPR came around Instapaper was not accessible for a long time in Europe which led me to look around for different solutions. However none of the other solutions really did it for me (Pocket f.e) which is why I started to create my own project. Couple of years forward and I have multiple GitHub repositories with better and worse implementations of a read-it-later app. One of these implementations (Reading Time) even was available on the App Store for a couple of months but I realized that it was to much effort for me to maintain this app.
+						</p>
+						<p>
+							Meanwhile Instapaper became available in Europe again and I figured there wasn't an alternative I liked better. Since Instapaper has an export feature and I wanted to prevent to lose all my saved articles whenever Instapaper would close its doors I would regularly login to the Instapaper website, download a csv dump of my saved articles and persist this in a private GitHub repository of mine. This however was a cumbersome process to say the least.
+						</p>
+						<h2>
+							The Solution
+						</h2>
+						<p>
+							So I knew I wanted to use Instapaper and I wanted to export my saved articles on a regular basis to make sure I wouldn't loose any of my link history. I figured GitHub Actions would be ideal to do exactly that and as a bonus are completely free. To create a GitHub action you need to create a new yaml configuration in <code>your-repo/.github/workflows/your-workflow-name.yml</code>. For me this looks like this:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-yml">name: Instapaper Export
 
 on:
   schedule:
@@ -402,23 +358,23 @@ jobs:
         git add -A
         (git commit -m &quot;update instapaper export&quot; &amp;&amp; git push origin master) || echo &quot;No changes to commit&quot;
 </code></pre>
-				</figure>
-				<p>
-					The cron parameter specifies that this action runs daily at midnight. To login into Instapaper I need my password which is passed via a secret environment variable. You can specifiy those in your repos settings. Last but not least the workflow runs my python script export-instapaper.py and pushes any changed files to remote.
-				</p>
-				<p>
-					GitHub Actions made this automation super simple and I highly recommend checking it out if you haven't. You even get an E-Mail notification should an action fail.
-				</p>
-				<h2>
-					The actual script & archiving
-				</h2>
-				<p>
-					What is left is the implementation of the actual script. Probably this is what you came for, right?
-					
-					Without any further ado here it is:
-				</p>
-				<figure class="highlight">
-					<pre><code class="language-python">#!/usr/bin/env python3
+						</figure>
+						<p>
+							The cron parameter specifies that this action runs daily at midnight. To login into Instapaper I need my password which is passed via a secret environment variable. You can specifiy those in your repos settings. Last but not least the workflow runs my python script export-instapaper.py and pushes any changed files to remote.
+						</p>
+						<p>
+							GitHub Actions made this automation super simple and I highly recommend checking it out if you haven't. You even get an E-Mail notification should an action fail.
+						</p>
+						<h2>
+							The actual script & archiving
+						</h2>
+						<p>
+							What is left is the implementation of the actual script. Probably this is what you came for, right?
+							
+							Without any further ado here it is:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-python">#!/usr/bin/env python3
 
 import logging
 import sys
@@ -517,27 +473,33 @@ html_file = open(&apos;instapaper-export.html&apos;, &apos;w&apos;)
 html_file.write(export_instapaper(fmt=&apos;html&apos;))
 html_file.close()
 </code></pre>
-				</figure>
-				<p>
-					Basically this authenticates on the Instapaper website, grabs the form field "form_key" (some csrf token) and triggers the export endpoint via HTTP POST.
-				</p>
-				<p>
-					As a bonus I added a command line argument "archive". If present the script will compare the exported links to links exported previously. All newly added urls are saved to the <a href="https://archive.org">Internet Archive</a> via the third-party library <a href="https://github.com/akamhy/waybackpy">waybackpy</a>. This way even if Instapaper shuts down I have a complete list of all articles I read or want to read and I will also find a snapshot of the website on the internet archive if one of the articles isn't reachable anymore.
-				</p>
-				<p>
-					Last but not least I also export all links in the HTML format Instapaper offers to maximize compatibility with other services (f.e Pocket only allows to import Instapaper articles from an HTML export).
-				</p>
-				<h2>
-					Conclusion
-				</h2>
-				<p>
-					This script is running for a couple of days now and I had no trouble since. I am pretty happy with the workflow now and use Instapaper on a daily basis without worrying over loosing all my links or being unable to read an article because the website shut down or the article was deleted. If you want to try it yourself I am happy to hear from you.
-				</p>
-				<small>Posted
-					<time><time datetime="2022-04-14">April 14, 2022</time></time>
-					in
-					<a href="/automation">automation</a></small>
-			</article>
-		</section>
+						</figure>
+						<p>
+							Basically this authenticates on the Instapaper website, grabs the form field "form_key" (some csrf token) and triggers the export endpoint via HTTP POST.
+						</p>
+						<p>
+							As a bonus I added a command line argument "archive". If present the script will compare the exported links to links exported previously. All newly added urls are saved to the <a href="https://archive.org">Internet Archive</a> via the third-party library <a href="https://github.com/akamhy/waybackpy">waybackpy</a>. This way even if Instapaper shuts down I have a complete list of all articles I read or want to read and I will also find a snapshot of the website on the internet archive if one of the articles isn't reachable anymore.
+						</p>
+						<p>
+							Last but not least I also export all links in the HTML format Instapaper offers to maximize compatibility with other services (f.e Pocket only allows to import Instapaper articles from an HTML export).
+						</p>
+						<h2>
+							Conclusion
+						</h2>
+						<p>
+							This script is running for a couple of days now and I had no trouble since. I am pretty happy with the workflow now and use Instapaper on a daily basis without worrying over loosing all my links or being unable to read an article because the website shut down or the article was deleted. If you want to try it yourself I am happy to hear from you.
+						</p>
+						<small>Posted
+							<time><time datetime="2022-04-14">2022-04-14</time></time>
+							in
+							<a href="/automation">automation</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
 	</body>
 </html>

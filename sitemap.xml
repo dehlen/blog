@@ -4,11 +4,11 @@
 		<changefreq>weekly</changefreq>
 	</url>
 	<url>
-		<loc>https://davidvonk.dev/about</loc>
+		<loc>https://davidvonk.dev/.well-known/webfinger</loc>
 		<changefreq>weekly</changefreq>
 	</url>
 	<url>
-		<loc>https://davidvonk.dev/archive</loc>
+		<loc>https://davidvonk.dev/about</loc>
 		<changefreq>weekly</changefreq>
 	</url>
 	<url>
