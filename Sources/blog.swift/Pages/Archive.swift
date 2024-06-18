@@ -9,25 +9,25 @@ struct Archive: Page {
     let pathComponents = [ "archive" ]
 
     func content() -> Node {
-        posts.sliced(by: [.year], for: \.date).map { (key: Date, value: [Post]) -> Node in
-            .fragment(
-                [
-                    h2 { "\(key.formatted(.year()))" },
-                    ul {
-                        value
-                            .reversed()
-                            .map { post in
-                                li {
-                                    "[ \(format(post.date)) ] "
-                                    a(href: post.path) {
-                                        post.title
-                                    }
+        let nodes: [Node] = posts.sliced(by: [.year], for: \.date).map { (key: Date, value: [Post]) -> Node in
+            [
+                h2 { "\(key.formatted(.year()))" },
+                ul {
+                    value
+                        .reversed()
+                        .map { post in
+                            li {
+                                "[ \(format(post.date)) ] "
+                                a(href: post.path) {
+                                    post.title
                                 }
                             }
-                    }
-                ].asNode()
-            )
-        }.flatMap { $0 }
+                        }
+                }
+            ]
+        }
+        
+        return .fragment(nodes.map { $0.asNode() })
     }
 }
 
