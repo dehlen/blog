@@ -20,6 +20,9 @@ extension Layout {
                 a(href: "/") { "/" }
             }
             li {
+                a(href: "/archive") { "/archive" }
+            }
+            li {
                 a(href: "/about") { "/about" }
             }
             li {
