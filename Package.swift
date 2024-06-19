@@ -14,7 +14,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.2"),
         .package(url: "https://github.com/apple/swift-cmark.git", .branch("main")),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
         .package(url: "https://github.com/dehlen/Swim.git", .branch("main"))
     ],
     targets: [
@@ -28,8 +27,7 @@ let package = Package(
             name: "blog.swift",
             dependencies: [
                 .product(name: "cmark", package: "swift-cmark"),
-                .product(name: "HTML", package: "Swim"),
-                .product(name: "Logging", package: "swift-log")
+                .product(name: "HTML", package: "Swim")
             ]),
     ]
 )

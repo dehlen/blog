@@ -1,19 +1,14 @@
 import Foundation
-import Swim
+import HTML
 
 struct AtomFeed: Page {
     static let defaultLayout: Layout = .empty
 
     let baseURL: URL
-
     let contentType = "application/xml"
-
     let dateFormatter = ISO8601DateFormatter()
-
     let pathComponents = [ "atom.xml" ]
-
     let posts: [Post]
-
     let title = "davidvonk.dev"
 
     func content() -> Node {

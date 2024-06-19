@@ -6,7 +6,6 @@ struct InlineFilter: Filter {
 
     func apply(node: Node, resources: inout Set<Resource>) -> Node {
         let visitor = InlineFilterVisitor(baseURL: baseURL)
-
         return visitor.visitNode(node)
     }
 

@@ -1,13 +1,11 @@
 import Foundation
-import Swim
+import HTML
 
 struct WebFinger: Page {
     static let defaultLayout: Layout = .empty
 
     let contentType = "application/json"
-
     let pathComponents = [ ".well-known", "webfinger" ]
-
     let title = "Webfinger"
 
     func content() -> Node {

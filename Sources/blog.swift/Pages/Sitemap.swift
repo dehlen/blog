@@ -5,13 +5,9 @@ struct Sitemap: Page {
     static let defaultLayout: Layout = .empty
 
     let baseURL: URL
-
     let contentType = "application/xml"
-
     let pathComponents = [ "sitemap.xml" ]
-
     let pages: [Page]
-
     let title = "Sitemap"
 
     func content() -> Node {

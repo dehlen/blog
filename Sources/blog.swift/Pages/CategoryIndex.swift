@@ -3,9 +3,7 @@ import HTML
 
 struct CategoryIndex: Page {
     var posts: [Post]
-
     var title: String
-
     var pathComponents: [String]
 
     init(category: String, posts: [Post]) {

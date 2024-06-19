@@ -6,7 +6,6 @@ import HTML
 struct PrismFilter: Filter {
     func apply(node: Node, resources: inout Set<Resource>) -> Node {
         let visitor = PrismVisitor()
-
         return visitor.visitNode(node)
     }
 }

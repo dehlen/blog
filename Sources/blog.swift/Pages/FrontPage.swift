@@ -1,14 +1,11 @@
 import Foundation
 import HTML
-import Swim
 
 struct FrontPage: Page {
     static let defaultLayout: Layout = .page
 
     let title = "David v.Knobelsdorff"
-
     let pathComponents = [] as [String]
-
     var posts: [Post]
 
     func content() -> Node {

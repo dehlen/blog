@@ -7,7 +7,6 @@ struct Build: ParsableCommand {
         print("Building the site.")
 
         let site = try Site(baseDirectory: Main.path)
-
         let resources = try Array(site.generate())
 
         resources

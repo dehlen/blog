@@ -1,26 +1,15 @@
 import Foundation
 import HTML
-import Swim
-
-private let calendar = Calendar(identifier: .gregorian)
 
 struct Post {
     var body: String
-
     var category: String?
-
     var date: Date
-
     var description: String?
-
     var isProject: Bool = false
-
     var image: String?
-
     var link: String?
-
     var pathComponents: [String]
-
     var title: String
 }
 

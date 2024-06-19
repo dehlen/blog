@@ -8,7 +8,6 @@ struct XMLEncodingFilter: Filter {
 
     func apply(node: Node, resources: inout Set<Resource>) -> Node {
         let visitor = XMLEncodingVisitor()
-
         return visitor.visitNode(node)
     }
 }

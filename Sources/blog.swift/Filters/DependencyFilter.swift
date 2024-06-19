@@ -5,9 +5,7 @@ import HTML
 struct DependencyFilter: Filter {
     func apply(node: Node, resources: inout Set<Resource>) -> Node {
         let finder = DependencyFindingVisitor()
-
         let stripped = finder.visitNode(node)
-
         let injector = DependencyInjectingVisitor(nodesToInject: finder.nodesToInject)
 
         return injector.visitNode(stripped)
@@ -15,9 +13,7 @@ struct DependencyFilter: Filter {
 
     static func dependency(javascript path: String, async: Bool) -> Node {
         var attributes = [ "src": path ]
-
         attributes["async"] = async ? "" : nil
-
         return Node.element("custom-script-dependency", attributes, nil)
     }
 

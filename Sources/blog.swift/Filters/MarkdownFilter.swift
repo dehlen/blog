@@ -29,13 +29,11 @@ struct MarkdownFilter: Filter {
 
     static func render(_ string: String) -> Node? {
         let parser = MarkdownParser(document: string)
-
         return parser.parse()
     }
 
     func apply(node: Node, resources: inout Set<Resource>) -> Node {
         let visitor = MarkdownFilterVisitor()
-
         return visitor.visitNode(node)
     }
 }
@@ -118,7 +116,6 @@ private final class MarkdownParser {
 
     func visitChildren(of node: OpaquePointer?) -> [Node] {
         let iterator = AnyIterator(first: cmark_node_first_child(node), next: cmark_node_next)
-
         return iterator.compactMap(visitNode)
     }
 
@@ -295,7 +292,6 @@ private extension MarkdownParser {
 
     func visit(element nodePointer: UnsafeMutablePointer<xmlNode>?) -> Node? {
         guard let node = nodePointer?.pointee else { return nil }
-
         guard let name = node.name.map({ String(cString: $0) }) else { return nil }
 
         let childIterator = AnyIterator(first: node.children, next: \.pointee.next)

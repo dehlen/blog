@@ -7,9 +7,7 @@ public struct Resource: Hashable {
     }
 
     private var backing: Backing
-
     public var contentType: String?
-
     public var path: String
 
     public var data: Data {
