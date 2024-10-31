@@ -6,9 +6,2707 @@
 	</author>
 	<title type="text">davidvonk.dev</title>
 	<id>https://davidvonk.dev</id>
-	<updated>2022-04-14T13:48:00Z</updated>
+	<updated>2024-10-31T17:52:00Z</updated>
 	<link href="https://davidvonk.dev/atom.xml" rel="self">
 	</link>
+	<entry>
+		<title type="text">Writing a chess app (9/9): Testing and Conclusion</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-9-9-testing-and-conclusion</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-9-9-testing-and-conclusion" rel="alternate">
+		</link>
+		<updated>2024-10-31T17:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;h2&gt;
+	Unit Tests
+&lt;/h2&gt;
+&lt;p&gt;
+	Well you probably think now &quot;Isn&apos;t this a personal project? Why bother writing unit tests?&quot; I actually found a lot of joy writing unit tests for this project. Since I basically have no third-party dependencies, no network traffic, etc. there isn&apos;t really much to mock or stub. The unit tests do what they are best at: Testing a logical unit of code and making sure it behaves the way it should. With the unit tests in place I feel very confident to refactor and iterate on the various implemented algorithms and logic. I actually found that for the PGN parser and chess logic packages test driven development was quite fun and helpful in making my implementation correct. For the future I plan to have a look at the new&lt;a href=&quot;https://developer.apple.com/xcode/swift-testing/&quot;&gt; swift-testing&lt;/a&gt; framework.
+&lt;/p&gt;
+&lt;h2&gt;
+	That&apos;s a wrap
+&lt;/h2&gt;
+&lt;p&gt;
+	You probably already got the impression that I am pretty passionate about chess and software development. This project really helped me finding joy again in writing software for my own personal use. What I especially liked about this project is that it was totally different from my typical &quot;side project&quot;. Most of the time I repeat the same boilerplate code, requesting some API endpoints and displaying data in some form of a list. This time it was and still is all about performance, reading up on algorithms, creating some custom UI components. So I couldn&apos;t be happier I pulled through this time and can actually hold a useful product in my hands which I am very keen to iterate on in the upcoming months.
+&lt;/p&gt;
+&lt;p&gt;
+	Despite all the positive experiences with this project there is one downside I found rather funny:  I am spending more time in Xcode and less time on &lt;a href=&quot;https://lichess.org&quot;&gt;lichess&lt;/a&gt; (Lichess is a charity and a free, libre, no-ads, open source chess server) actually playing chess. I guess there is only a limited amount of time in a day but I am looking forward to getting back at improving my chess skills now with my own little chess companion in my pocket.
+&lt;/p&gt;
+&lt;p&gt;
+	If you liked this article, want to talk about chess or software development let me know!
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (8/9): Using a chess engine locally</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-8-9-using-a-chess-engine-locally</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-8-9-using-a-chess-engine-locally" rel="alternate">
+		</link>
+		<updated>2024-10-31T16:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;h2&gt;
+	Available engines
+&lt;/h2&gt;
+&lt;p&gt;
+	When developing a chess application, you have several options for integrating a chess engine. The two most popular choices are: &lt;a href=&quot;https://stockfishchess.org&quot;&gt;Stockfish&lt;/a&gt; and &lt;a href=&quot;https://lczero.org&quot;&gt;Leela Chess Zero&lt;/a&gt;. Both engines are open source, extremly powerful and support the UCI engine protocol. For my project I chose to use Stockfish as it used by my favorite chess platform lichess and besides that considered as the best chess engine currently existing in terms of playing strength.
+&lt;/p&gt;
+&lt;h2&gt;
+	UCI Engine Protocol
+&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://backscattering.de/chess/uci/2006-04.txt&quot;&gt;UCI protocol documentation&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;
+	The Universal Chess Interface (UCI) is a protocol that allows communication between chess engines and GUIs. It standardizes the way commands are sent and received, making it easier for us to integrate different engines into our applications.
+&lt;/p&gt;
+&lt;h3&gt;
+	UCI Command Structure
+&lt;/h3&gt;
+&lt;p&gt;
+	The UCI protocol consists of a series of text-based commands that the GUI sends to the engine, and responses that the engine sends back. Here’s a breakdown of some of the most common commands in the UCI protocol:
+&lt;/p&gt;
+&lt;h4&gt;
+	1. Initialization Commands
+&lt;/h4&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;uci&lt;/code&gt;&lt;/strong&gt;: This command is sent by the GUI to initiate communication with the engine. The engine responds with its identity and capabilities.
+		&lt;/p&gt;
+		&lt;p&gt;&lt;strong&gt;Example&lt;/strong&gt;:
+		&lt;/p&gt;
+		&lt;figure class=&quot;highlight&quot;&gt;
+			&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; uci &amp;lt; id name Stockfish 15 &amp;lt; uciok
+&lt;/code&gt;&lt;/pre&gt;
+		&lt;/figure&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;isready&lt;/code&gt;&lt;/strong&gt;: This command checks if the engine is ready to receive new commands. The engine responds with &lt;code&gt;readyok&lt;/code&gt; when it is ready.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;
+	2. Position Setup Commands
+&lt;/h4&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;position&lt;/code&gt;&lt;/strong&gt;: This command sets the position on the board. It can take two forms:
+		&lt;/p&gt;
+		&lt;ul&gt;
+			&lt;li&gt;
+				&lt;p&gt;&lt;strong&gt;&lt;code&gt;position startpos&lt;/code&gt;&lt;/strong&gt;: Initializes the board to the standard starting position.
+				&lt;/p&gt;
+			&lt;/li&gt;
+			&lt;li&gt;
+				&lt;p&gt;&lt;strong&gt;&lt;code&gt;position fen &amp;lt;FEN&amp;gt;&lt;/code&gt;&lt;/strong&gt;: Sets the board to a specific configuration defined by the FEN string.
+				&lt;/p&gt;
+			&lt;/li&gt;
+		&lt;/ul&gt;
+		&lt;p&gt;&lt;strong&gt;Example&lt;/strong&gt;:
+		&lt;/p&gt;
+		&lt;figure class=&quot;highlight&quot;&gt;
+			&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; position startpos
+&lt;/code&gt;&lt;/pre&gt;
+		&lt;/figure&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;setposition&lt;/code&gt;&lt;/strong&gt;: Similar to &lt;code&gt;position&lt;/code&gt;, but used to set a position without the need to specify moves.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;
+	3. Move Calculation Commands
+&lt;/h4&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;go&lt;/code&gt;&lt;/strong&gt;: This command instructs the engine to start calculating the best move. It can be accompanied by parameters such as:
+		&lt;/p&gt;
+		&lt;ul&gt;
+			&lt;li&gt;
+				&lt;p&gt;&lt;strong&gt;&lt;code&gt;depth &amp;lt;n&amp;gt;&lt;/code&gt;&lt;/strong&gt;: Limits the search to a specific depth.
+				&lt;/p&gt;
+			&lt;/li&gt;
+			&lt;li&gt;
+				&lt;p&gt;&lt;strong&gt;&lt;code&gt;time &amp;lt;milliseconds&amp;gt;&lt;/code&gt;&lt;/strong&gt;: Limits the time the engine can spend calculating.
+				&lt;/p&gt;
+			&lt;/li&gt;
+			&lt;li&gt;
+				&lt;p&gt;&lt;strong&gt;&lt;code&gt;movetime &amp;lt;milliseconds&amp;gt;&lt;/code&gt;&lt;/strong&gt;: Specifies the exact time to think for the current move.
+				&lt;/p&gt;
+			&lt;/li&gt;
+		&lt;/ul&gt;
+		&lt;p&gt;&lt;strong&gt;Example&lt;/strong&gt;:
+		&lt;/p&gt;
+		&lt;figure class=&quot;highlight&quot;&gt;
+			&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; go movetime 2000
+&lt;/code&gt;&lt;/pre&gt;
+		&lt;/figure&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;stop&lt;/code&gt;&lt;/strong&gt;: This command tells the engine to stop its calculations immediately. The engine will return the best move it has found so far.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;
+	4. Engine Options Commands
+&lt;/h4&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;setoption name &amp;lt;name&amp;gt; value &amp;lt;value&amp;gt;&lt;/code&gt;&lt;/strong&gt;: This command allows the GUI to set various options for the engine, such as adjusting its playing style or tuning specific parameters.
+		&lt;/p&gt;
+		&lt;p&gt;&lt;strong&gt;Example&lt;/strong&gt;:
+		&lt;/p&gt;
+		&lt;figure class=&quot;highlight&quot;&gt;
+			&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; setoption name Hash value 2048
+&lt;/code&gt;&lt;/pre&gt;
+		&lt;/figure&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;
+	5. Termination Commands
+&lt;/h4&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;&lt;code&gt;quit&lt;/code&gt;&lt;/strong&gt;: This command is used to terminate the engine process. The engine will respond with a message indicating it is shutting down.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;
+	Example Interaction Flow
+&lt;/h3&gt;
+&lt;p&gt;
+	To illustrate how UCI works in practice, let’s walk through a typical interaction between a GUI and a chess engine:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Initialization&lt;/strong&gt;:
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; uci &amp;lt; id name Stockfish 15 &amp;lt; uciok
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Setting Up the Position&lt;/strong&gt;:
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; position startpos
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Instructing the Engine to Calculate a Move&lt;/strong&gt;:
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; go movetime 3000
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Receiving the Best Move&lt;/strong&gt;:
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;lt; bestmove e2e4 &amp;lt; info depth 20 seldepth 30 score cp 25
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Stopping the Engine (if needed)&lt;/strong&gt;:
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; stop &amp;lt; bestmove e2e4
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Terminating the Engine&lt;/strong&gt;:
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;gt; quit
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h2&gt;
+	Redirect STDOUT and STDIN
+&lt;/h2&gt;
+&lt;p&gt;
+	Now that we have chosen a chess engine and have an understanding how to communicate with it we should look at how to incorporate that into our iOS and macOS application. Since stockfish is written in C++ (&lt;a href=&quot;https://github.com/official-stockfish/Stockfish&quot;&gt;source code&lt;/a&gt;) the best option to make the engine available to our Swift application is by bridging it in a Objective-C++ framework. I created a new Swift package with one target containing the stockfish source code as well as some wrapper implementation. When using the stockfish engine the source code expects you to send commands on stdin and receive the response on stdout. To make this work with our iOS application we create a new pipe for reading and one for writing and redirect stdin and stdout to those pipes. Fortunately a function to do exactly this already exists in the C standard library ready for us to use it.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-objc&quot;&gt;- (void)start {
+    // set up read pipe
+    _readPipe = [NSPipe pipe];
+    _pipeReadHandle = [_readPipe fileHandleForReading];
+
+    dup2([[_readPipe fileHandleForWriting] fileDescriptor], fileno(stdout));
+
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(readStdout:)
+     name:NSFileHandleReadCompletionNotification
+     object:_pipeReadHandle
+    ];
+
+    [_pipeReadHandle readInBackgroundAndNotify];
+
+    // set up write pipe
+    _writePipe = [NSPipe pipe];
+    _pipeWriteHandle = [_writePipe fileHandleForWriting];
+    dup2([[_writePipe fileHandleForReading] fileDescriptor], fileno(stdin));
+
+    _queue = dispatch_queue_create(&amp;quot;ck-message-queue&amp;quot;, DISPATCH_QUEUE_CONCURRENT);
+
+    dispatch_async(_queue, ^{
+        _engine-&amp;gt;initialize();
+    });
+}
+
+- (void)stop {
+    [_pipeReadHandle closeFile];
+    [_pipeWriteHandle closeFile];
+
+    _readPipe = NULL;
+    _pipeReadHandle = NULL;
+
+    _writePipe = NULL;
+    _pipeWriteHandle = NULL;
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)sendCommand: (NSString*) command {
+    dispatch_sync(_queue, ^{
+        const char *cmd = [[command stringByAppendingString:@&amp;quot;\n&amp;quot;] UTF8String];
+        write([_pipeWriteHandle fileDescriptor], cmd, strlen(cmd));
+    });
+}
+
+# pragma mark Private
+
+- (void)readStdout: (NSNotification*) notification {
+    [_pipeReadHandle readInBackgroundAndNotify];
+
+    NSData *data = [[notification userInfo] objectForKey:NSFileHandleNotificationDataItem];
+    NSArray&amp;lt;NSString *&amp;gt; *output = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] componentsSeparatedByString:@&amp;quot;\n&amp;quot;];
+
+    [output enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self responseHandler](obj);
+    }];
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	With this wrapper in place we can start to implement the UCI protocol and interface with the chosen engine implementation.
+&lt;/p&gt;
+&lt;h2&gt;
+	Using a chess engine
+&lt;/h2&gt;
+&lt;p&gt;
+	We need 4 core components:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			A model to represent engine commands
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			A parser to parse engine responses
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			An interface to send commands to the engine and to receive responses from it (done)
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			An engine representation to bring all of this together
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	For reference I included parts of this implementation for you to get a better understanding how my integration works. Please note that while I changed the implementation quite a bit in my current project this code was initially taken from this open source package: &lt;a href=&quot;https://github.com/chesskit-app/chesskit-engine&quot;&gt;chesskit-engine&lt;/a&gt;.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;public enum EngineCommand: Equatable {
+	case uci
+	case isready
+	case position(PositionString, moves: [String]? = nil)
+	...
+}
+
+class EngineResponseParser {
+    static func parse(response: String) -&amp;gt; EngineResponse? {
+        let tokens = response.split { $0.isWhitespace || $0.isNewline } .map(String.init)
+        var iterator = tokens.makeIterator()
+
+        guard let command = iterator.next() else {
+            return nil
+        }
+
+        switch command {
+        case &amp;quot;id&amp;quot;:          return parseID(&amp;amp;iterator)
+        case &amp;quot;uciok&amp;quot;:       return .uciok
+        case &amp;quot;readyok&amp;quot;:     return .readyok
+        case &amp;quot;bestmove&amp;quot;:    return parseBestMove(&amp;amp;iterator)
+        case &amp;quot;info&amp;quot;:        return parseInfo(&amp;amp;iterator)
+        default:            return nil
+        }
+    }
+
+    // ...
+}
+
+public class Engine {
+    private let messenger: EngineMessenger
+    public private(set) var isRunning = false
+    private var startupLoop: EngineSetupLoop
+
+    private let queue = DispatchQueue(
+        label: &amp;quot;ck-engine-queue&amp;quot;,
+        qos: .userInteractive
+    )
+
+    deinit {
+        stop()
+    }
+
+    public func start(
+        coreCount: Int? = nil,
+        multipv: Int = 1,
+        completion: @escaping () -&amp;gt; Void = {}
+    ) {
+        startupLoop.startupDidComplete = {
+            self.isRunning = true
+            self.performInitialSetup(
+                coreCount: coreCount ?? ProcessInfo.processInfo.processorCount,
+                multipv: multipv
+            )
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
+
+        messenger.responseHandler = { [weak self] response in
+            guard let self else { return }
+
+            guard let parsed = EngineResponse(rawValue: response) else {
+                if !response.isEmpty {
+                    self.log(response)
+                }
+                return
+            }
+
+            if !self.isRunning, let next = startupLoop.nextCommand(given: parsed) {
+                self.send(command: next)
+            }
+            
+            DispatchQueue.main.async {
+                self.receiveResponse(parsed)
+            }
+        }
+
+        messenger.start()
+        send(command: .uci)
+    }
+
+    public func stop() {
+        guard isRunning else { return }
+
+        send(command: .stop)
+        send(command: .quit)
+        messenger.stop()
+
+        isRunning = false
+        initialSetupComplete = false
+    }
+	
+	public func send(command: EngineCommand) {
+        guard isRunning || [.uci, .isready].contains(command) else {
+            return
+        }
+
+        queue.sync {
+            messenger.sendCommand(command.rawValue)
+        }
+    }
+
+    public var receiveResponse: (_ response: EngineResponse) -&amp;gt; Void = {
+        _ in
+    }
+
+    private var initialSetupComplete = false
+
+    private func performInitialSetup(coreCount: Int, multipv: Int) {
+        guard !initialSetupComplete else { return }
+
+        let fileOptions = [
+                &amp;quot;EvalFile&amp;quot;: &amp;quot;nn-1111cefa1111&amp;quot;,
+                &amp;quot;EvalFileSmall&amp;quot;: &amp;quot;nn-37f18f62d772&amp;quot;
+            ].compactMapValues {
+                Bundle.main.url(forResource: $0, withExtension: &amp;quot;nnue&amp;quot;)?.path()
+            }
+        fileOptions.map(EngineCommand.setoption).forEach(send)
+
+        send(command: .setoption(
+            id: &amp;quot;Threads&amp;quot;,
+            value: &amp;quot;\(max(coreCount - 1, 1))&amp;quot;
+        ))
+        send(command: .setoption(id: &amp;quot;MultiPV&amp;quot;, value: &amp;quot;\(multipv)&amp;quot;))
+
+        initialSetupComplete = true
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	If you are wondering what those EvalFiles are about here is a quick rundown for you:
+	
+	Both Stockfish and Leela Chess Zero require neural network files to be provided to the engine for computation. They can be downloaded on their respective website and will be added to the engine via the setoption command. You are free to chose your options on how to provide the engine with these files. You might want to consider downloading them at app launch or maybe you just bundle them with the application in the first place.
+&lt;/p&gt;
+&lt;h2&gt;
+	Game Review
+&lt;/h2&gt;
+&lt;p&gt;
+	One thing popular chess platforms like lichess offer to their users is a detailed game review analysis. It boils down to categorizing moves as blunders, mistakes and inaccuracies with the help of a chess engine. This information can provide great value when analyzing your games to quickly spot interesting parts of the game and to identify fields of improvements for your chess training.
+&lt;/p&gt;
+&lt;p&gt;
+	Another useful metric is the average centipawn loss.
+	
+	Centipawn loss refers to the difference in evaluation scores given by a chess engine before and after a move. This score is expressed in centipawns, which is one-hundredth of a pawn. A lower centipawn loss indicates better move quality, while a higher centipawn loss suggests a poorer decision. The average centipawn loss further describes the average of all centipawn losses throughout the game. The calculation of this metric is done with the following algorithm:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Analyze Each Move&lt;/strong&gt;: After the game is completed, use a chess engine to analyze each move. For each move, record the evaluation score before and after the move.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Calculate Centipawn Loss for Each Move&lt;/strong&gt;: &lt;code&gt;Centipawn Loss = Evaluation Before Move - Evaluation After Move&lt;/code&gt;. This formula gives you the centipawn loss for each move. If the evaluation after the move is lower than before, the result will be a positive centipawn loss, indicating a drop in position quality.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Sum the Centipawn Losses&lt;/strong&gt;: Add up all the individual centipawn losses for the moves made during the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Count the Number of Moves&lt;/strong&gt;: Determine the total number of moves made in the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Calculate Average Centipawn Loss&lt;/strong&gt;: &lt;code&gt;ACPL = Total Centipawn Loss / Number of Moves&lt;/code&gt; This formula provides the average centipawn loss over the course of the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	As of this writing I did not have any time to look into that more closely but it is one of the features I would like to tackle next.
+&lt;/p&gt;
+&lt;h2&gt;
+	Closing words
+&lt;/h2&gt;
+&lt;p&gt;
+	Thats all I have for this topic. In the last part I&apos;d like to draw a conclusion as well as say a few words about unit tests.
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (7/9): Chess puzzles</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-7-9-chess-puzzles</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-7-9-chess-puzzles" rel="alternate">
+		</link>
+		<updated>2024-10-31T15:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;h2&gt;
+	What are chess puzzles?
+&lt;/h2&gt;
+&lt;p&gt;
+	Chess puzzles are specially crafted scenarios in which players are presented with a specific position on the chessboard. The objective is to find the best move or sequence of moves to achieve a particular goal, such as checkmating the opponent, winning material, or escaping from a difficult situation. These puzzles serve as a training tool for players of all skill levels, from beginners to grandmasters.
+&lt;/p&gt;
+&lt;h3&gt;
+	Types of Chess Puzzles
+&lt;/h3&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Checkmate Puzzles&lt;/strong&gt;: These puzzles require the player to deliver checkmate in a certain number of moves. They are often categorized by the number of moves needed to achieve checkmate, such as &quot;mate in 1,&quot; &quot;mate in 2,&quot; etc.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Tactical Puzzles&lt;/strong&gt;: These focus on specific tactical themes, such as forks, pins, skewers, and discovered attacks. Solving these puzzles helps players recognize tactical opportunities during real games.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Endgame Puzzles&lt;/strong&gt;: These involve positions that arise in the endgame phase of chess. They often test players&apos; understanding of key endgame concepts and techniques.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Defensive Puzzles&lt;/strong&gt;: In these scenarios, the player must find the best defensive move to avoid losing material or getting checkmated.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	To conclude puzzles are of tremendous help in improving your overall chess skills especially in terms of pattern recognition. This is the reason why I wanted to incorporate puzzle training into my chess training app.
+&lt;/p&gt;
+&lt;h2&gt;
+	Datasource for chess puzzles
+&lt;/h2&gt;
+&lt;p&gt;
+	Fortunately lichess offers a huge catalog of chess puzzles you can use in your application. At the time of writing the database consists of &lt;strong&gt;4,211,138&lt;/strong&gt; puzzles which are also categorized.
+&lt;/p&gt;
+&lt;p&gt;
+	On their &lt;a href=&quot;https://database.lichess.org/#puzzles&quot;&gt;website&lt;/a&gt; they state:
+&lt;/p&gt;
+&lt;blockquote&gt;
+	&lt;p&gt;
+		Lichess games and puzzles are released under the &lt;a href=&quot;https://tldrlegal.com/license/creative-commons-cc0-1.0-universal&quot;&gt;Creative Commons CC0 license&lt;/a&gt;. Use them for research, commercial purpose, publication, anything you like. You can download, modify and redistribute them, without asking for permission.
+	&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;
+	And I think that is wonderful.
+&lt;/p&gt;
+&lt;h2&gt;
+	Implementation
+&lt;/h2&gt;
+&lt;p&gt;
+	In the previous parts we already talked about SAN, FEN and PGN Parsing. We also have a catalog of UI components which can be used to display a chess board and play moves. GRDB.swift is integrated into project as well to help with reading from a sqlite database. Therefore everything is in place to build the puzzle feature in the application.
+&lt;/p&gt;
+&lt;p&gt;
+	I downloaded a database dump and added it to my app project. Next I created some models to read from it via GRDB.swift. Creating a list of possible categories and adding some puzzle modes was trivial with the help of SwiftUI. I added two playing modes:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Puzzle Streak: Trying to solve as many puzzles as possible without a mistake, with each puzzle getting trickier.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Puzzle Storm: Trying to solve as many puzzles as possible in a limited amount of time.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	This is something which existing online platforms like lichess solve pretty well already. However I wanted to add this functionality to my app as well to have a full featured application solving all my various needs in terms of training my chess skills.
+&lt;/p&gt;
+&lt;p&gt;
+	In the upcoming part of this series we will examine chess engines and how we can leverage them in our project.
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (6/9): Spaced repetition repertoire training</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-6-9-spaced-repetition-repertoire-training</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-6-9-spaced-repetition-repertoire-training" rel="alternate">
+		</link>
+		<updated>2024-10-31T14:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;p&gt;
+	You probably already heard about the term &lt;a href=&quot;https://en.wikipedia.org/wiki/Spaced_repetition&quot;&gt;Spaced repetition&lt;/a&gt;. Maybe you even used spaced repetition training when learning for an exam or something like this. The most popular online platform to deal with spaced repetition is &lt;a href=&quot;https://apps.ankiweb.net/&quot;&gt;Anki&lt;/a&gt; flashcards. In chess spaced repetition also I widely known as one of the best techniques to memorize a repertoire and to learn the various moves. Online platforms like &lt;a href=&quot;https://chessable.com&quot;&gt;Chessable&lt;/a&gt; make use of this learning technique to provide valuable tools to chess players.
+	
+	One of the more recent developments in this area is the FSRS(Free Spaced Repetition Scheduler) algorithm which I am currently using to develop this feature for my app.
+&lt;/p&gt;
+&lt;h2&gt;
+	FSRS algorithm
+&lt;/h2&gt;
+&lt;p&gt;
+	I probably won&apos;t describe this algorithm better than its developer Jarrett Ye. So without further explanation I highly recommend you to read up on this algorithm through these links:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;a href=&quot;https://github.com/open-spaced-repetition/fsrs4anki/wiki/ABC-of-FSRS&quot;&gt;Overview&lt;/a&gt;&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;a href=&quot;https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm&quot;&gt;Reference&lt;/a&gt;&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	Furthermore a pretty solid implementation for Swift already exists online on GitHub which is why I didn&apos;t look into building my own package and instead decided to build upon this existing one: &lt;a href=&quot;https://github.com/4rays/swift-fsrs&quot;&gt;swift-fsrs&lt;/a&gt;.
+&lt;/p&gt;
+&lt;p&gt;
+	Instead I&apos;d like to focus more on the parts I did implement on my own which is the actual repertoire training and how to chose which move to learn and schedule next.
+&lt;/p&gt;
+&lt;h2&gt;
+	Tree data structure
+&lt;/h2&gt;
+&lt;p&gt;
+	A chess repertoire can be represented as a tree, where each node corresponds to a position in a game, and the edges represent possible moves. The root of the tree is the starting position, and the leaves represent the end of a line or a position that has been thoroughly studied. When using a tree data structure we want to look at two main traversing algorithms:
+&lt;/p&gt;
+&lt;h3&gt;
+	1. Depth-First Traversal
+&lt;/h3&gt;
+&lt;p&gt;
+	Depth-first traversal (DFT) explores as far down a branch of the tree as possible before backtracking. This method can be particularly useful for in-depth study of a specific line in a repertoire.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func depthFirstTraversal(node: ChessNode) {
+    // Mark the node as visited
+    visit(node)
+    
+    // Recursively visit each child node
+    for child in node.children {
+        depthFirstTraversal(child)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	2. Breadth-First Traversal
+&lt;/h3&gt;
+&lt;p&gt;
+	Breadth-first traversal (BFT), on the other hand, explores all nodes at the present depth level before moving on to nodes at the next depth level. This approach is beneficial for ensuring a well-rounded understanding of the repertoire.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func breadthFirstTraversal(root: ChessNode) {
+    var queue: [ChessNode] = [root]
+    
+    while !queue.isEmpty {
+        let node = queue.removeFirst()
+        visit(node)
+        
+        // Add all child nodes to the queue
+        queue.append(contentsOf: node.children)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	To effectively schedule the next move in a chess repertoire using spaced repetition, you can combine the traversal algorithms with a spaced repetition algorithm. Here’s how you might integrate them:
+&lt;/p&gt;
+&lt;p&gt;
+	If there are any moves markes as &quot;due for review&quot; present them to the user. If all due moves are reviewed, choose the first move which isn&apos;t reviewed yet based on the chosen tree traversal algorithm. Once the user reviewed this move calculate the next interval at which the move should be reviewed again.
+&lt;/p&gt;
+&lt;p&gt;
+	For completeness sake I will provide you with my current implementation of a chess game tree which I use to implement the presented algorithms:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;@Observable
+public final class Game: CustomStringConvertible, Identifiable, Hashable, Equatable {
+    public private(set) var current: GameNode
+    public private(set) var root: GameNode
+    public private(set) var tags: [String: String]
+
+    init(root: GameNode, tags: [String: String]) {
+        self.root = root
+        self.current = root
+        self.tags = tags
+    }
+    
+    public convenience init(tags: [String: String]) throws {
+        if let fen = tags[&amp;quot;FEN&amp;quot;] {
+            let position = try Position(fen: fen)
+            let node = GameNode(position: position)
+            self.init(root: node, tags: tags)
+        } else {
+            self.init(root: GameNode(), tags: tags)
+        }
+    }
+    
+    public convenience init() {
+        self.init(root: GameNode(), tags: [:])
+    }
+
+    public static func == (lhs: Game, rhs: Game) -&amp;gt; Bool {
+        lhs.id == rhs.id
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    public var id: UUID {
+        root.nodeId
+    }
+
+    public var ply: Int { current.ply }
+    
+    public var isAtBeginning: Bool {
+        current.isTopNode
+    }
+    
+    public var isAtEnd: Bool {
+        current.variations.isEmpty
+    }
+    
+    public func goForward() {
+        guard let next = current.variations.first else { return }
+        self.current = next
+    }
+    
+    public func goBackward() {
+        guard let parent = current.parent else { return }
+        self.current = parent
+    }
+    
+    public func goToBeginning() {
+        go(to: root)
+    }
+    
+    public func goToEnd() {
+        while !isAtEnd {
+            goForward()
+        }
+    }
+    
+    public func go(to node: GameNode) {
+        self.current = node
+    }
+    
+    public func go(to id: UUID) {
+        guard let match = root.search(for: id) else { return }
+        go(to: match)
+    }
+    
+    public func play(move: Move) throws {
+        let newPosition = try current.position.play(move: move)
+        let newNode = GameNode(position: newPosition, move: move, parent: current)
+        
+        let existingNode = current.variations.first { $0.move == move }
+        
+        if let existingNode {
+            go(to: existingNode)
+        } else {
+            add(node: newNode)
+        }
+    }
+    
+    public func add(node: GameNode) {
+        current.variations.append(node)
+        go(to: node)
+    }
+    
+    public func addMainline(node: GameNode) {
+        current.variations.insert(node, at: 0)
+        go(to: node)
+    }
+    
+    public func remove(node: GameNode) {
+        node.parent?.variations.removeAll(where: {
+            $0.nodeId == node.nodeId
+        })
+    }
+    
+    public func remove(id: UUID) {
+        guard let match = root.search(for: id) else { return }
+        remove(node: match)
+    }
+    
+    public func promote(node: GameNode) {
+        let variationStart = node.variationStart
+        guard let parent = variationStart.parent else { return }
+        guard let index = parent.variations.firstIndex(where: {
+            $0.nodeId == variationStart.nodeId
+        }) else { return }
+        if index &amp;gt; 0 {
+            parent.variations.swapAt(index, index - 1)
+        }
+    }
+    
+    public func promoteToMainline(node: GameNode) {
+        let variationStart = node.variationStart
+        guard let parent = variationStart.parent else { return }
+        guard let index = parent.variations.firstIndex(where: {
+            $0.nodeId == variationStart.nodeId
+        }), index != 0 else { return }
+        
+        parent.variations.removeAll(where: {
+            $0.nodeId == variationStart.nodeId
+        })
+        parent.variations.insert(variationStart, at: 0)
+    }
+    
+    public func demote(node: GameNode) {
+        let variationStart = node.variationStart
+        guard let parent = variationStart.parent else { return }
+        guard let index = parent.variations.firstIndex(where: {
+            $0.nodeId == variationStart.nodeId
+        }) else { return }
+        if index &amp;lt; parent.variations.count - 1 {
+            parent.variations.swapAt(index, index + 1)
+        }
+    }
+    
+    public func traverse(from node: GameNode, visit: (GameNode) -&amp;gt; Void) {
+        visit(node)
+        for variation in node.variations {
+            traverse(from: variation, visit: visit)
+        }
+    }
+    
+    public func traverseMainline(from node: GameNode, visit: (GameNode) -&amp;gt; Void) {
+        visit(node)
+        if let next = node.variations.first {
+            traverseMainline(from: next, visit: visit)
+        }
+    }
+    
+    public var uciPath: [String] {
+        current.reconstructMovesFromBeginning().map(\.uci)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h2&gt;
+	Bonus: Finding deviations of your repertoire in your online games
+&lt;/h2&gt;
+&lt;p&gt;
+	One last bonus before we finish up this part of the blog post series. One main motivation for building my own chess training application was to learn my new repertoire. This meant of course building the spaced repetition feature for training the repertoire.
+&lt;/p&gt;
+&lt;p&gt;
+	One feature I could not find on any of the available platforms though was to analyze my online games in the context of my repertoire. On my MacBook this is fairly simple to do since I can open multiple windows to open my repertoire in some chess database software next to my online game. On iOS this is rather tricky and the user experience left me frustrated.
+&lt;/p&gt;
+&lt;p&gt;
+	Since my application stores my repertoire already I decided to integrate with the lichess and chess.com APIs to download my online games. With the game information available I was able to build a feature where each move of my online games is compared to my repertoire database. If my opponent or I deviate from my repertoire I mark this in the move notation view and provide a link to the respective position in the repertoire. With this little change I now quickly can see where my repertoire needs to be expanded as well as which parts of my repertoire I have trouble with recalling.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt; func checkForDeviation() {
+    for move in moves {
+        let fen = position.make(move: move).fen
+        if await !database.findMoveInRepertoire(for: playerSide, fen: fen) {
+            // did not find position in repertoire
+        }
+    }
+}
+
+func findMoveInRepertoire(for side: Repertoire.Side, fen: String) async -&amp;gt; Bool {
+    do {
+        return try await reader.read { db in
+            if try Repertoire
+            .filter(Repertoire.Columns.side == playerSide)
+            .joining(required: Repertoire.positions.filter(RepertoirePosition.Columns.fen == fen))
+            .fetchOne(db) == nil {
+                return false
+                } else {
+                    return true
+                }
+            }
+    } catch {
+        return false
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (5/9): Database Schema and move encoding</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-5-9-database-schema-and-move-encoding</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-5-9-database-schema-and-move-encoding" rel="alternate">
+		</link>
+		<updated>2024-10-31T13:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;p&gt;
+	Hello and welcome to the next part of my ongoing blog post series of writing a chess app for iOS and macOS.
+	
+	In this part I&apos;d like to talk about my design decision regarding the database schema.
+	
+	So lets dive in.
+&lt;/p&gt;
+&lt;h2&gt;
+	Database Schema
+&lt;/h2&gt;
+&lt;p&gt;
+	For the database schema I heavily leaned on on the work of &lt;a href=&quot;https://github.com/nguyenpham/ocgdb&quot;&gt;ocgdb&lt;/a&gt;. It is an open database format, is actually quite performant to store and search chess games and is the best excuse to use one of my favourite Swift packages (&lt;a href=&quot;https://github.com/groue/GRDB.swift&quot;&gt;GRDB.swift&lt;/a&gt;). Besides the obvious benefits the open source chess database software &lt;a href=&quot;https://encroissant.org&quot;&gt;En Croissant&lt;/a&gt; also uses the exact same database format and so my choice was being made.
+&lt;/p&gt;
+&lt;p&gt;
+	For reference here is the sqlite schema which I think is pretty self explanatory:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;CREATE TABLE Info (
+    Name TEXT UNIQUE NOT NULL,
+    Value TEXT
+);
+
+CREATE TABLE Events (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT UNIQUE
+);
+
+CREATE TABLE Sites (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT UNIQUE
+);
+
+CREATE TABLE Players (
+    ID INTEGER PRIMARY KEY,
+    Name TEXT UNIQUE,
+    Elo INTEGER
+);
+
+CREATE TABLE Games (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    EventID INTEGER,
+    SiteID INTEGER,
+    Date TEXT,
+    Round INTEGER,
+    WhiteID INTEGER,
+    WhiteElo INTEGER,
+    BlackID INTEGER,
+    BlackElo INTEGER,
+    Result INTEGER,
+    TimeControl TEXT,
+    ECO TEXT,
+    PlyCount INTEGER,
+    FEN TEXT,
+    Moves BLOB,
+    FOREIGN KEY(EventID) REFERENCES Events,
+    FOREIGN KEY(SiteID) REFERENCES Sites,
+    FOREIGN KEY(WhiteID) REFERENCES Players,
+    FOREIGN KEY(BlackID) REFERENCES Players
+);
+
+CREATE INDEX IF NOT EXISTS games_date_idx ON Games(Date);
+CREATE INDEX IF NOT EXISTS games_white_idx ON Games(WhiteID);
+CREATE INDEX IF NOT EXISTS games_black_idx ON Games(BlackID);
+CREATE INDEX IF NOT EXISTS games_result_idx ON Games(Result);
+CREATE INDEX IF NOT EXISTS games_white_elo_idx ON Games(WhiteElo);
+CREATE INDEX IF NOT EXISTS games_black_elo_idx ON Games(BlackElo);
+CREATE INDEX IF NOT EXISTS games_plycount_idx ON Games(PlyCount);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	If you had a closer look at the schema you might have noticed that the &lt;code&gt;Moves&lt;/code&gt; column is specified as a &lt;code&gt;BLOB&lt;/code&gt;. The idea behind that design decision is discussed in our next chapter.
+&lt;/p&gt;
+&lt;h2&gt;
+	Move Encoding
+&lt;/h2&gt;
+&lt;p&gt;
+	When thinking about how to encode moves into the database several options come to mind. The obvious solution is to store the movetext just as a &lt;code&gt;TEXT&lt;/code&gt; column and move on. I opted for encoding every chess move with only 2 bytes. This not only makes the actual data that is saved pretty small it also makes encoding and decoding moves trivial. Of course this could be optimized even further but weighting performance and ease of use against each other I ultimately found this solution to be the best fit for my needs.
+&lt;/p&gt;
+&lt;p&gt;
+	As we learned at the beginning of this blog post series a chess board has 64 squares and a move can be represented by moving a piece from one square to another square. The piece does not have to be stored itself, since this information is typically retrieved from a FEN string which encodes a chess board quite efficiently. There is a special case when moving a pawn to the backrank of your opponent resulting in promoting your pawn to a queen, knight, bishop or rook. So we need to account for that. If we represent the various promotion options with an integer enum we end up with a single integer ranging from 0-4 to encode a promotion information:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;enum Promotion: Int {
+	case empty
+	case queen
+	case bishop
+	case rook
+	case knight
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	With this in place a move representation can look something like this:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;typealias Square = Int
+
+extension Square {
+	var rank: Int {
+	    value &amp;gt;&amp;gt; 3
+	}
+	
+	var file: Int {
+	    value &amp;amp; 0x7
+	}
+}
+
+struct Move: Hashable, Equatable, Sendable {
+    let from: Square
+    let to: Square
+    let promotion: Promotion
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	There is room for improvement though. You could represent a square with a struct conforming to &lt;code&gt;RawRepresentable&lt;/code&gt; and &lt;code&gt;ExpressibleByIntegerLiteral&lt;/code&gt; to actually not pollute the &lt;code&gt;Int&lt;/code&gt; namespace with our extensions but this is something I haven&apos;t looked into yet. As a bonus I added some code to retrieve the file and rank of a given square.
+&lt;/p&gt;
+&lt;p&gt;
+	Looking at the above representation of a move lets count how much bits we need to actually store this information.
+	
+	We need 6 bits for each square (2^6 = 64) and 2 bits (2^2 = 4) to store the promotion information adding up to 14 bits in total which easily fits in an UInt16 or 2 bytes. For completeness sake here are the respective encoding and decoding functions:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;init(encoded: UInt16) {
+    let from = encoded &amp;amp; 63
+    let to = encoded &amp;gt;&amp;gt; 6 &amp;amp; 63
+    let promotion = (encoded &amp;gt;&amp;gt; 12) &amp;amp; 7
+    let promotionRole = Promotion(rawValue: Int(promotion))
+    self.init(from: Square(from), to: Int(to), promotion: promotionRole)
+}
+
+var encoded: UInt16 {
+    UInt16(from) | UInt16(to) &amp;lt;&amp;lt; 6 | (UInt16(promotion.rawValue)) &amp;lt;&amp;lt; 12
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	And with that lets move on our next part which will look at spaced repetition training of repertoires.
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (4/9): Building a suite of components for chess applications in SwiftUI</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-4-9-building-a-suite-of-components-for-chess-applications-in-swiftui</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-4-9-building-a-suite-of-components-for-chess-applications-in-swiftui" rel="alternate">
+		</link>
+		<updated>2024-10-31T12:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;p&gt;
+	When learning to program we probably all at some point ended up drawing a &quot;chessboard&quot; by learning about &lt;code&gt;for loops&lt;/code&gt;. At least when I started to learn programming with Java this was a typical exercise.
+	
+	Unfortunately it takes a little more than two for loops to build a chessboard UI component with all bells and whistles. In this series I want to highlight some of the most interesting bits I stumbled upon.
+&lt;/p&gt;
+&lt;h2&gt;
+	Board
+&lt;/h2&gt;
+&lt;p&gt;
+	Thanks to the SwiftUI layout system I found this task to be rather fun and entertaining. Basically I use a ZStack to overlay multiple views on top of each other. At the lowest zIndex the board background is drawn and from there square decorations, pieces, etc. will follow:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;ZStack {
+    background
+    lastMoveDecoration
+    selectedSquareDecoration
+    moveDestinationsDecoration
+    inCheckDecoration
+    pieces
+    draggedPiece
+    draggedPieceDecoration
+    annotations
+    shapes
+    promotionModal
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	Thanks to the declarative nature of SwiftUI I was able to build a full-blown theming system for the board as well. Whenever my theme property changes the board gets redrawn and will be updated. To retrieve the currently selected theme I can fetch the board settings from the environment:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;public extension EnvironmentValues {
+    @Entry var boardSettings: BoardSettings = .init(
+        isLastMoveHighlightEnabled: true,
+        isValidMovesHighlightingEnabled: true,
+        isBlindfoldMode: false,
+        isShapeDrawingEnabled: true,
+        shapeDrawingColor: .green,
+        isAnnotationDrawingEnabled: true,
+        isCoordinateDrawingEnabled: true,
+        isMagnifyingDraggedPiecesEnabled: true,
+        boardTheme: .blue,
+        pieceSet: .cburnett
+    )
+}
+
+ BoardView(model: model.boardModel)
+    .environment(\.boardSettings, boardSettings)
+
+// In BoardView:
+@Environment(\.boardSettings) private var boardSettings
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;div id=&quot;image-table&quot;&gt;
+	&lt;table&gt;
+		&lt;tr&gt;
+			&lt;td style=&quot;padding:10px&quot;&gt;
+				&lt;img alt=&quot;An image showing a chess board with a blue theme.&quot; loading=&quot;lazy&quot; src=&quot;/img/writing-a-chess-app/theme-blue.png&quot; width=&quot;200&quot;/&gt;
+			&lt;/td&gt;
+			&lt;td style=&quot;padding:10px&quot;&gt;
+				&lt;img alt=&quot;An image showing a chess board with a wooden theme.&quot; loading=&quot;lazy&quot; src=&quot;/img/writing-a-chess-app/theme-wood.png&quot; width=&quot;200&quot;/&gt;
+			&lt;/td&gt;
+			&lt;td style=&quot;padding:10px&quot;&gt;
+				&lt;img alt=&quot;An image showing a chess board with a newspaper theme and alternative piece images.&quot; loading=&quot;lazy&quot; src=&quot;/img/writing-a-chess-app/theme-newspaper-merida.png&quot; width=&quot;200&quot;/&gt;
+			&lt;/td&gt;
+			&lt;td style=&quot;padding:10px&quot;&gt;
+				&lt;img alt=&quot;An image showing a settings screen in an iOS application to style a chess board.&quot; loading=&quot;lazy&quot; src=&quot;/img/writing-a-chess-app/theme-settings.png&quot; width=&quot;200&quot;/&gt;
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/table&gt;
+&lt;/div&gt;
+&lt;p&gt;
+	To display the current piece information on the board I pass a FEN string to my data model which makes use of the package we talked about in Part 3 of this series to parse the encoded information into a chess position which I then can use to draw the piece images on the board.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func set(fen: String) {
+    let newPieces = FENParser.parsePieces(from: fen)
+    withAnimation(.linear(duration: 0.1)) {
+        self.preparePieceAnimation(oldPieces: pieces, newPieces: newPieces)
+    } completion: {
+        self.resetPieceAnimation()
+        self.pieces = newPieces
+    }
+}
+
+@ViewBuilder private var pieces: some View {
+    ForEach(Array(model.pieces), id: \.0) { (squareId, piece) in
+        PositionedSquare(
+            squareSize: squareSize,
+            squareId: squareId,
+            orientation: model.orientation) {
+                AnimatedPieceImage(
+                    isEnabled: !isDragging,
+                    isFading: model.isFading(at: squareId, piece: piece),
+                    translation: model.translation(for: squareId, piece: piece, squareSize: squareSize)) {
+                        PieceImage(
+                            piece: piece,
+                            pieceAssets: boardSettings.pieceSet.assets,
+                            isBlindfoldMode: boardSettings.isBlindfoldMode
+                        )
+                        .animation(.linear(duration: 0.25), value: draggedSquareId)
+                        .opacity(draggedSquareId == squareId &amp;amp;&amp;amp; isDragging ? 0.5 : 1)
+                    }
+                }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h2&gt;
+	Promotion Handling
+&lt;/h2&gt;
+&lt;p&gt;
+	When a pawn moves to the opponents backrank it promotes to either a bishop, knight, rook or a queen. I actually quite like how lichess handles this. Most of the chessboard implementations show a modal to choose the promotion piece. However on lichess an inline representation is displayed and I quite like the user experience of that.
+&lt;/p&gt;
+&lt;video controls width=&quot;200&quot;&gt;
+	&lt;source src=&quot;/img/writing-a-chess-app/promotion.mp4&quot; type=&quot;video/mp4&quot;/&gt;
+&lt;/video&gt;
+&lt;p&gt;
+	Thanks to SwiftUI displaying this on the board is just a matter of conditionally including the promotion picker view in a ZStack to overlay the board with the picker component.
+&lt;/p&gt;
+&lt;h2&gt;
+	Animations
+&lt;/h2&gt;
+&lt;p&gt;
+	When talking about animations I specifically mean the piece animation when moving a piece from one square to another. SwiftUI already comes with a builtin animation engine which can be used to accomplish this task. Whenever the chess board will be updated with a new FEN I calculate all translating and fading (captured) pieces and store them in a property. Moving on I use this information to animate the position of the piece. Once the animation completes I reset the calculated properties and apply the new FEN position to the board.
+&lt;/p&gt;
+&lt;p&gt;
+	For completeness sake here is the respective code snippet:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func preparePieceAnimation(oldPieces: Pieces, newPieces: Pieces) {
+    var newOnSquare: Pieces = [:]
+    var missingOnSquare: Pieces = [:]
+    var animatedOrigins: Set&amp;lt;SquareId&amp;gt; = .init()
+    
+    for squareId in SquareId.all {
+        let oldPiece = oldPieces[squareId]
+        let newPiece = newPieces[squareId]
+        if let newPiece {
+            if let oldPiece {
+                if newPiece != oldPiece {
+                    missingOnSquare[squareId] = oldPiece
+                    newOnSquare[squareId] = newPiece
+                }
+            } else {
+                newOnSquare[squareId] = newPiece
+            }
+        } else if let oldPiece {
+            missingOnSquare[squareId] = oldPiece
+        }
+    }
+    
+    for (newPieceSquareId, newPiece) in newOnSquare {
+        if let fromSquareId = closestSquare(
+            squareId: newPieceSquareId,
+            from: Set(missingOnSquare.filter({ $0.1 == newPiece }).keys)
+        ) {
+            translatingPieces[newPieceSquareId] = (fromSquareId, newPiece)
+            animatedOrigins.insert(fromSquareId)
+        }
+    }
+    
+    for (missingPieceSquareId, missingPiece) in missingOnSquare {
+        if !animatedOrigins.contains(missingPieceSquareId) {
+            fadingPieces[missingPieceSquareId] = missingPiece
+        }
+    }
+}
+
+func distanceSq(from: SquareId, to: SquareId) -&amp;gt; Int {
+    let fromCoordinate = Coordinate(squareId: from)
+    let toCoordinate = Coordinate(squareId: to)
+    let dx = fromCoordinate.x - toCoordinate.x
+    let dy = fromCoordinate.y - toCoordinate.y
+    return dx * dx + dy * dy
+}
+
+func closestSquare(squareId: SquareId, from squares: Set&amp;lt;SquareId&amp;gt;) -&amp;gt; SquareId? {
+    guard !squares.isEmpty else { return nil }
+    return squares.min {
+        distanceSq(from: squareId, to: $0) &amp;lt; distanceSq(from: squareId, to: $1) ? true : false
+    }
+}
+
+func resetPieceAnimation() {
+    self.translatingPieces.removeAll()
+    self.fadingPieces.removeAll()
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	And the result looks like this:
+&lt;/p&gt;
+&lt;video controls width=&quot;200&quot;&gt;
+	&lt;source src=&quot;/img/writing-a-chess-app/animations.mp4&quot; type=&quot;video/mp4&quot;/&gt;
+&lt;/video&gt;
+&lt;h2&gt;
+	Shapes
+&lt;/h2&gt;
+&lt;p&gt;
+	One feature you see in full featured chessboard implementations is the ability to draw shapes on the board. They help visualizing a plan or to explain concepts to a chess player. This is the reason why the PGN file format was supplemented with specific commands encoded in the comments section of a move. Two of those commands deal with drawing a circle or an arrow on the board. Here are two examples:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			[%cal Gc2c3,Rc3d4]: Draw a coloured arrow in green from c2 to c3 and a red arrow from c3 to d4
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			[%csl Ra3,Ba4]: Draw a coloured circle in red on a3 and a blue circle on a4
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	Since the circle shape already exists in SwiftUI all that was left for me to implement was the arrow shape. I created a custom shape component and implemented it with a &lt;code&gt;Path&lt;/code&gt; view:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;var body: some View {
+    let start = Coordinate(squareId: configuration.origin)
+    let startPoint = start.offset(orientation: orientation, squareSize: squareSize)
+    let end = Coordinate(squareId: configuration.destination)
+    let endPoint = end.offset(orientation: orientation, squareSize: squareSize)
+    let arrowAngle = CGFloat(Double.pi / 5)
+    
+    let rankDistance = end.x - start.x
+    let fileDistance = end.y - start.y
+    let isKnightMove = (abs(rankDistance) == 2 &amp;amp;&amp;amp; abs(fileDistance) == 1) || (abs(rankDistance) == 1 &amp;amp;&amp;amp; abs(fileDistance) == 2)
+    
+    Path { path in
+        var delta: CGPoint
+        path.move(to: startPoint)
+        
+        if isKnightMove {
+            let dx = endPoint.x - startPoint.x
+            let dy = endPoint.y - startPoint.y
+            let horizontalFirst = abs(dx) &amp;gt; abs(dy)
+            let turnPoint = horizontalFirst ? CGPoint(x: endPoint.x, y: startPoint.y) : CGPoint(x: startPoint.x, y: endPoint.y)
+            path.addLine(to: turnPoint)
+            delta = CGPoint(
+                x: endPoint.x - turnPoint.x,
+                y: endPoint.y - turnPoint.y
+            )
+        } else {
+            delta = CGPoint(
+                x: endPoint.x - startPoint.x,
+                y: endPoint.y - startPoint.y
+            )
+        }
+        
+        // Draw Triangle
+        let pointerLineLength = squareSize.width * 0.15625
+        let angle = atan2(delta.y, delta.x)
+        let arrowLine1 = CGPoint(
+            x: endPoint.x + pointerLineLength * cos(CGFloat(Double.pi) - angle + arrowAngle),
+            y: endPoint.y - pointerLineLength * sin(CGFloat(Double.pi) - angle + arrowAngle)
+        )
+        let arrowLine2 = CGPoint(
+            x: endPoint.x + pointerLineLength * cos(CGFloat(Double.pi) - angle - arrowAngle),
+            y: endPoint.y - pointerLineLength * sin(CGFloat(Double.pi) - angle - arrowAngle)
+        )
+        
+        let triangleCenter = ((arrowLine1.x + endPoint.x + arrowLine2.x)/3, (arrowLine1.y + endPoint.y + arrowLine2.y)/3)
+        path.addLine(to: CGPoint(x: triangleCenter.0, y: triangleCenter.1))
+        path.move(to: arrowLine1)
+        path.addLine(to: endPoint)
+        path.addLine(to: arrowLine2)
+        path.closeSubpath()
+    }
+    .strokedPath(StrokeStyle(lineWidth: squareSize.width * 0.15625, lineCap: .round, lineJoin: .miter))
+    .foregroundColor(configuration.color.color)
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	The result allows to not only colour the shape in any colour I&apos;d like it also scales to the boards dimension due to the inclusion of the square size. Besides that I also draw a different path for a typical knight move as this is something I saw on the online platform chess.com  and I quite liked this.
+&lt;/p&gt;
+&lt;div class=&quot;image&quot;&gt;
+	&lt;img alt=&quot;An image showing a chess board written in SwiftUI with shapes drawn above it.&quot; loading=&quot;lazy&quot; src=&quot;/img/writing-a-chess-app/shapes.png&quot; width=&quot;463.5&quot;/&gt;
+&lt;/div&gt;
+&lt;h2&gt;
+	Move Notation
+&lt;/h2&gt;
+&lt;p&gt;
+	The last challenge I want to talk about is to display the move notation below or next to the board. The actual string representation of a chess game is something I added to my chess logic package. Internally I store a chess game in some kind of tree structure which I can traverse and build the SAN representation of every given move. If you look at it the implementation boils down to a parser printer as this is pretty similar to our PGN parser, just in reverse order.
+&lt;/p&gt;
+&lt;p&gt;
+	However the real challenge I faced was to display this string representation with SwiftUI. My goal was to maintain the flow layout a text has while being able to decorate specific ranges of the string with different foreground and background colours. Also a specific move needs to be selectable so I can quickly jump to the position in the game. Lets quickly examine the available options and why they did not work for me:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			For each move render a button component which can receive an action and can be styled to the specific needs.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			For each move render a seperate text component which can be styled with a foreground and background color. To implement the click action the &lt;code&gt;onTapGesture&lt;/code&gt;  view modifier can be used.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	Both options did not work for me because because I lose the flow layout a Text typically is rendered with. I could use the &lt;code&gt;Layout&lt;/code&gt; protocol of SwiftUI to recreate this but ultimately decided against it.
+&lt;/p&gt;
+&lt;p&gt;
+	The solution I found was to use an &lt;code&gt;AttributedString&lt;/code&gt; to display the move notation in a single text component. Styling attributes like foreground color and background color are part of the &lt;code&gt;AttributedString&lt;/code&gt; and a &lt;code&gt;Text&lt;/code&gt; component in SwiftUI already has an initializer to display it. To be able to select a specific range in the text and execute an action on it I encoded a link attribute in the attributed string with a deeplink. Further I implemented a custom &lt;code&gt;onOpenUrl&lt;/code&gt; action to handle the received deeplink and with that the move notation seems rather usable.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;struct GameNotationView: View {
+    let model: GameModel
+    
+    var body: some View {
+        Text(model.attributedMoveNotation)
+            .environment(\.openURL, .init(handler: handle(_:)))
+    }
+    
+    private func handle(_ url: URL) -&amp;gt; OpenURLAction.Result {
+        guard url.scheme == AppConfiguration.urlScheme else {
+            return .discarded
+        }
+        
+        guard url.host() == &amp;quot;node&amp;quot; else {
+            return .discarded
+        }
+        
+        let path = url.path().dropFirst(1)
+        guard let nodeId = UUID(uuidString: String(path)) else {
+            return .discarded
+        }
+
+        model.goTo(nodeId: nodeId)
+
+        return .handled
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	One thing I would like to revisit at a later time is the limitation that an attributed string has no way of specifying a corner radius for the background color. I think I might be able to leverage this years addition to the SwiftUI framework &lt;code&gt;TextRenderer&lt;/code&gt; to accomplish the design I have in mind but for now the solution is &quot;good enough&quot; for my needs.
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (3/9): Implementation of the actual chess logic</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-3-9-implementation-of-the-actual-chess-logic</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-3-9-implementation-of-the-actual-chess-logic" rel="alternate">
+		</link>
+		<updated>2024-10-31T11:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;p&gt;
+	Before starting with the various implementation details I would like to point you to the superb website at &lt;a href=&quot;https://www.chessprogramming.org/&quot;&gt;chessprogramming.org&lt;/a&gt;. A lot of the algorithms and concepts I&apos;ll try to demonstrate in the following chapters are discussed there in great detail.
+&lt;/p&gt;
+&lt;h2&gt;
+	Bitboards
+&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.chessprogramming.org/Bitboards&quot;&gt;Reference&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;
+	When developing a chess application, one of the key components you&apos;ll need to handle is the representation of the chessboard and pieces. One efficient way to represent the board is through the use of &lt;strong&gt;bitboards&lt;/strong&gt;.
+&lt;/p&gt;
+&lt;p&gt;
+	A bitboard is a compact representation of a chessboard using a 64-bit integer. Each bit in the integer corresponds to a square on the chessboard. For example, in a standard 8x8 chessboard layout:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			The least significant bit (LSB) represents a1 (the bottom-left square).
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			The most significant bit (MSB) represents h8 (the top-right square).
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	In a bitboard, each piece type (e.g., pawns, knights, bishops) can be represented as a separate 64-bit integer. With this representation, you can perform operations on the entire board or on individual pieces using bitwise operations.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Advantages of Using Bitboards&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Memory Efficiency&lt;/strong&gt;: A bitboard uses only 8 bytes (64 bits) to represent an entire chessboard, which is significantly more efficient than using a 2D array of objects.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Speed&lt;/strong&gt;: Bitwise operations (AND, OR, NOT, XOR) are extremely fast and can be leveraged to quickly calculate moves, attacks, and other game states.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Simplicity in Move Generation&lt;/strong&gt;: Bitboards simplify the implementation of move generation algorithms. For example, you can easily calculate possible moves for a knight by using precomputed masks and bitwise operations.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Parallelism&lt;/strong&gt;: Bitboards can take advantage of modern CPU architectures by allowing operations on multiple bits simultaneously, which can lead to performance improvements.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	To make this point more clear let&apos;s look at the following example:
+	
+	Assume we have a attack set of a queen, and like to know whether the queen attacks opponent pieces it may capture, we need to &apos;and&apos; the queen-attacks with the set of opponent pieces.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;queen attacks    &amp;amp;  opponent pieces  =  attacked pieces
+. . . . . . . .     1 . . 1 1 . . 1     . . . . . . . .
+. . . 1 . . 1 .     1 . 1 1 1 1 1 .     . . . 1 . . 1 .
+. 1 . 1 . 1 . .     . 1 . . . . . 1     . 1 . . . . . .
+. . 1 1 1 . . .     . . . . . . . .     . . . . . . . .
+1 1 1 * 1 1 1 .  &amp;amp;  . . . * . . 1 .  =  . . . * . . 1 .
+. . 1 1 1 . . .     . . . . . . . .     . . . . . . . .
+. . . 1 . 1 . .     . . . . . . . .     . . . . . . . .
+. . . 1 . . . .     . . . . . . . .     . . . . . . . .
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	Representing the demonstrated idea in Swift code is actually easier than one might think when confronted with the idea for the first time. Here is my solution for that problem:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;// A set of squares represented by a 64 bit integer mask, using little endian
+/// rank-file (LERF) mapping.
+///
+/// ```
+///  8 | 56 57 58 59 60 61 62 63
+///  7 | 48 49 50 51 52 53 54 55
+///  6 | 40 41 42 43 44 45 46 47
+///  5 | 32 33 34 35 36 37 38 39
+///  4 | 24 25 26 27 28 29 30 31
+///  3 | 16 17 18 19 20 21 22 23
+///  2 | 8  9  10 11 12 13 14 15
+///  1 | 0  1  2  3  4  5  6  7
+///    -------------------------
+///      a  b  c  d  e  f  g  h
+/// ```
+public struct SquareSet: Hashable, CustomStringConvertible, Sendable {
+    /// 64 bit integer representing the square set.
+    public let value: UInt64
+    
+    /// Creates a `SquareSet` with the provided 64bit integer value.
+    public init(value: UInt64) {
+        self.value = value
+    }
+    
+    /// Creates a `SquareSet` with a single `Square`.
+    public init(square: Square) {
+        precondition(square &amp;gt;= 0 &amp;amp;&amp;amp; square &amp;lt; 64)
+        self.value = 1 &amp;lt;&amp;lt; square
+    }
+    
+    /// Creates a `SquareSet` from several `Square`s.
+    public init(squares: Set&amp;lt;Square&amp;gt;) {
+        self.value = squares.map {
+            1 &amp;lt;&amp;lt; $0
+        }.reduce(0, |)
+    }
+    
+    /// Create a `SquareSet` containing all squares of the given rank.
+    public init(rank: Int) {
+        precondition(rank &amp;gt;= 0 &amp;amp;&amp;amp; rank &amp;lt; 8)
+        self.value = 0xff &amp;lt;&amp;lt; (8 * rank)
+    }
+    
+    /// Create a `SquareSet` containing all squares of the given file.
+    public init(file: Int) {
+        precondition(file &amp;gt;= 0 &amp;amp;&amp;amp; file &amp;lt; 8)
+        self.value = 0x0101010101010101 &amp;lt;&amp;lt; file
+    }
+    
+    /// Create a `SquareSet` containing all squares of the given backrank `Side`.
+    public init(backrankOf side: Side) {
+        self.value = side == Side.white ? 0xff : 0xff00000000000000
+    }
+    
+    public static let empty = SquareSet(value: 0)
+    public static let full = SquareSet(value: 0xffffffffffffffff)
+    public static let lightSquares = SquareSet(value: 0x55AA55AA55AA55AA)
+    public static let darkSquares = SquareSet(value: 0xAA55AA55AA55AA55)
+    public static let diagonal = SquareSet(value: 0x8040201008040201)
+    public static let antidiagonal = SquareSet(value: 0x0102040810204080)
+    public static let corners = SquareSet(value: 0x8100000000000081)
+    public static let center = SquareSet(value: 0x0000001818000000)
+    public static let backranks = SquareSet(value: 0xff000000000000ff)
+   
+    
+    /// Bitwise right shift
+    public func shr(shift: Int) -&amp;gt; SquareSet {
+        if shift &amp;gt;= 64 {
+            return SquareSet.empty
+        }
+        if shift &amp;gt; 0 {
+            return SquareSet(value: value &amp;gt;&amp;gt; shift)
+        }
+        return self
+    }
+    
+    /// Bitwise left shift
+    public func shl(shift: Int) -&amp;gt; SquareSet {
+        if shift &amp;gt;= 64 {
+            return SquareSet.empty
+        }
+        if shift &amp;gt; 0 {
+            return SquareSet(value: value &amp;lt;&amp;lt; shift)
+        }
+        return self
+    }
+    
+    public func xor(_ other: SquareSet) -&amp;gt; SquareSet {
+        SquareSet(value: value ^ other.value)
+    }
+    
+    public static func ^ (lhs: SquareSet, rhs: SquareSet) -&amp;gt; SquareSet {
+        lhs.xor(rhs)
+    }
+    
+    public func union(_ other: SquareSet) -&amp;gt; SquareSet {
+        SquareSet(value: value | other.value)
+    }
+    
+    public static func | (lhs: SquareSet, rhs: SquareSet) -&amp;gt; SquareSet {
+        lhs.union(rhs)
+    }
+    
+    public func intersect(_ other: SquareSet) -&amp;gt; SquareSet {
+        SquareSet(value: value &amp;amp; other.value)
+    }
+    
+    public static func &amp;amp; (lhs: SquareSet, rhs: SquareSet) -&amp;gt; SquareSet {
+        lhs.intersect(rhs)
+    }
+    
+    /// Wrapping subtract
+    /// UInt64(100).wrappingSub(100) == 0
+    /// UInt64(100).wrappingSub(UInt64.max) == 101
+    public func minus(_ other: SquareSet) -&amp;gt; SquareSet {
+        SquareSet(value: (value &amp;amp;- other.value) &amp;amp; UInt64.max)
+    }
+    
+    public static func - (lhs: SquareSet, rhs: SquareSet) -&amp;gt; SquareSet {
+        lhs.minus(rhs)
+    }
+    
+    public func complement() -&amp;gt; SquareSet {
+        SquareSet(value: ~value)
+    }
+    
+    public func diff(_ other: SquareSet) -&amp;gt; SquareSet {
+        SquareSet(value: value &amp;amp; ~other.value)
+    }
+    
+    public func flipVertical() -&amp;gt; SquareSet {
+        let x = 0x00FF00FF00FF00FF as UInt64
+        let y = 0x0000FFFF0000FFFF as UInt64
+        var n = self.value
+        n = ((n &amp;gt;&amp;gt;  8) &amp;amp; x) | ((n &amp;amp; x) &amp;lt;&amp;lt;  8)
+        n = ((n &amp;gt;&amp;gt; 16) &amp;amp; y) | ((n &amp;amp; y) &amp;lt;&amp;lt; 16)
+        n =  (n &amp;gt;&amp;gt; 32)      |       (n &amp;lt;&amp;lt; 32)
+        return SquareSet(value: n)
+    }
+
+    public func mirrorHorizontal() -&amp;gt; SquareSet {
+        let x = 0x5555555555555555 as UInt64
+        let y = 0x3333333333333333 as UInt64
+        let z = 0x0F0F0F0F0F0F0F0F as UInt64
+        var n = self.value
+        n = ((n &amp;gt;&amp;gt; 1) &amp;amp; x) | ((n &amp;amp; x) &amp;lt;&amp;lt; 1)
+        n = ((n &amp;gt;&amp;gt; 2) &amp;amp; y) | ((n &amp;amp; y) &amp;lt;&amp;lt; 2)
+        n = ((n &amp;gt;&amp;gt; 4) &amp;amp; z) | ((n &amp;amp; z) &amp;lt;&amp;lt; 4)
+        return SquareSet(value: n)
+    }
+    
+    public var size: Int {
+        popcnt64(n: value)
+    }
+    
+    public var isEmpty: Bool { value == 0 }
+    public var isNotEmpty: Bool { value != 0 }
+    
+    public var first: Int? {
+        firstSquare(bitboard: value)
+    }
+    
+    public var last: Int? {
+        lastSquare(bitboard: value)
+    }
+    
+    public var squares: [Square] {
+        var bitboard = value
+        var squares = [Int]()
+        while bitboard != 0 {
+            if let square = firstSquare(bitboard: bitboard) {
+                squares.append(square)
+                bitboard ^= 1 &amp;lt;&amp;lt; square
+            }
+        }
+        return squares
+    }
+    
+    public var reversedSquares: [Square] {
+        var bitboard = value
+        var squares = [Int]()
+        while bitboard != 0 {
+            if let square = lastSquare(bitboard: bitboard) {
+                squares.append(square)
+                bitboard ^= 1 &amp;lt;&amp;lt; square
+            }
+        }
+        return squares
+    }
+    
+    public var moreThanOne: Bool {
+        isNotEmpty &amp;amp;&amp;amp; size &amp;gt; 1
+    }
+     
+    /// Returns square if it is single, otherwise returns null.
+    public var singleSquare: Int? {
+        moreThanOne ? nil : last
+    }
+    
+    public func has(square: Square) -&amp;gt; Bool {
+        precondition(square &amp;gt;= 0 &amp;amp;&amp;amp; square &amp;lt; 64)
+        return value &amp;amp; (1 &amp;lt;&amp;lt; square) != 0
+    }
+    
+    public func isIntersected(with other: SquareSet) -&amp;gt; Bool {
+        intersect(other).isNotEmpty
+    }
+    
+    public func isDisjoint(with other: SquareSet) -&amp;gt; Bool {
+        intersect(other).isEmpty
+    }
+    
+    public func with(square: Square) -&amp;gt; SquareSet {
+        precondition(square &amp;gt;= 0 &amp;amp;&amp;amp; square &amp;lt; 64)
+        let new = value | (1 &amp;lt;&amp;lt; square)
+        return SquareSet(value: new)
+    }
+    
+    public func without(square: Square) -&amp;gt; SquareSet {
+        precondition(square &amp;gt;= 0 &amp;amp;&amp;amp; square &amp;lt; 64)
+        return SquareSet(value: value &amp;amp; ~(1 &amp;lt;&amp;lt; square))
+      }
+    
+    public func toggle(square: Square) -&amp;gt; SquareSet {
+        precondition(square &amp;gt;= 0 &amp;amp;&amp;amp; square &amp;lt; 64)
+        return SquareSet(value: value ^ (1 &amp;lt;&amp;lt; square))
+      }
+    
+    public func withoutFirst() -&amp;gt; SquareSet {
+        if let first {
+            without(square: first)
+        } else {
+            SquareSet.empty
+        }
+    }
+    
+    public var description: String {
+        let buffer = (0...63).reversed().reduce(into: &amp;quot;&amp;quot;) { result, square in
+            result.append(has(square: square) ? &amp;quot;1&amp;quot; : &amp;quot;0&amp;quot;)
+        }
+        guard let firstInt = Int(buffer.prefix(32), radix: 2),
+              let secondInt = Int(buffer.suffix(32), radix: 2) else {
+            return &amp;quot;SquareSet(?)&amp;quot;
+        }
+        let first = String(firstInt, radix: 16).uppercased().leftPad(upTo: 8, using: &amp;quot;0&amp;quot;)
+        let last = String(secondInt, radix: 16).uppercased().leftPad(upTo: 8, using: &amp;quot;0&amp;quot;)
+        let stringVal = &amp;quot;\(first)\(last)&amp;quot;
+        if stringVal == &amp;quot;0000000000000000&amp;quot; {
+            return &amp;quot;SquareSet(0)&amp;quot;
+        }
+        return &amp;quot;SquareSet(0x\(stringVal))&amp;quot;
+    }
+    
+    /// Prints the square set as a human readable string format
+    public var humanReadableSquareSet: String {
+        var buffer = &amp;quot;&amp;quot;
+        for y in (0..&amp;lt;8).reversed() {
+            for x in 0..&amp;lt;8 {
+                let square = x + y * 8
+                buffer.append(has(square: square) ? &amp;quot;1&amp;quot; : &amp;quot;.&amp;quot;)
+                buffer.append(x &amp;lt; 7 ? &amp;quot; &amp;quot; : &amp;quot;\n&amp;quot;)
+            }
+        }
+        return buffer
+    }
+    
+    private func firstSquare(bitboard: UInt64) -&amp;gt; Int? {
+        let ntz = ntz64(x: bitboard)
+        return ntz &amp;gt;= 0 &amp;amp;&amp;amp; ntz &amp;lt; 64 ? ntz : nil
+    }
+
+    private func lastSquare(bitboard: UInt64) -&amp;gt; Int? {
+        if bitboard == 0  {
+            return nil
+        }
+        return 63 - nlz64(x: bitboard)
+    }
+    
+    private func popcnt64(n: UInt64) -&amp;gt; Int {
+        n.nonzeroBitCount
+    }
+
+    private func nlz64(x: UInt64) -&amp;gt; Int {
+        x.leadingZeroBitCount
+    }
+
+    private func ntz64(x: UInt64) -&amp;gt; Int {
+        return x.trailingZeroBitCount
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h2&gt;
+	FEN Parsing
+&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.chessprogramming.org/Forsyth-Edwards_Notation#Shredder-FEN&quot;&gt;Reference&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;
+	With bitboards implemented we have an extremely performant way to implement our chess logic like finding valid moves, or determining whether a check or checkmate is delivered on the board.
+&lt;/p&gt;
+&lt;p&gt;
+	What we need to have a look at next is parsing a FEN encoded chess position as this is, as we learned, an integral part of encoding a given chess position.
+&lt;/p&gt;
+&lt;p&gt;
+	Lets do a quick recap at what we are looking at. A FEN consists of 6 parts:
+	&lt;code&gt;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1&lt;/code&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;lt;FEN&amp;gt; ::=  &amp;lt;Piece Placement&amp;gt;
+       &amp;apos; &amp;apos; &amp;lt;Side to move&amp;gt;
+       &amp;apos; &amp;apos; &amp;lt;Castling ability&amp;gt;
+       &amp;apos; &amp;apos; &amp;lt;En passant target square&amp;gt;
+       &amp;apos; &amp;apos; &amp;lt;Halfmove clock&amp;gt;
+       &amp;apos; &amp;apos; &amp;lt;Fullmove counter&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	My FEN parser implementation is relaxed. Missing FEN fields will be accepted (except the board part) and will be filled with default values. Also FEN fields can either be separated by a space or by an underscore.
+&lt;/p&gt;
+&lt;p&gt;
+	Various FEN extensions like &lt;a href=&quot;https://en.wikipedia.org/wiki/X-FEN&quot;&gt;X-FEN&lt;/a&gt; and &lt;a href=&quot;https://www.chessprogramming.org/Forsyth-Edwards_Notation#Shredder-FEN&quot;&gt;Shredder-FEN&lt;/a&gt; exist, as well as some differences in piece placement data notation for chess variants like Crazyhouse (&lt;a href=&quot;https://fairy-stockfish.github.io/chess-variant-standards/fen.html&quot;&gt;Promotion Status in FEN data&lt;/a&gt;). While my parser supports these I won&apos;t talk about that in detail as I think this is not really relevant for the problem at hand.
+&lt;/p&gt;
+&lt;p&gt;
+	First the FEN string is split into the various parts:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;var parts = fen.split(whereSeparator: { $0.isWhitespace || $0 == &amp;quot;_&amp;quot; })
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	After each part is successfully parsed I remove it from the array. Before dealing with the most interesting part, the piece placement data, lets quickly have a look at the other parts of a FEN. Extracting the information which player&apos;s turn it is seems pretty straight forward:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;let turn: Side
+if parts.isEmpty {
+	// relaxed parsing: default to white
+    turn = .white
+} else {
+	// remove part from the array of yet to be parsed parts
+    let turnPart = parts.removeFirst()
+    if turnPart == &amp;quot;w&amp;quot; {
+        turn = .white
+    } else if turnPart == &amp;quot;b&amp;quot; {
+        turn = .black
+    } else {
+        throw FenError.invalidTurn(String(turnPart))
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	The other parts are similarly easy and I won&apos;t go into detail for everyone of them.
+	
+	Let&apos;s look at the more interesting part, the piece placement data.
+&lt;/p&gt;
+&lt;p&gt;
+	We start with an empty board and with the last rank and first file as we learned in the first part of this series. Next we loop over every character in the string. If we encounter a &lt;code&gt;/&lt;/code&gt; and are positioned at the last file of a rank we move on to the next rank. Otherwise we move on with our parsing logic. At this point we examine whether we are currently looking at a number or a character. If a number is found this means we are dealing with one or more empty squares so we can just skip those and move on. If a character is found we check whether the character is lowercased or uppercased to determine whether a white or a black piece is encoded. Ultimately we determine the actual piece information based on the predefined map and update our board representation.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;&amp;lt;Piece Placement&amp;gt; ::= &amp;lt;rank8&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank7&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank6&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank5&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank4&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank3&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank2&amp;gt;&amp;apos;/&amp;apos;&amp;lt;rank1&amp;gt;
+&amp;lt;ranki&amp;gt;       ::= [&amp;lt;digit17&amp;gt;]&amp;lt;piece&amp;gt; {[&amp;lt;digit17&amp;gt;]&amp;lt;piece&amp;gt;} [&amp;lt;digit17&amp;gt;] | &amp;apos;8&amp;apos;
+&amp;lt;piece&amp;gt;       ::= &amp;lt;white Piece&amp;gt; | &amp;lt;black Piece&amp;gt;
+&amp;lt;digit17&amp;gt;     ::= &amp;apos;1&amp;apos; | &amp;apos;2&amp;apos; | &amp;apos;3&amp;apos; | &amp;apos;4&amp;apos; | &amp;apos;5&amp;apos; | &amp;apos;6&amp;apos; | &amp;apos;7&amp;apos;
+&amp;lt;white Piece&amp;gt; ::= &amp;apos;P&amp;apos; | &amp;apos;N&amp;apos; | &amp;apos;B&amp;apos; | &amp;apos;R&amp;apos; | &amp;apos;Q&amp;apos; | &amp;apos;K&amp;apos;
+&amp;lt;black Piece&amp;gt; ::= &amp;apos;p&amp;apos; | &amp;apos;n&amp;apos; | &amp;apos;b&amp;apos; | &amp;apos;r&amp;apos; | &amp;apos;q&amp;apos; | &amp;apos;k&amp;apos;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;init(fen: String) throws(FenError) {
+    var board = Board.empty
+    var rank = 7
+    var file = 0
+    
+    for i in fen.indices {
+        let character = fen[i]
+        if character == &amp;quot;/&amp;quot; &amp;amp;&amp;amp; file == 8 {
+            file = 0
+            rank -= 1
+        } else {
+            if character.isNumber, let number = Int(String(character)) {
+                file += number
+            } else {
+                if file &amp;gt;= 8 || rank &amp;lt; 0 {
+                    throw FenError.invalidBoardCoordinates(file, rank)
+                }
+                
+                let square = file + rank * 8
+                guard let piece = Piece(char: String(character)) else {
+                    throw FenError.invalidPiece(String(character))
+                }
+                board = board.set(piece: piece, at: square)
+                file += 1
+            }
+        }
+    }
+    
+    if rank != 0 || file != 8 {
+        throw FenError.invalidBoardCoordinates(file, rank)
+    }
+    
+    self = board
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	And with that we are able to read any given FEN string and convert this into our custom board data structure.
+&lt;/p&gt;
+&lt;h2&gt;
+	SAN Parsing
+&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.chessprogramming.org/Algebraic_Chess_Notation#Standard_Algebraic_Notation_.28SAN.29&quot;&gt;Reference&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;
+	As this post is already quite lengthy I will only briefly talk about some of the challenges parsing SANs:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Castling notation can either be represented with the letter &lt;code&gt;O&lt;/code&gt; or the number &lt;code&gt;0&lt;/code&gt; so your implementation should be able to handle both.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			If two or more identical pieces can move to the same square the notation accounts for this with standardized disambiguation rules. The parser needs to be able to handle those cases.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	Other than that it is pretty straight-forward to extract the source and destination square, as well as the promotion information from a given SAN into a move value type.
+	
+	In my implementation I also check for move validity with the help of my bitboard implementation. To round things up lets look at an example on how to parse a castling notation like &lt;code&gt;O-O&lt;/code&gt;.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;if san == &amp;quot;O-O&amp;quot; {
+    guard
+        let king = board.king(of: turn),
+        let rook = castles.rook(of: turn, castlingSide: .king)
+    else {
+        return nil
+    }
+    let move = Move(from: king, to: rook)
+    if !isLegal(move: move) {
+        return nil
+    }
+    return move
+}
+
+func king(of side: Side ) -&amp;gt; Square? {
+    return by(piece: Piece(color: side, role: Role.king)).singleSquare
+}
+
+func by(piece: Piece) -&amp;gt; SquareSet {
+    by(side: piece.color) &amp;amp; by(role: piece.role)
+}
+
+func by(side: Side) -&amp;gt; SquareSet {
+    side == Side.white ? white : black
+}
+
+func by(role: Role) -&amp;gt; SquareSet {
+    switch role {
+    case Role.pawn:
+        return pawns
+    case Role.knight:
+        return knights
+    case Role.bishop:
+        return bishops
+    case Role.rook:
+        return rooks
+    case Role.queen:
+        return queens
+    case Role.king:
+        return kings
+    }
+}
+
+// These are the bitboards for a given position
+// This is just an example for the initial standard chess board position
+// In a given position your bitboards might look different due to the fact that the pieces are already
+// captured or on a different square, a piece was promoted etc.
+let white = SquareSet(value: 0xffff)
+let black = SquareSet(value: 0xffff000000000000)
+let pawns: SquareSet(value: 0x00ff00000000ff00),
+let knights: SquareSet(value: 0x4200000000000042),
+let bishops: SquareSet(value: 0x2400000000000024),
+let rooks: SquareSet.corners,
+let queens: SquareSet(value: 0x0800000000000008),
+let kings: SquareSet(value: 0x1000000000000010)
+
+// Again this is the initial standard position, your bitboards may vary...
+let castles = Castles(
+    castlingRights: SquareSet.corners,
+    whiteRookQueenSide: Squares.a1,
+    whiteRookKingSide: Squares.h1,
+    blackRookQueenSide: Squares.a8,
+    blackRookKingSide: Squares.h8,
+    whitePathQueenSide: SquareSet(value: 0x000000000000000e),
+    whitePathKingSide: SquareSet(value: 0x0000000000000060),
+    blackPathQueenSide: SquareSet(value: 0x0e00000000000000),
+    blackPathKingSide: SquareSet(value: 0x6000000000000000)
+)
+
+extension Castles {
+    func rook(of side: Side, castlingSide: CastlingSide) -&amp;gt; Square? {
+        return if castlingSide == CastlingSide.queen {
+            if side == .white {
+                whiteRookQueenSide
+            } else {
+                blackRookQueenSide
+            }
+        } else {
+            if side == .white {
+                whiteRookKingSide
+            } else {
+                blackRookKingSide
+            }
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	What is actually happening here? Lets say it is whites turn to play. So a SAN like O-O would mean to castle the white king to safety on the kingside. But how do we find the square the white king is currently positioned at? There are several options to choose from but since we are using bitboards to represent the chessboard we have a very performant way to do so. To find the white kings position all we have to do is to take the bitboard of all white pieces and build the intersection of the bitboard encoding all king pieces. The result should be a bitboard containing only one &lt;code&gt;1&lt;/code&gt; representing the white king piece. As we learned the bitboard ist a UInt64 with each bit representing a square so to convert this binary value to the actual square all we need to do is to solve this rather trivial equation: &lt;code&gt;square = 64 - 1 - leadingZeroBitCount&lt;/code&gt;.
+&lt;/p&gt;
+&lt;h2&gt;
+	Conclusion
+&lt;/h2&gt;
+&lt;p&gt;
+	This was quite a lot to cover and I tried my best to keep it concise where I could. Building a package to handle all the related chess logic is quite a big task as you can see. Fortunately some open source packages exist where you can draw inspiration from or which can help you if you are stuck with the problem at hand. I hope this little overview helped you understand what it takes to build a full-blown chess logic package. Next up I&apos;d like to talk about representing the game of chess not only in data but also on screen with a handful of UI components.
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (2/9): Parsing pgn files</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-2-9-parsing-pgn-files</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-2-9-parsing-pgn-files" rel="alternate">
+		</link>
+		<updated>2024-10-31T10:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;p&gt;
+	As learned in part 1 of this series a chess game can be represented via the Portable Game Notation. It is the de-facto standard to represent a chess game. So when building a chess application we need to deal with this file format and find a performant way to extract information out of it. One would think that there exists a ton of high-quality open-source packages to deal with this topic. Unfortunately I could find only a handful of really robust, performant solutions and none of them are built in Swift. I probably could have taken a Rust implementation or something similiar, compile a static library and write some shims around the API but this time I felt like it would be a fun challenge to come up with my own solution.
+&lt;/p&gt;
+&lt;p&gt;
+	The problem with a lot of the existing implementations is that they either make extensive use of regex which hurts the performance quite a bit or they do not implement the full PGN specification. For example I only found a few implementations which actually dealt with comments in PGN files. Comments however are a pretty big part of my repertoires since they help me not only memorizing moves but also to understand them better. I briefly tried some parser generators based on some PGN grammar I found online but at least the Swift generators were too slow for my needs which is why I ultimately decided to built a custom PGN parser from the ground up.
+&lt;/p&gt;
+&lt;h2&gt;
+	PGN Specification
+&lt;/h2&gt;
+&lt;p&gt;
+	We already looked at PGN files on a high-level in part 1 of this blog post series. Now lets examine it a bit closer.
+&lt;/p&gt;
+&lt;p&gt;
+	A PGN file typically consists of two main parts:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Tags&lt;/strong&gt;: These are metadata that provide information about the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Moves&lt;/strong&gt;: The actual moves made during the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;
+	Tags
+&lt;/h3&gt;
+&lt;p&gt;
+	Tags are enclosed in square brackets and provide various details about the game.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Example:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[Event &amp;quot;Event Name&amp;quot;]&lt;/code&gt;: Name of the tournament or match.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[Site &amp;quot;Location&amp;quot;]&lt;/code&gt;: Where the game took place.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[Date &amp;quot;YYYY.MM.DD&amp;quot;]&lt;/code&gt;: Date of the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[Round &amp;quot;Round Number&amp;quot;]&lt;/code&gt;: Round in the tournament.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[White &amp;quot;Player Name&amp;quot;]&lt;/code&gt;: Name of the player with the white pieces.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[Black &amp;quot;Player Name&amp;quot;]&lt;/code&gt;: Name of the player with the black pieces.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;[Result &amp;quot;Result&amp;quot;]&lt;/code&gt;: Outcome of the game (e.g., &quot;1-0&quot;, &quot;0-1&quot;, &quot;1/2-1/2&quot;).
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	There is a list of common tag names but potentially you can add any tag you like. The seven tags above are standard for a valid PGN file and are called the Seven Tag Roaster.
+&lt;/p&gt;
+&lt;h3&gt;
+	Moves
+&lt;/h3&gt;
+&lt;p&gt;
+	The moves of the game follow the tags and are recorded in standard algebraic notation. Each move is separated by a space, and turns are indicated by numbering:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Move Number&lt;/strong&gt;: Each full turn (White and Black) is numbered.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Move Notation&lt;/strong&gt;: Moves are represented using standard algebraic notation
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Example:&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. d3 d6 7. c3 O-O 8. Nbd2 Nb8 9. Re1 Nbd7 10. Nf1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	Results
+&lt;/h3&gt;
+&lt;p&gt;
+	At the end of the moves, the result is indicated using the Result tag. The possible results are:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;&amp;quot;1-0&amp;quot;&lt;/code&gt;: White wins
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;&amp;quot;0-1&amp;quot;&lt;/code&gt;: Black wins
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;&amp;quot;1/2-1/2&amp;quot;&lt;/code&gt;: Draw
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;&amp;quot;*&amp;quot;&lt;/code&gt;: Unknown/Ongoing
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;
+	Comments
+&lt;/h3&gt;
+&lt;p&gt;
+	Comments are inserted by either a &lt;code&gt;;&lt;/code&gt; (a comment that continues to the end of the line) or a &lt;code&gt;{&lt;/code&gt; (which continues until a &lt;code&gt;}&lt;/code&gt;). Comments do not nest.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Example:&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;1. e4 e5 2. Nf3 {This is a common opening.} Nc6 3. Bb5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	Variations
+&lt;/h3&gt;
+&lt;p&gt;
+	A variation is a sequence of movetext containing one or more alternative moves enclosed in parentheses. The alternate move sequence given by a variation is one that may be legally played by first unplaying the move that appears immediately prior to the parantheses. Because a variation is a recursive construct, it may be nested.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Example:&lt;/strong&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;1. e4 e5 2. Nf3 Nc6 (2... d6) 3. Bb5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	Multiple Games
+&lt;/h3&gt;
+&lt;p&gt;
+	A PGN file can contain multiple games, separated by an empty line.
+&lt;/p&gt;
+&lt;h3&gt;
+	Encoding
+&lt;/h3&gt;
+&lt;p&gt;
+	PGN files are typically encoded in UTF-8, which allows for the inclusion of special characters.
+&lt;/p&gt;
+&lt;h2&gt;
+	Buffered reading
+&lt;/h2&gt;
+&lt;p&gt;
+	PGN files can get quite large, or at least large enough to consider parser performance and the overall memory footprint when dealing with these files. This lead me to a rabbit hole researching various buffered reading solutions available for the iOS and macOS platforms. This is one area where I found various options which probably all will work for the given task. The most promising solution I found is to use &lt;code&gt;BufferedReader&lt;/code&gt; from swift-nio &lt;a href=&quot;https://swiftinit.org/docs/swift-nio/_niofilesystem/bufferedreader&quot;&gt;API Documentation&lt;/a&gt;. However at the end I did not want to include such a big dependency like swift-nio in my package. Therefore I opted for implementing a simple RingBuffer data structure with the help of &lt;a href=&quot;https://github.com/michaeltyson/TPCircularBuffer&quot;&gt;TPCircularBuffer&lt;/a&gt; in combination with &lt;code&gt;FileHandle.read(upToCount:)&lt;/code&gt; &lt;a href=&quot;https://developer.apple.com/documentation/foundation/filehandle/3516317-read&quot;&gt;API Documentation&lt;/a&gt; to solve the task at hand. In the following I&apos;ll present you a trimmed down version of my solution:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;final class RingByteBuffer {
+    let size: Int
+    private var buffer: TPCircularBuffer
+    
+    init(size: Int) {
+        self.size = size
+        self.buffer = TPCircularBuffer()
+        TPCircularBufferInit(&amp;amp;self.buffer, Int32(size))
+    }
+    
+    deinit {
+        TPCircularBufferCleanup(&amp;amp;self.buffer)
+    }
+    
+    func enqueue(data: Data) -&amp;gt; Bool {
+        return data.withUnsafeBytes { buffer -&amp;gt; Bool in
+            guard let bytes = buffer.baseAddress?.assumingMemoryBound(to: UInt8.self) else {
+                return false
+            }
+            return TPCircularBufferProduceBytes(&amp;amp;self.buffer, UnsafeRawPointer(bytes), Int32(data.count))
+        }
+    }
+    
+    func enqueue(_ bytes: UnsafeRawPointer, count: Int) -&amp;gt; Bool {
+        return TPCircularBufferProduceBytes(&amp;amp;self.buffer, bytes, Int32(count))
+    }
+    
+    func withMutableHeadBytes(_ f: (UnsafeMutableRawPointer, Int) -&amp;gt; Int) {
+        var availableBytes: Int32 = 0
+        let bytes = TPCircularBufferHead(&amp;amp;self.buffer, &amp;amp;availableBytes)
+        let enqueuedBytes = f(bytes!, Int(availableBytes))
+        TPCircularBufferProduce(&amp;amp;self.buffer, Int32(enqueuedBytes))
+    }
+    
+    func space() -&amp;gt; (UnsafeMutableRawPointer, Int) {
+        var availableBytes: Int32 = 0
+        let bytes = TPCircularBufferHead(&amp;amp;self.buffer, &amp;amp;availableBytes)
+        return (bytes!, Int(availableBytes))
+    }
+    
+    func fill(_ count: Int) {
+        TPCircularBufferProduce(&amp;amp;self.buffer, Int32(count))
+    }
+    
+    func dequeue(_ bytes: UnsafeMutableRawPointer, count: Int) -&amp;gt; Int {
+        var availableBytes: Int32 = 0
+        let tail = TPCircularBufferTail(&amp;amp;self.buffer, &amp;amp;availableBytes)
+        
+        let copiedCount = min(count, Int(availableBytes))
+        memcpy(bytes, tail, copiedCount)
+        
+        TPCircularBufferConsume(&amp;amp;self.buffer, Int32(copiedCount))
+        
+        return copiedCount
+    }
+    
+    func dequeue(count: Int) -&amp;gt; Data {
+        var availableBytes: Int32 = 0
+        let tail = TPCircularBufferTail(&amp;amp;self.buffer, &amp;amp;availableBytes)
+        
+        let copiedCount = min(count, Int(availableBytes))
+        let bytes = malloc(copiedCount)!
+        memcpy(bytes, tail, copiedCount)
+        
+        TPCircularBufferConsume(&amp;amp;self.buffer, Int32(copiedCount))
+        
+        return Data(bytesNoCopy: bytes.assumingMemoryBound(to: UInt8.self), count: copiedCount, deallocator: .free)
+    }
+    
+    func clear() {
+        TPCircularBufferClear(&amp;amp;self.buffer)
+    }
+    
+    var availableBytes: Int {
+        var count: Int32 = 0
+        TPCircularBufferTail(&amp;amp;self.buffer, &amp;amp;count)
+        return Int(count)
+    }
+    
+    var data: [UInt8] {
+        var availableBytes: Int32 = 0
+        guard let tail = TPCircularBufferTail(&amp;amp;self.buffer, &amp;amp;availableBytes) else { return [] }
+        let pointer = tail.bindMemory(to: UInt8.self, capacity: Int(availableBytes))
+        return Array(UnsafeBufferPointer(start: pointer, count: Int(availableBytes)))
+    }
+}
+
+struct Buffer {
+    let size: Int
+    var inner: RingByteBuffer
+
+    init(size: Int) {
+        self.size = size
+        self.inner = RingByteBuffer(size: size * 2)
+    }
+}
+
+struct BufferedReader {
+    var inner: any Read
+    var buffer: Buffer
+    
+    init(url: URL, bufferSize: Int = 1024 * 8) throws {
+        let fileHandle = try FileHandle(forReadingFrom: url)
+        let fileHandleReader = FileHandleReader(fileHandle: fileHandle)
+        let buffer = Buffer(size: bufferSize)
+        self.inner = fileHandleReader
+        self.buffer = buffer
+    }
+
+    mutating func fillBufferAndPeek() -&amp;gt; UInt8? {
+        while buffer.inner.availableBytes &amp;lt; buffer.size {
+            do {
+                let (ptr, count) = buffer.inner.space()
+                let remainder = UnsafeMutableRawBufferPointer(start: ptr, count: count)
+                let size = try inner.read(into: remainder)
+                if size == 0 { break }
+                buffer.inner.fill(size)
+            } catch {
+                break
+            }
+        }
+
+        return buffer.inner.data.first
+    }
+
+    func data() -&amp;gt; [UInt8] {
+        return buffer.inner.data
+    }
+
+    mutating func consume(_ n: Int) {
+        _ = buffer.inner.dequeue(count: n)
+    }
+
+    func peek() -&amp;gt; UInt8? {
+        return buffer.inner.data.first
+    }
+
+    mutating func bump() -&amp;gt; UInt8? {
+        let head = peek()
+        if head != nil {
+            consume(1)
+        }
+        return head
+    }
+
+    func remaining() -&amp;gt; Int {
+        return buffer.inner.availableBytes
+    }
+
+    mutating func consumeAll() {
+        let remaining = buffer.inner.availableBytes
+        consume(remaining)
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	With this in place we can assure that the reader itself does not allocate (besides a single fixed-size buffer) which keeps the memory footprint of our solution to a minimum.
+&lt;/p&gt;
+&lt;h2&gt;
+	Visitor pattern
+&lt;/h2&gt;
+&lt;p&gt;
+	The Visitor Pattern is a design pattern that allows you to separate an algorithm from the object structure on which it operates. This is particularly useful in the context of a parser implementation, where you may want to perform various operations on a complex data structure without modifying the structure itself.
+&lt;/p&gt;
+&lt;p&gt;
+	I chose this approach due to the following key points which I think are pretty valuable in terms of performance, flexibility and ease of use:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			The visitor can decide if and how to represent games in memory.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			The reader does not validate move legality. This allows implementing support for custom chess variants, or delaying move validation.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	For reference here is the protocol I built to represent a visitor for the PGN parser implementation:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;protocol Visitor {
+    associatedtype VisitorResult
+
+    func beginGame()
+    
+    func beginHeaders()
+    func header(key: String, value: String)
+    func endHeaders()
+    
+    func san(_ san: String)
+    func nag(_ nag: Nag)
+    func comment(_ comment: String)
+    
+    func beginVariation()
+    func endVariation()
+    
+    func outcome(_ outcome: Outcome)
+    
+    func endGame() -&amp;gt; VisitorResult
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h2&gt;
+	Implementing a parser
+&lt;/h2&gt;
+&lt;p&gt;
+	So now that we have a good understanding about the PGN file format, can read PGN files quite efficiently in terms of memory consumption and have a visitor interface in place to transform the parsed data all that is left is actually implementing the parsing logic to tell a concrete visitor instance about the parsed information.
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;mutating func readGame&amp;lt;V: Visitor&amp;gt;(visitor: V) throws -&amp;gt; V.VisitorResult? {
+    reader.skipBom()
+    reader.skipWhitespace()
+    
+    guard let _ = reader.fillBufferAndPeek() else {
+        return nil
+    }
+    
+    visitor.beginGame()
+    visitor.beginHeaders()
+    try self.readHeaders(visitor: visitor)
+    visitor.endHeaders()
+    try self.readMoveText(visitor: visitor)
+
+    reader.skipWhitespace()
+    return visitor.endGame()
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h2&gt;
+	Benchmarks
+&lt;/h2&gt;
+&lt;p&gt;
+	One burning question remains unanswered though. How fast is it? To answer this question I ran some benchmarks on my implementation.
+&lt;/p&gt;
+&lt;p&gt;
+	The benchmark was run with a PGN file I downloaded from the &lt;a href=&quot;https://database.lichess.org/standard&quot;&gt;Lichess database&lt;/a&gt; (~ 1,000,000 games, ~ 1 GB uncompressed) on an Apple M1 MacBook Pro with 32 GB RAM.
+&lt;/p&gt;
+&lt;p&gt;
+	My simple benchmark visitor counts up statistics on the PGN file (how many games are available in this file, etc.):
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;class Stats {
+    var games: Int = 0
+    var headers: Int = 0
+    var sans: Int = 0
+    var nags: Int = 0
+    var comments: Int = 0
+    var variations: Int = 0
+    var outcomes: Int = 0
+}
+
+struct StatsVisitor: Visitor {
+    typealias VisitorResult = Stats
+    let stats = Stats()
+
+    func beginGame() {}
+    
+    func beginHeaders() {}
+    
+    func header(key: String, value: String) {
+        stats.headers += 1
+    }
+    
+    func endHeaders() {}
+    
+    func san(_ san: String) {
+        stats.sans += 1
+    }
+    
+    func nag(_ nag: PGNKit.Nag) {
+        stats.nags += 1
+    }
+    
+    func comment(_ comment: String) {
+        stats.comments += 1
+    }
+    
+    func beginVariation() {}
+    
+    func endVariation() {
+        stats.variations += 1
+    }
+    
+    func outcome(_ outcome: PGNKit.Outcome) {
+        stats.outcomes += 1
+    }
+    
+    func endGame() -&amp;gt; Stats {
+        stats.games += 1
+        return stats
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	I then used the &lt;a href=&quot;https://github.com/google/swift-benchmark&quot;&gt;swift-benchmark&lt;/a&gt; package to actually execute my test.
+&lt;/p&gt;
+&lt;p&gt;
+	Here are the results:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Time&lt;/strong&gt;: 28,19s
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Throughput&lt;/strong&gt;: 38,12 MB/s
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	To my eye it seems like there still is room for improvement comparing against highly optimized solutions build in different languages. However parsing 1 GB of chess games in about half a minute while being able to support the full specification is more than fine for my use case. My typical chess dataset is a couple of megabytes in size. At a later point I might want to revisit this implementation though and see if I can find the culprit slowing it down. For the moment I am more than happy with the results. What do you think?
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Writing a chess app (1/9): Getting on the same page</title>
+		<id>https://davidvonk.dev/swift/writing-a-chess-app-1-9-getting-on-the-same-page</id>
+		<link href="https://davidvonk.dev/swift/writing-a-chess-app-1-9-getting-on-the-same-page" rel="alternate">
+		</link>
+		<updated>2024-10-31T09:52:00Z</updated>
+		<summary type="text">
+			A blog post series detailing my journey of developing a chess app for iOS and macOS
+		</summary>
+		<content type="html">
+			&lt;h2&gt;
+	Motivation
+&lt;/h2&gt;
+&lt;p&gt;
+	At the beginning of the current month I started writing a chess iOS and macOS app... again. I started a handful of chess apps over the course of the last couple of years but never really finished one. My chess skills really improved since then which is why I wanted to learn a new opening repertoire this year. While researching my options for software assisting me in my intention I found the existing solutions to be lacking. I have two kids and therefore rarely find the time to boot up my MacBook and do actual chess training with some chess database software. Most of the time I am lucky to have a few spare minutes on my phone so the optimal solution would be an iOS app which I could use &quot;on-the-go&quot; for my specific use case while having a counterpart on my MacBook when dealing with the joy of having free time.
+&lt;/p&gt;
+&lt;h2&gt;
+	Chess terminology
+&lt;/h2&gt;
+&lt;p&gt;
+	For the start of this series I want to get us all on the same page so you can follow the rest of the blog posts if you are interested in software development but not necessarily in chess.
+	
+	When building and discussing a chess app, you often come across certain technical terms that are essential for both understanding the game and how it’s represented in software. Here’s a quick rundown:
+&lt;/p&gt;
+&lt;h3&gt;
+	Chessboard Files and Ranks
+&lt;/h3&gt;
+&lt;p&gt;
+	The chessboard is divided into files and ranks to identify square positions. Files are the vertical columns labeled a through h from left to right, while ranks are the horizontal rows labeled 1 through 8 from bottom to top. Together, they form a coordinate system for identifying squares (e.g., e4).
+&lt;/p&gt;
+&lt;p&gt;
+	Reference: &lt;a href=&quot;https://en.wikipedia.org/wiki/Chessboard&quot;&gt;Chessboard&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;
+	SAN (Standard Algebraic Notation)
+&lt;/h3&gt;
+&lt;p&gt;
+	SAN is the standard way of recording chess moves in text, specifying each move with just enough detail to understand what was played. SAN includes the piece moved, the destination square, and any captures or special moves. It is concise and universally understood in chess. If two or more identical pieces can move to the same square the notation accounts for this with standardized disambiguation rules.
+&lt;/p&gt;
+&lt;p&gt;
+	Example of SAN moves:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;e4&lt;/code&gt;: Move pawn to e4
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;Bb5&lt;/code&gt;: Move bishop to b5
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;O-O&lt;/code&gt;: Kingside castling
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;O-O-O&lt;/code&gt;: Queenside castling
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;exd4&lt;/code&gt;: Move pawn to d4 with a capture
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;Qh4+&lt;/code&gt;: Queen moves to h4 and gives a check
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;Qg7#&lt;/code&gt;: Queen moves to g7 and delivers mate
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;e8=Q#&lt;/code&gt;: Pawn moves to e8, is promoted to a queen and delivers checkmate
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	Reference: &lt;a href=&quot;https://en.wikipedia.org/wiki/Algebraic_notation_(chess)&quot;&gt;Standard Algebraic Notation&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;
+	FEN (Forsyth-Edwards Notation)
+&lt;/h3&gt;
+&lt;p&gt;
+	FEN is a standard notation used to represent the current state of a chessboard. It includes information on piece placement, active color, castling rights, en passant target squares, and move counters totalling in six fields, each seperated by a space. FEN strings allow a game position to be saved or shared easily, making it essential for loading a specific position in a chess app.
+&lt;/p&gt;
+&lt;p&gt;
+	Example FEN for the starting position:
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;
+	A quick explanation of the specific fields in the given example FEN:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR&lt;/code&gt;: This encodes the piece placement data. Each rank is described starting at rank 8 up to rank 1, separated by a &lt;code&gt;/&lt;/code&gt;. Within a rank the contents of the squares are described from the a to h file. Empty squares are described with a digit ranging from 1 to 8 (for consecutive empty squares), while piece information is encoded in algebraic notation
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;w&lt;/code&gt;: White is to move
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;KQkq&lt;/code&gt;: White and black can still castle king or queenside
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;-&lt;/code&gt;: There is no en passant target square
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;0&lt;/code&gt;: The number of halfmoves since the last capture or pawn advance
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;code&gt;1&lt;/code&gt;: The number of full moves, starting at 1
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	We will explore this notation in more detail when talking about parsing a FEN to extract the encoded position from it.
+&lt;/p&gt;
+&lt;p&gt;
+	Reference: &lt;a href=&quot;https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation&quot;&gt;Forsyth–Edwards Notation&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;
+	Variations (or Lines)
+&lt;/h3&gt;
+&lt;p&gt;
+	A &lt;strong&gt;line&lt;/strong&gt; or &lt;strong&gt;variation&lt;/strong&gt; refers to any sequence of moves that can arise from a specific opening. We typically distinguish between the mainline and sidelines.
+&lt;/p&gt;
+&lt;p&gt;
+	A &lt;strong&gt;mainline&lt;/strong&gt; refers to the most popular and extensively studied sequence of moves within a particular opening. These moves are generally considered the best responses according to established theory.
+&lt;/p&gt;
+&lt;p&gt;
+	In contrast to this &lt;strong&gt;sidelines&lt;/strong&gt; are alternative moves or sequences that diverge from the mainline. While they may not be as popular or theoretically sound as the mainline moves, sidelines can still be effective and surprise opponents who are less familiar with them.
+&lt;/p&gt;
+&lt;h3&gt;
+	PGN (Portable Game Notation)
+&lt;/h3&gt;
+&lt;p&gt;
+	PGN is a notation format used to record entire chess games, move by move, along with additional information like players’ names, date, and location. PGN is popular for saving and sharing chess games, as it allows both humans and software to read and interpret the game data.
+&lt;/p&gt;
+&lt;p&gt;
+	Example PGN:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-&quot;&gt;[Event &amp;quot;IBM Kasparov vs. Deep Blue Rematch&amp;quot;]
+[Site &amp;quot;New York, NY USA&amp;quot;]
+[Date &amp;quot;1997.05.11&amp;quot;]
+[Round &amp;quot;6&amp;quot;]
+[White &amp;quot;Deep Blue&amp;quot;]
+[Black &amp;quot;Kasparov, Garry&amp;quot;]
+[Opening &amp;quot;Caro-Kann: 4...Nd7&amp;quot;]
+[ECO &amp;quot;B17&amp;quot;]
+[Result &amp;quot;1-0&amp;quot;]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7 5. Ng5 Ngf6 6. Bd3 e6 7. N1f3 h6 8. Nxe6 Qe7 9. O-O fxe6 10. Bg6+ Kd8 {Kasparov is shaking his head} 11. Bf4 b5 12. a4 Bb7 13. Re1 Nd5 14. Bg3 Kc8 15. axb5 cxb5 16. Qd3 Bc6 17. Bf5 exf5 18. Rxe7 Bxe7 19. c4 1-0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	Parsing a PGN will be our topic in the next part of this series. If you want to read up on it for more details here is a reference link for you to look at:
+	&lt;a href=&quot;https://de.wikipedia.org/wiki/Portable_Game_Notation&quot;&gt;Portable Game Notation&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;
+	NAG (Numeric Annotation Glyphs)
+&lt;/h3&gt;
+&lt;p&gt;
+	NAG are numeric codes added to moves to indicate specific annotations. Some commonly used NAGs are typically represented with a character sequence such as &quot;!&quot; (good move) or &quot;??&quot; (blunder) while other glyphs are encoded in the form of &lt;code&gt;$&amp;lt;number&amp;gt;&lt;/code&gt;. NAGs provide a quick way to annotate moves without verbose commentary, which is helpful for both users and software to analyze moves made in a game.
+&lt;/p&gt;
+&lt;p&gt;
+	Examples:
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;1. e4! e5 2. Qg4?&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;
+	Reference: &lt;a href=&quot;https://en.wikipedia.org/wiki/Numeric_Annotation_Glyphs&quot;&gt;Numeric Annotation Glyphs&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;
+	Chess Engines
+&lt;/h3&gt;
+&lt;p&gt;
+	A chess engine is the software core that analyzes positions, evaluates moves, and calculates optimal strategies. Engines range from basic AI with minimal calculation depth to advanced, powerful programs like Stockfish that use deep evaluation techniques. Integrating a chess engine into an app allows users to play against a computer or analyze their games. The best engine in terms of playing strength currently is stockfish which happens to be open source. Over the course of this blog post series we will have a look on how to integrate this engine in our application to analyze games locally on device and provide valuable input to the user.
+&lt;/p&gt;
+&lt;h3&gt;
+	Repertoire
+&lt;/h3&gt;
+&lt;p&gt;
+	A chess repertoire refers to a collection of openings, strategies, and plans that a player has prepared and is comfortable using in their games. Essentially, it is a personalized library of moves that a player has studied and practiced, designed to suit their playing style and preferences.
+&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Key points&lt;/strong&gt;:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Personalized&lt;/strong&gt;: Each player’s repertoire is unique, reflecting their strengths, weaknesses, and preferred strategies.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Openings and Responses&lt;/strong&gt;: It typically includes various openings and the corresponding responses to different opponent moves.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Preparation&lt;/strong&gt;: Players often invest time in preparing their repertoire to gain an advantage in the opening phase of the game.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Adaptability&lt;/strong&gt;: A good repertoire can evolve over time as players learn new strategies or adjust to different opponents.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;
+	Conclusion
+&lt;/h2&gt;
+&lt;p&gt;
+	Understanding these terms is essential for both developers and chess enthusiasts to navigate and use chess apps effectively. As mentioned above we will look first at parsing PGN files in the next part of this series as it is a fundamental part of the project.
+&lt;/p&gt;
+		</content>
+	</entry>
 	<entry>
 		<title type="text">Backing up my saved articles</title>
 		<id>https://davidvonk.dev/automation/backing-up-my-saved-articles</id>
@@ -199,524 +2897,6 @@ html_file.close()
 &lt;/h2&gt;
 &lt;p&gt;
 	This script is running for a couple of days now and I had no trouble since. I am pretty happy with the workflow now and use Instapaper on a daily basis without worrying over loosing all my links or being unable to read an article because the website shut down or the article was deleted. If you want to try it yourself I am happy to hear from you.
-&lt;/p&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">Generating licenses for SPM dependencies</title>
-		<id>https://davidvonk.dev/swift/generating-licenses-for-spm-dependencies</id>
-		<link href="https://davidvonk.dev/swift/generating-licenses-for-spm-dependencies" rel="alternate">
-		</link>
-		<updated>2020-12-24T22:15:00Z</updated>
-		<summary type="text">
-			A quick overview how to generate licenses for SPM dependencies
-		</summary>
-		<content type="html">
-			&lt;p&gt;
-	Chances are your are using Swift Package Manager, at least to some degree, in your (i(Pad)?|mac|tv|watch)OS app. Since the first class support in Xcode was added it definetly is my favourite tool to handle dependencies for apps in the Apple ecosystem.
-&lt;/p&gt;
-&lt;p&gt;
-	As app developers we have to deal with a lot of stuff besides the actual development of features like setting up CI, supporting our customers etc. If you happen to use third party dependencies one of these tasks probably will be to include various Open Source licenses in your application. Having used well known alternatives like Carthage and Cocoapods before SPM was a thing I encountered plugins for these tools to automate this for me. Not only is this approach keeping work from me for every new project I fire up in Xcode, it also won’t forget to include a license for every dependency that is added. I can’t say that confidently about myself.
-&lt;/p&gt;
-&lt;p&gt;
-	To avoid copying each license html manually like an animal I did a quick search for available tools for SPM and I found some. But none of them fitted my requirements exactly. Here is a list of possibilities for you:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;&lt;a href=&quot;https://github.com/nicklockwood/Tribute&quot;&gt;Tribute&lt;/a&gt;&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;&lt;a href=&quot;https://github.com/mono0926/LicensePlist&quot;&gt;LicensePlist&lt;/a&gt;&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;&lt;a href=&quot;https://github.com/carloe/LicenseGenerator-iOS&quot;&gt;LicenseGenerator-iOS&lt;/a&gt;&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	Since I couldn’t find a perfect solution to my problem I thought it would be a fun exercise to build a tool by myself. Also, to be honest, it was a great excuse to get my hands on the recently released &lt;a href=&quot;https://github.com/apple/swift-argument-parser&quot;&gt;swift-argument-parser&lt;/a&gt;. You can find the project on GitHub, it’s called &lt;a href=&quot;https://github.com/dehlen/SPMLicenses&quot;&gt;SPMLicenses&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;
-	To set some expectations upfront: It hardly is a v1.0.0. I used it in two projects of mine now and it worked fine for me but I can‘t promise to build a full featured tool out of this. On the other hand it is Open Source so if there is something missing or not working for you spin up Xcode and a debugger and build a tool that fits your needs.
-&lt;/p&gt;
-&lt;p&gt;
-	How does it work? SPMLicenses fetches all your third party dependencies from a Package.resolved file which is created and updated by Xcode. It further tries to find the GitHub url of the dependencies and fetches the license from the GitHub API. The result will then be written to a json file. There are at least two problems with this approach:
-&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			If you use packages which aren’t hosted on GitHub they won‘t be included in the json
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			You can get rate limited (60 requests per hour) for making to many API requests when running this on CI f.e
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;
-	No 2. is addressed by the fact that you can specify GitHub credentials when generating your license json. This way you won‘t get rate limited that easily (5000 requests per hour). It also makes sure you can access private repositories to fetch their licenses.
-	
-	To register a GitHub application please follow this link: &lt;a href=&quot;https://github.com/settings/developers&quot;&gt;https://github.com/settings/developers&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;
-	There are ideas to fix No 1. but as I said above: it hardly is a v1.0.0. For my current use case limiting the tool to GitHub only is totally fine. If you need something different I highly recommend using &lt;a href=&quot;https://github.com/nicklockwood/Tribute&quot;&gt;Tribute&lt;/a&gt; from Nick Lockwood. It definitely seems like the tool I want to use but unfortunately it is lacking SPM support at the time of this writing.
-&lt;/p&gt;
-&lt;p&gt;
-	All of the above is expressed by a single call on your command line:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;$ swift run spm-licenses &amp;lt;path to .xcworkspace&amp;gt; &amp;lt;output.json&amp;gt; &amp;lt;optional GitHub client id&amp;gt; &amp;lt;optional GitHub client secret&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	If you want to tinker with it or use the tool in one of your applications you can build SPMLicenses from source like so:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;$ swift build -c release
-$ cd .build/release
-$ cp -f spm-licenses /usr/local/bin/spm-licenses
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Or use &lt;a href=&quot;https://github.com/yonaskolb/Mint&quot;&gt;Mint&lt;/a&gt;:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;$ mint install dehlen/SPMLicenses
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	If you want to update the license file on every Xcode build you can add this simple script as a Run Script Build Phase. To set this up in Xcode, do the following:
-&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Click on your project in the file list, choose your target under TARGETS, click the Build Phases tab
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Add a New Run Script Phase by clicking the little plus icon in the top left and paste in the following script:
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ol&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sh&quot;&gt;if which spm-licenses &amp;gt;/dev/null; then
- spm-licenses &amp;lt;path to .xcworkspace&amp;gt; &amp;lt;output.json&amp;gt; &amp;lt;optional GitHub client id&amp;gt; &amp;lt;optional GitHub client secret&amp;gt;
-else
-  echo &amp;quot;warning: SPMLicenses not installed, download from https://github.com/dehlen/SPMLicenses&amp;quot;
-fi
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	To wrap things up you can use this SwiftUI module to automatically render the generated licenses in your app:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;import Foundation
-import SwiftUI
-import os
-
-struct License: Codable, Identifiable {
-    let licenseName: String
-    let licenseText: String
-    let packageName: String
-    
-    var id: String { packageName }
-}
-
-extension License {
-    static let mock: License = .init(licenseName: &amp;quot;MIT&amp;quot;, licenseText: &amp;quot;MIT license text&amp;quot;, packageName: &amp;quot;Test Dependency&amp;quot;)
-}
-
-final class LicensesViewModel: ObservableObject {
-    @Published private(set) var licenses: [License] = []
-    #warning(&amp;quot;update subsystem string&amp;quot;)
-    private let logger = Logger(subsystem: &amp;quot;com.sample.app&amp;quot;, category: String(describing: LicensesViewModel.self))
-
-    init() {
-        #warning(&amp;quot;make sure licenses.json is added to the project&amp;quot;)
-        guard let url = Bundle.main.url(forResource: &amp;quot;licenses&amp;quot;, withExtension: &amp;quot;json&amp;quot;) else {
-            logger.debug(&amp;quot;Could not read licenses because file does not exist.&amp;quot;)
-            return
-        }
-
-        do {
-            let data = try Data(contentsOf: url)
-            self.licenses = try JSONDecoder().decode([License].self, from: data)
-        } catch {
-            logger.debug(&amp;quot;Could not read licenses: \(error.localizedDescription, privacy: .public)&amp;quot;)
-        }
-    }
-}
-
-struct LicensesView: View {
-    @ObservedObject var viewModel: LicensesViewModel
-
-    var body: some View {
-        List(viewModel.licenses) { license in
-            LicenseView(license: license)
-        }.navigationBarTitle(Text(&amp;quot;Licenses&amp;quot;), displayMode: .inline)
-    }
-}
-
-struct LicensesView_Previews: PreviewProvider {
-    static var previews: some View {
-        LicensesView(viewModel: .init())
-    }
-}
-
-struct LicenseView: View {
-    let license: License
-    var body: some View {
-        NavigationLink(destination: LicenseDetailView(license: license)) {
-            HStack {
-                Text(license.packageName)
-                    .font(.body)
-                Spacer()
-                Text(license.licenseName)
-                    .font(.body)
-                    .foregroundColor(Color(.secondaryLabel))
-            }
-        }
-    }
-}
-
-struct LicenseView_Previews: PreviewProvider {
-    static var previews: some View {
-        LicenseView(license: .mock)
-    }
-}
-
-struct LicenseDetailView: View {
-    let license: License
-    
-    var body: some View {
-        ScrollView {
-            VStack {
-                Text(license.licenseText)
-                Spacer()
-            }.padding()
-        }.navigationBarTitle(Text(license.packageName), displayMode: .inline)
-    }
-}
-
-struct LicenseDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        LicenseDetailView(license: .mock)
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">When your macOS application is about to quit</title>
-		<id>https://davidvonk.dev/macos/when-your-macos-application-is-about-to-quit</id>
-		<link href="https://davidvonk.dev/macos/when-your-macos-application-is-about-to-quit" rel="alternate">
-		</link>
-		<updated>2020-05-01T10:13:00Z</updated>
-		<summary type="text">
-			Familiarize yourself with the NSApplication.TerminateReply API
-		</summary>
-		<content type="html">
-			&lt;h2&gt;
-	Executing work before the application quits
-&lt;/h2&gt;
-&lt;p&gt;
-	A quick Google search on &lt;code&gt;NSApplication.TerminateReply&lt;/code&gt; results in 328 results. I can&apos;t think of many search phrases which perform worse.
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image showing a google search for NSApplication.TerminateReply.&quot; loading=&quot;lazy&quot; src=&quot;/img/terminate-reply/NSApplication-TerminateReply-Google-Search.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;
-	In my Text Editor &lt;em&gt;Caret&lt;/em&gt; I am not able to use Apples &lt;code&gt;NSDocument&lt;/code&gt; class, or at least, I found, it probably isn&apos;t the best idea for my use case. However &lt;code&gt;NSDocument&lt;/code&gt; comes with a neat little feature I knew I needed to support: &lt;strong&gt;Autosaving changes&lt;/strong&gt;. Whenever a user edits text in the text editor the changes should be reflected on disk. Of course I do everything to coordinate these file changes and to have a reliable mechanism but to be extra sure I wanted to save all pending file changes before the application quits. Turns out this is what &lt;code&gt;NSApplication.TerminateReply&lt;/code&gt; is for.
-&lt;/p&gt;
-&lt;h3&gt;
-	Info.plist setup
-&lt;/h3&gt;
-&lt;p&gt;
-	First you most certainly want to set the following key in your &lt;code&gt;Info.plist&lt;/code&gt;:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-xml&quot;&gt;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;
-&amp;lt;!DOCTYPE plist PUBLIC &amp;quot;-//Apple//DTD PLIST 1.0//EN&amp;quot; &amp;quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&amp;quot;&amp;gt;
-&amp;lt;plist version=&amp;quot;1.0&amp;quot;&amp;gt;
-&amp;lt;dict&amp;gt;
-	&amp;lt;key&amp;gt;NSSupportsSuddenTermination&amp;lt;/key&amp;gt;
-	&amp;lt;false/&amp;gt;
-&amp;lt;/dict&amp;gt;
-&amp;lt;/plist&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Otherwise it can happen that &lt;code&gt;applicationShouldTerminate&lt;/code&gt; won&apos;t being called and &lt;code&gt;NSApplicationWillTerminateNotification&lt;/code&gt; won&apos;t being sent. With that out of our mind let&apos;s dive into using the above API.
-&lt;/p&gt;
-&lt;h3&gt;
-	AppDelegate implementation
-&lt;/h3&gt;
-&lt;p&gt;
-	You might start by doing all your saving logic in
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func applicationWillTerminate(_ aNotification: Notification) {
-  // Insert code here to tear down your application
-} 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Unfortunately this won&apos;t work since, after all, the application will terminate. If your operation is taking enough time to finish you&apos;ll end up with a terminated process and no saved changes.
-&lt;/p&gt;
-&lt;p&gt;
-	To fix this we need to implement &lt;code&gt;applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply&lt;/code&gt;.
-	&lt;code&gt;NSApplication.TerminateReply&lt;/code&gt; actually is an enum and can either be:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			terminateCancel
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			terminateNow
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			terminateLater
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;terminateCancel&lt;/code&gt; will stop the termination of the application. This isn&apos;t a pleasant user experience since the user wanted to quit you app. Interesting however is &lt;code&gt;terminateNow&lt;/code&gt; and &lt;code&gt;terminateLater&lt;/code&gt;. When you do not have any pending file changes you can quit right away by returning &lt;code&gt;terminateNow&lt;/code&gt;, but when you do have changes &lt;code&gt;terminateLater&lt;/code&gt; is what you want.
-&lt;/p&gt;
-&lt;p&gt;
-	Start by implementing something like the following logic in your AppDelegate:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func applicationShouldTerminate(_ sender: NSApplication) -&amp;gt; NSApplication.TerminateReply {
-    if hasPendingChanges {
-        savePendingChanges()
-	return .terminateLater
-    }
-
-    return .terminateNow
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	When you run your app in this state and quit it with pending changes the application won&apos;t be terminated. Whats left is to tell the process when you actually finished your save operation in order to terminate the application.
-	
-	Luckily for us there is API to do exactly that: &lt;code&gt;NSApp.reply(toApplicationShouldTerminate: true)&lt;/code&gt;.
-&lt;/p&gt;
-&lt;p&gt;
-	To round things up this is how your &lt;code&gt;savePendingChanges&lt;/code&gt; method should look like:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func savePendingChanges() {
-    doSomeWork {
-        NSApp.reply(toApplicationShouldTerminate: true)
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;h3&gt;
-	Conclusion
-&lt;/h3&gt;
-&lt;p&gt;
-	Doing work just before the application quits actually is pretty straightforward to implement on macOS. One common pitfall is to miss the Info.plist entry I mentioned at the beginning of the post. Of course, just because this option exists, you probably do not want to run operations which take a long time. This inevitably will lead to bad UX for your customers. Try to save as often as you can without sacrificing performance or user experience of your application. By implementing the pattern explained in this blog post you will make sure to provide a reliable experience for your users.
-&lt;/p&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">Sandbox on macOS</title>
-		<id>https://davidvonk.dev/macos/sandbox-on-macos</id>
-		<link href="https://davidvonk.dev/macos/sandbox-on-macos" rel="alternate">
-		</link>
-		<updated>2020-04-30T19:45:00Z</updated>
-		<summary type="text">
-			File system access in a sandboxed macOS application
-		</summary>
-		<content type="html">
-			&lt;h2&gt;
-	File System access in a sandboxed macOS application
-&lt;/h2&gt;
-&lt;p&gt;
-	While the sandbox is great for consumers and the overall security on Apples platforms it can be quite frustrating to deal with. On macOS, in comparison to iOS, this gets even worse since you are more likely to deal with the file system and other sandbox related resources of the system. Unfortunately as soon as you plan to sell your application in the Mac App Store this is the only option you have. Part of developing my upcoming Text Editor &lt;em&gt;Caret&lt;/em&gt; was to read and write markdown and plain text files from/to disk so doing the whole sandbox dance was without any alternative.
-&lt;/p&gt;
-&lt;h3&gt;
-	How hard can it be?
-&lt;/h3&gt;
-&lt;p&gt;
-	First things first you probably start by looking into the &lt;a href=&quot;https://developer.apple.com/documentation/foundation/filemanager&quot;&gt;FileManager&lt;/a&gt; API to access the file system. By quickly browsing through the available API it looks like we are in the right spot for our requirement. 🔋 Batteries included. To get a list of files in a specific folder one only has to write these simple couple of lines, right?:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;let url = URL(fileURLWithPath: &amp;quot;/path/to/folder&amp;quot;) 
-let fileURLs = try FileManager.default.contentsOfDirectory(at: url,
-    includingPropertiesForKeys: nil,
-    options: .skipsHiddenFiles)
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	This works fine as long as you specify a folder outside of the applications sandbox. Every macOS application creates a sandbox with a dedicated &lt;em&gt;Documents&lt;/em&gt; directory for example.
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image of a Finder window showing the sandbox directories content.&quot; loading=&quot;lazy&quot; src=&quot;/img/sandbox/Sandbox-Directory.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;
-	But what about the users &lt;em&gt;Documents&lt;/em&gt; directoy at &lt;code&gt;$HOME/Documents&lt;/code&gt;? Trying to read files from this directory will yield an error. The user did not grant any permission to read this directory. This is great for us as a consumer but how do we deal with this from a developers perspective?
-&lt;/p&gt;
-&lt;h3&gt;
-	Full-Disk Permission
-&lt;/h3&gt;
-&lt;p&gt;
-	There are a handful of options we have right now. We could ask the user for Full-Disk Permission. This would certainly make our life easier, but lets be honest: We probably would delete the app right away as a consumer.
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image of System settings showing how to configure the full disk permission setting.&quot; loading=&quot;lazy&quot; src=&quot;/img/sandbox/Full-Disk-Permission.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;h3&gt;
-	Disabling Sandbox
-&lt;/h3&gt;
-&lt;p&gt;
-	We could also disable the sandbox but then we won’t be able to sell our application through Apples Mac App Store (as stated above). So not a great option either.
-&lt;/p&gt;
-&lt;h3&gt;
-	NSOpenPanel
-&lt;/h3&gt;
-&lt;p&gt;
-	Next there is the possibility to ask the user for permission to access the specific folder before trying to read or write files. This actually is the right way to do it and &lt;code&gt;NSOpenPanel&lt;/code&gt; already handles this for us. However to use this we need to configure our Xcode project first. Go to &lt;code&gt;General —&amp;gt; Target —&amp;gt; App Sandbox —&amp;gt; User Selected File&lt;/code&gt; and select &lt;em&gt;Read/Write&lt;/em&gt;.
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image of an Xcode project showing how to configure the project to read and write files.&quot; loading=&quot;lazy&quot; src=&quot;/img/sandbox/Project-Configuration.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;p&gt;
-	Xcode will now create an entitlements file and sets the correct .plist entries for you. To prompt the user to select a directory we now finally can request an &lt;code&gt;NSOpenPanel&lt;/code&gt; like so:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func requestPermission(then handler: @escaping (URL?) -&amp;gt; Void) {
-    let openPanel = NSOpenPanel()
-    openPanel.message = &amp;quot;Choose your directory&amp;quot;
-    openPanel.prompt = &amp;quot;Choose&amp;quot;
-    openPanel.allowsMultipleSelection = false
-    openPanel.canChooseDirectories = true
-    openPanel.canCreateDirectories = true
-    openPanel.canChooseFiles = false
-    openPanel.begin { (result) -&amp;gt; Void in
-        if result == .OK {
-            handler(openPanel.urls.first)
-        }
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Invoking the FileManager API after an user selected an URL in the presented &lt;code&gt;NSOpenPanel&lt;/code&gt; will return the expected results. Yay!
-&lt;/p&gt;
-&lt;p&gt;
-	That’s it for todays post. Thank you very much for joining me on this and ... wait. Of course this wasn’t the whole thing. There has to be some caveat for making implementing sandbox on macOS a theme for a blog post, right? Actually the granted permission from the selected folder won’t be persisted. Whenever the application relaunches we will have to ask for permission again. The solution to this problem are &lt;code&gt;Security-Scoped Bookmarks&lt;/code&gt;. At this point we probably already read the whole abstract on the macOS sandbox over at &lt;a href=&quot;https://developer.apple.com/library/archive/documentation/Security/Conceptual/AppSandboxDesignGuide/AboutAppSandbox/AboutAppSandbox.html&quot;&gt;App Sanbox Quick Start&lt;/a&gt;, just to find this massive, complex abstract:
-	&lt;a href=&quot;https://developer.apple.com/library/archive/documentation/Security/Conceptual/AppSandboxDesignGuide/AppSandboxInDepth/AppSandboxInDepth.html&quot;&gt;App Sandbox in Depth&lt;/a&gt;.
-&lt;/p&gt;
-&lt;p&gt;
-	Luckily for you, you can just proceed reading this blog post to get the gist of it and to finally implement macOS sandboxing (for real!).
-&lt;/p&gt;
-&lt;h3&gt;
-	Security-Scoped Bookmarks
-&lt;/h3&gt;
-&lt;p&gt;
-	The concept is fairly simple. Whenever you get access to a new location outside of your apps sandbox you want to store the URL as serialized data in a persistent store(UserDefaults/.plist are good options here). When the application is launched we try to read back the saved data. In practice URL bookmarks can be marked as stale and they need to be refreshed. Your implementation will need to handle this case, otherwise the bookmark will be unusable at some point.
-&lt;/p&gt;
-&lt;h4&gt;
-	Storing a bookmark
-&lt;/h4&gt;
-&lt;p&gt;
-	To store a bookmark we will use
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func saveBookmark(for url: URL) {
-    let data = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
-    // persist data somewhere
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	You most certainly want to call this in the completion block of your &lt;code&gt;NSOpenPanel&lt;/code&gt;. The returned data then can be stored in your persistent container. By calling this in the completion block of the &lt;code&gt;NSOpenPanel&lt;/code&gt; we make sure the bookmark data will be written when we launch the application the next time.
-&lt;/p&gt;
-&lt;h4&gt;
-	Reading and refreshing a bookmark
-&lt;/h4&gt;
-&lt;p&gt;
-	Reading a bookmark is fairly simple as well. We can leverage an already existing initializer of &lt;code&gt;Foundation.URL&lt;/code&gt;:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;func restoreBookmark(with bookmarkData: Data) -&amp;gt; URL? {
-	do {
-		var isStale = false
-		let url = try URL(resolvingBookmarkData: bookmarkData, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &amp;amp;isStale)
-
-		if isStale {
-	  	saveBookmark(for: url)
-		}
-		
-		return url
-	} catch {
-		debugPrint(error)
-		return nil
-	}
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	As I already mentioned a persisted bookmark can be marked as stale. When this happens we need to refresh it by invoking our &lt;code&gt;saveBookmark&lt;/code&gt; function once again. At this point we are nearly finished, although the above solution still won’t work. In order to really access the bookmarked URL we need to start requesting access to it, before doing any read/write operation.
-&lt;/p&gt;
-&lt;h3&gt;
-	Start / Stop Requesting Access
-&lt;/h3&gt;
-&lt;p&gt;
-	When we’re ready to read files, we’ll have to wrap this in a pair of calls to signal that we want to access the resource:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;defer { url.stopAccessingSecurityScopedResource() }
-if !url.startAccessingSecurityScopedResource() {
-    print(&amp;quot;startAccessingSecurityScopedResource returned false. This directory might not need it, or this URL might not be a security scoped URL, or maybe something’s wrong?&amp;quot;)
-}
-// do your file operation
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Here we call startAccessingSecurityScopedResource on the URL we’ve been given. This might return false  under a few conditions:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			The user really doesn’t have access to this
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			The URL isn’t a security scoped URL
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			This directory doesn’t need it, f.e &lt;code&gt;$HOME/Downloads&lt;/code&gt;&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	In most situations, like accessing the Downloads folder, you are probably safe to just log the result, like in the code snippet above, and to continue.
-&lt;/p&gt;
-&lt;h4&gt;
-	Providing a wrapper
-&lt;/h4&gt;
-&lt;p&gt;
-	Of course we do not want to introduce code duplication into our perfectly structured, highly optimized codebase :) So it sounds like a good plan to introduce a wrapper in order to abstract this complexity away from our buisness logic. Also it might be a good idea to store bookmarks in a dictionary &lt;code&gt;[URL: Data]&lt;/code&gt; to be able to store multiple bookmarks our application then has persisted access to. I published a gist at:
-	&lt;a href=&quot;https://gist.github.com/dehlen/1fce47792bc4ef676557947895be2ccd&quot;&gt;SandboxDirectoryAccess.swift&lt;/a&gt; and I invite you to use it, no questions asked.
-&lt;/p&gt;
-&lt;h3&gt;
-	Conclusion
-&lt;/h3&gt;
-&lt;p&gt;
-	When you made it that far, congratulations. You earned yourself some time to take a break.
-	
-	However at some point you probably want to start to comply with Apples recommendation and wrap all your file system calls in a &lt;a href=&quot;https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileCoordinators/FileCoordinators.html&quot;&gt;FileCoordinator&lt;/a&gt; to make sure your read and write operations are properly coordinated throughout the system. I’ll provide an extensive guide on this topic on another day.
 &lt;/p&gt;
 		</content>
 	</entry>

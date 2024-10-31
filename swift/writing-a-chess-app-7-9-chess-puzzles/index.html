@@ -17,7 +17,7 @@
 		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
 		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
 		<title>
-			macos
+			Writing a chess app (7/9): Chess puzzles
 			– davidvonk.dev
 		</title>
 		<style>
@@ -313,20 +313,91 @@ code:not(figure code), pre:not(figure pre) {
 			</header>
 			<main>
 				<section id="content">
-					<ul>
-						<li>
-							[ <time datetime="2020-05-01">2020-05-01</time> ] 
-							<a href="/macos/when-your-macos-application-is-about-to-quit">When your macOS application is about to quit</a>
-							<br/>
-							Familiarize yourself with the NSApplication.TerminateReply API
-						</li>
-						<li>
-							[ <time datetime="2020-04-30">2020-04-30</time> ] 
-							<a href="/macos/sandbox-on-macos">Sandbox on macOS</a>
-							<br/>
-							File system access in a sandboxed macOS application
-						</li>
-					</ul>
+					<article>
+						<header>
+							<h1>
+								<a href="/swift/writing-a-chess-app-7-9-chess-puzzles">Writing a chess app (7/9): Chess puzzles</a>
+							</h1>
+						</header>
+						<h2>
+							What are chess puzzles?
+						</h2>
+						<p>
+							Chess puzzles are specially crafted scenarios in which players are presented with a specific position on the chessboard. The objective is to find the best move or sequence of moves to achieve a particular goal, such as checkmating the opponent, winning material, or escaping from a difficult situation. These puzzles serve as a training tool for players of all skill levels, from beginners to grandmasters.
+						</p>
+						<h3>
+							Types of Chess Puzzles
+						</h3>
+						<ol>
+							<li>
+								<p><strong>Checkmate Puzzles</strong>: These puzzles require the player to deliver checkmate in a certain number of moves. They are often categorized by the number of moves needed to achieve checkmate, such as "mate in 1," "mate in 2," etc.
+								</p>
+							</li>
+							<li>
+								<p><strong>Tactical Puzzles</strong>: These focus on specific tactical themes, such as forks, pins, skewers, and discovered attacks. Solving these puzzles helps players recognize tactical opportunities during real games.
+								</p>
+							</li>
+							<li>
+								<p><strong>Endgame Puzzles</strong>: These involve positions that arise in the endgame phase of chess. They often test players' understanding of key endgame concepts and techniques.
+								</p>
+							</li>
+							<li>
+								<p><strong>Defensive Puzzles</strong>: In these scenarios, the player must find the best defensive move to avoid losing material or getting checkmated.
+								</p>
+							</li>
+						</ol>
+						<p>
+							To conclude puzzles are of tremendous help in improving your overall chess skills especially in terms of pattern recognition. This is the reason why I wanted to incorporate puzzle training into my chess training app.
+						</p>
+						<h2>
+							Datasource for chess puzzles
+						</h2>
+						<p>
+							Fortunately lichess offers a huge catalog of chess puzzles you can use in your application. At the time of writing the database consists of <strong>4,211,138</strong> puzzles which are also categorized.
+						</p>
+						<p>
+							On their <a href="https://database.lichess.org/#puzzles">website</a> they state:
+						</p>
+						<blockquote>
+							<p>
+								Lichess games and puzzles are released under the <a href="https://tldrlegal.com/license/creative-commons-cc0-1.0-universal">Creative Commons CC0 license</a>. Use them for research, commercial purpose, publication, anything you like. You can download, modify and redistribute them, without asking for permission.
+							</p>
+						</blockquote>
+						<p>
+							And I think that is wonderful.
+						</p>
+						<h2>
+							Implementation
+						</h2>
+						<p>
+							In the previous parts we already talked about SAN, FEN and PGN Parsing. We also have a catalog of UI components which can be used to display a chess board and play moves. GRDB.swift is integrated into project as well to help with reading from a sqlite database. Therefore everything is in place to build the puzzle feature in the application.
+						</p>
+						<p>
+							I downloaded a database dump and added it to my app project. Next I created some models to read from it via GRDB.swift. Creating a list of possible categories and adding some puzzle modes was trivial with the help of SwiftUI. I added two playing modes:
+						</p>
+						<ol>
+							<li>
+								<p>
+									Puzzle Streak: Trying to solve as many puzzles as possible without a mistake, with each puzzle getting trickier.
+								</p>
+							</li>
+							<li>
+								<p>
+									Puzzle Storm: Trying to solve as many puzzles as possible in a limited amount of time.
+								</p>
+							</li>
+						</ol>
+						<p>
+							This is something which existing online platforms like lichess solve pretty well already. However I wanted to add this functionality to my app as well to have a full featured application solving all my various needs in terms of training my chess skills.
+						</p>
+						<p>
+							In the upcoming part of this series we will examine chess engines and how we can leverage them in our project.
+						</p>
+						<small>Posted
+							<time><time datetime="2024-10-31">2024-10-31</time></time>
+							in
+							<a href="/swift">swift</a></small>
+					</article>
 				</section>
 			</main>
 			<footer>

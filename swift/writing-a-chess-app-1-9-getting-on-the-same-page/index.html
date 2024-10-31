@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Writing a chess app (1/9): Getting on the same page
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/swift/writing-a-chess-app-1-9-getting-on-the-same-page">Writing a chess app (1/9): Getting on the same page</a>
+							</h1>
+						</header>
+						<h2>
+							Motivation
+						</h2>
+						<p>
+							At the beginning of the current month I started writing a chess iOS and macOS app... again. I started a handful of chess apps over the course of the last couple of years but never really finished one. My chess skills really improved since then which is why I wanted to learn a new opening repertoire this year. While researching my options for software assisting me in my intention I found the existing solutions to be lacking. I have two kids and therefore rarely find the time to boot up my MacBook and do actual chess training with some chess database software. Most of the time I am lucky to have a few spare minutes on my phone so the optimal solution would be an iOS app which I could use "on-the-go" for my specific use case while having a counterpart on my MacBook when dealing with the joy of having free time.
+						</p>
+						<h2>
+							Chess terminology
+						</h2>
+						<p>
+							For the start of this series I want to get us all on the same page so you can follow the rest of the blog posts if you are interested in software development but not necessarily in chess.
+							
+							When building and discussing a chess app, you often come across certain technical terms that are essential for both understanding the game and how it’s represented in software. Here’s a quick rundown:
+						</p>
+						<h3>
+							Chessboard Files and Ranks
+						</h3>
+						<p>
+							The chessboard is divided into files and ranks to identify square positions. Files are the vertical columns labeled a through h from left to right, while ranks are the horizontal rows labeled 1 through 8 from bottom to top. Together, they form a coordinate system for identifying squares (e.g., e4).
+						</p>
+						<p>
+							Reference: <a href="https://en.wikipedia.org/wiki/Chessboard">Chessboard</a></p>
+						<h3>
+							SAN (Standard Algebraic Notation)
+						</h3>
+						<p>
+							SAN is the standard way of recording chess moves in text, specifying each move with just enough detail to understand what was played. SAN includes the piece moved, the destination square, and any captures or special moves. It is concise and universally understood in chess. If two or more identical pieces can move to the same square the notation accounts for this with standardized disambiguation rules.
+						</p>
+						<p>
+							Example of SAN moves:
+						</p>
+						<ul>
+							<li>
+								<p><code>e4</code>: Move pawn to e4
+								</p>
+							</li>
+							<li>
+								<p><code>Bb5</code>: Move bishop to b5
+								</p>
+							</li>
+							<li>
+								<p><code>O-O</code>: Kingside castling
+								</p>
+							</li>
+							<li>
+								<p><code>O-O-O</code>: Queenside castling
+								</p>
+							</li>
+							<li>
+								<p><code>exd4</code>: Move pawn to d4 with a capture
+								</p>
+							</li>
+							<li>
+								<p><code>Qh4+</code>: Queen moves to h4 and gives a check
+								</p>
+							</li>
+							<li>
+								<p><code>Qg7#</code>: Queen moves to g7 and delivers mate
+								</p>
+							</li>
+							<li>
+								<p><code>e8=Q#</code>: Pawn moves to e8, is promoted to a queen and delivers checkmate
+								</p>
+							</li>
+						</ul>
+						<p>
+							Reference: <a href="https://en.wikipedia.org/wiki/Algebraic_notation_(chess)">Standard Algebraic Notation</a></p>
+						<h3>
+							FEN (Forsyth-Edwards Notation)
+						</h3>
+						<p>
+							FEN is a standard notation used to represent the current state of a chessboard. It includes information on piece placement, active color, castling rights, en passant target squares, and move counters totalling in six fields, each seperated by a space. FEN strings allow a game position to be saved or shared easily, making it essential for loading a specific position in a chess app.
+						</p>
+						<p>
+							Example FEN for the starting position:
+						</p>
+						<p><code>rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</code></p>
+						<p>
+							A quick explanation of the specific fields in the given example FEN:
+						</p>
+						<ul>
+							<li>
+								<p><code>rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR</code>: This encodes the piece placement data. Each rank is described starting at rank 8 up to rank 1, separated by a <code>/</code>. Within a rank the contents of the squares are described from the a to h file. Empty squares are described with a digit ranging from 1 to 8 (for consecutive empty squares), while piece information is encoded in algebraic notation
+								</p>
+							</li>
+							<li>
+								<p><code>w</code>: White is to move
+								</p>
+							</li>
+							<li>
+								<p><code>KQkq</code>: White and black can still castle king or queenside
+								</p>
+							</li>
+							<li>
+								<p><code>-</code>: There is no en passant target square
+								</p>
+							</li>
+							<li>
+								<p><code>0</code>: The number of halfmoves since the last capture or pawn advance
+								</p>
+							</li>
+							<li>
+								<p><code>1</code>: The number of full moves, starting at 1
+								</p>
+							</li>
+						</ul>
+						<p>
+							We will explore this notation in more detail when talking about parsing a FEN to extract the encoded position from it.
+						</p>
+						<p>
+							Reference: <a href="https://en.wikipedia.org/wiki/Forsyth–Edwards_Notation">Forsyth–Edwards Notation</a></p>
+						<h3>
+							Variations (or Lines)
+						</h3>
+						<p>
+							A <strong>line</strong> or <strong>variation</strong> refers to any sequence of moves that can arise from a specific opening. We typically distinguish between the mainline and sidelines.
+						</p>
+						<p>
+							A <strong>mainline</strong> refers to the most popular and extensively studied sequence of moves within a particular opening. These moves are generally considered the best responses according to established theory.
+						</p>
+						<p>
+							In contrast to this <strong>sidelines</strong> are alternative moves or sequences that diverge from the mainline. While they may not be as popular or theoretically sound as the mainline moves, sidelines can still be effective and surprise opponents who are less familiar with them.
+						</p>
+						<h3>
+							PGN (Portable Game Notation)
+						</h3>
+						<p>
+							PGN is a notation format used to record entire chess games, move by move, along with additional information like players’ names, date, and location. PGN is popular for saving and sharing chess games, as it allows both humans and software to read and interpret the game data.
+						</p>
+						<p>
+							Example PGN:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-">[Event &quot;IBM Kasparov vs. Deep Blue Rematch&quot;]
+[Site &quot;New York, NY USA&quot;]
+[Date &quot;1997.05.11&quot;]
+[Round &quot;6&quot;]
+[White &quot;Deep Blue&quot;]
+[Black &quot;Kasparov, Garry&quot;]
+[Opening &quot;Caro-Kann: 4...Nd7&quot;]
+[ECO &quot;B17&quot;]
+[Result &quot;1-0&quot;]
+
+1. e4 c6 2. d4 d5 3. Nc3 dxe4 4. Nxe4 Nd7 5. Ng5 Ngf6 6. Bd3 e6 7. N1f3 h6 8. Nxe6 Qe7 9. O-O fxe6 10. Bg6+ Kd8 {Kasparov is shaking his head} 11. Bf4 b5 12. a4 Bb7 13. Re1 Nd5 14. Bg3 Kc8 15. axb5 cxb5 16. Qd3 Bc6 17. Bf5 exf5 18. Rxe7 Bxe7 19. c4 1-0
+</code></pre>
+						</figure>
+						<p>
+							Parsing a PGN will be our topic in the next part of this series. If you want to read up on it for more details here is a reference link for you to look at:
+							<a href="https://de.wikipedia.org/wiki/Portable_Game_Notation">Portable Game Notation</a></p>
+						<h3>
+							NAG (Numeric Annotation Glyphs)
+						</h3>
+						<p>
+							NAG are numeric codes added to moves to indicate specific annotations. Some commonly used NAGs are typically represented with a character sequence such as "!" (good move) or "??" (blunder) while other glyphs are encoded in the form of <code>$&lt;number&gt;</code>. NAGs provide a quick way to annotate moves without verbose commentary, which is helpful for both users and software to analyze moves made in a game.
+						</p>
+						<p>
+							Examples:
+						</p>
+						<p><code>1. e4! e5 2. Qg4?</code></p>
+						<p>
+							Reference: <a href="https://en.wikipedia.org/wiki/Numeric_Annotation_Glyphs">Numeric Annotation Glyphs</a></p>
+						<h3>
+							Chess Engines
+						</h3>
+						<p>
+							A chess engine is the software core that analyzes positions, evaluates moves, and calculates optimal strategies. Engines range from basic AI with minimal calculation depth to advanced, powerful programs like Stockfish that use deep evaluation techniques. Integrating a chess engine into an app allows users to play against a computer or analyze their games. The best engine in terms of playing strength currently is stockfish which happens to be open source. Over the course of this blog post series we will have a look on how to integrate this engine in our application to analyze games locally on device and provide valuable input to the user.
+						</p>
+						<h3>
+							Repertoire
+						</h3>
+						<p>
+							A chess repertoire refers to a collection of openings, strategies, and plans that a player has prepared and is comfortable using in their games. Essentially, it is a personalized library of moves that a player has studied and practiced, designed to suit their playing style and preferences.
+						</p>
+						<p><strong>Key points</strong>:
+						</p>
+						<ul>
+							<li>
+								<p><strong>Personalized</strong>: Each player’s repertoire is unique, reflecting their strengths, weaknesses, and preferred strategies.
+								</p>
+							</li>
+							<li>
+								<p><strong>Openings and Responses</strong>: It typically includes various openings and the corresponding responses to different opponent moves.
+								</p>
+							</li>
+							<li>
+								<p><strong>Preparation</strong>: Players often invest time in preparing their repertoire to gain an advantage in the opening phase of the game.
+								</p>
+							</li>
+							<li>
+								<p><strong>Adaptability</strong>: A good repertoire can evolve over time as players learn new strategies or adjust to different opponents.
+								</p>
+							</li>
+						</ul>
+						<h2>
+							Conclusion
+						</h2>
+						<p>
+							Understanding these terms is essential for both developers and chess enthusiasts to navigate and use chess apps effectively. As mentioned above we will look first at parsing PGN files in the next part of this series as it is a fundamental part of the project.
+						</p>
+						<small>Posted
+							<time><time datetime="2024-10-31">2024-10-31</time></time>
+							in
+							<a href="/swift">swift</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>

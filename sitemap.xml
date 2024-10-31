@@ -47,4 +47,40 @@
 		<loc>https://davidvonk.dev/swift/generating-licenses-for-spm-dependencies</loc>
 		<changefreq>weekly</changefreq>
 	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-1-9-getting-on-the-same-page</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-2-9-parsing-pgn-files</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-3-9-implementation-of-the-actual-chess-logic</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-4-9-building-a-suite-of-components-for-chess-applications-in-swiftui</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-5-9-database-schema-and-move-encoding</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-6-9-spaced-repetition-repertoire-training</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-7-9-chess-puzzles</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-8-9-using-a-chess-engine-locally</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/swift/writing-a-chess-app-9-9-testing-and-conclusion</loc>
+		<changefreq>weekly</changefreq>
+	</url>
 </urlset>

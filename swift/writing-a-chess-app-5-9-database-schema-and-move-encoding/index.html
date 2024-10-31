@@ -17,7 +17,7 @@
 		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
 		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
 		<title>
-			When your macOS application is about to quit
+			Writing a chess app (5/9): Database Schema and move encoding
 			– davidvonk.dev
 		</title>
 		<style>
@@ -319,119 +319,152 @@ code:not(figure code), pre:not(figure pre) {
 					<article>
 						<header>
 							<h1>
-								<a href="/macos/when-your-macos-application-is-about-to-quit">When your macOS application is about to quit</a>
+								<a href="/swift/writing-a-chess-app-5-9-database-schema-and-move-encoding">Writing a chess app (5/9): Database Schema and move encoding</a>
 							</h1>
 						</header>
+						<p>
+							Hello and welcome to the next part of my ongoing blog post series of writing a chess app for iOS and macOS.
+							
+							In this part I'd like to talk about my design decision regarding the database schema.
+							
+							So lets dive in.
+						</p>
 						<h2>
-							Executing work before the application quits
+							Database Schema
 						</h2>
 						<p>
-							A quick Google search on <code>NSApplication.TerminateReply</code> results in 328 results. I can't think of many search phrases which perform worse.
+							For the database schema I heavily leaned on on the work of <a href="https://github.com/nguyenpham/ocgdb">ocgdb</a>. It is an open database format, is actually quite performant to store and search chess games and is the best excuse to use one of my favourite Swift packages (<a href="https://github.com/groue/GRDB.swift">GRDB.swift</a>). Besides the obvious benefits the open source chess database software <a href="https://encroissant.org">En Croissant</a> also uses the exact same database format and so my choice was being made.
 						</p>
-						<div class="image">
-							<img alt="An image showing a google search for NSApplication.TerminateReply." loading="lazy" src="/img/terminate-reply/NSApplication-TerminateReply-Google-Search.png" width="463.5"/>
-						</div>
 						<p>
-							In my Text Editor <em>Caret</em> I am not able to use Apples <code>NSDocument</code> class, or at least, I found, it probably isn't the best idea for my use case. However <code>NSDocument</code> comes with a neat little feature I knew I needed to support: <strong>Autosaving changes</strong>. Whenever a user edits text in the text editor the changes should be reflected on disk. Of course I do everything to coordinate these file changes and to have a reliable mechanism but to be extra sure I wanted to save all pending file changes before the application quits. Turns out this is what <code>NSApplication.TerminateReply</code> is for.
-						</p>
-						<h3>
-							Info.plist setup
-						</h3>
-						<p>
-							First you most certainly want to set the following key in your <code>Info.plist</code>:
+							For reference here is the sqlite schema which I think is pretty self explanatory:
 						</p>
 						<figure class="highlight">
-							<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
-&lt;plist version=&quot;1.0&quot;&gt;
-&lt;dict&gt;
-	&lt;key&gt;NSSupportsSuddenTermination&lt;/key&gt;
-	&lt;false/&gt;
-&lt;/dict&gt;
-&lt;/plist&gt;
-</code></pre>
-						</figure>
-						<p>
-							Otherwise it can happen that <code>applicationShouldTerminate</code> won't being called and <code>NSApplicationWillTerminateNotification</code> won't being sent. With that out of our mind let's dive into using the above API.
-						</p>
-						<h3>
-							AppDelegate implementation
-						</h3>
-						<p>
-							You might start by doing all your saving logic in
-						</p>
-						<figure class="highlight">
-							<pre><code class="language-swift">func applicationWillTerminate(_ aNotification: Notification) {
-  // Insert code here to tear down your application
-} 
-</code></pre>
-						</figure>
-						<p>
-							Unfortunately this won't work since, after all, the application will terminate. If your operation is taking enough time to finish you'll end up with a terminated process and no saved changes.
-						</p>
-						<p>
-							To fix this we need to implement <code>applicationShouldTerminate(_ sender: NSApplication) -&gt; NSApplication.TerminateReply</code>.
-							<code>NSApplication.TerminateReply</code> actually is an enum and can either be:
-						</p>
-						<ul>
-							<li>
-								<p>
-									terminateCancel
-								</p>
-							</li>
-							<li>
-								<p>
-									terminateNow
-								</p>
-							</li>
-							<li>
-								<p>
-									terminateLater
-								</p>
-							</li>
-						</ul>
-						<p><code>terminateCancel</code> will stop the termination of the application. This isn't a pleasant user experience since the user wanted to quit you app. Interesting however is <code>terminateNow</code> and <code>terminateLater</code>. When you do not have any pending file changes you can quit right away by returning <code>terminateNow</code>, but when you do have changes <code>terminateLater</code> is what you want.
-						</p>
-						<p>
-							Start by implementing something like the following logic in your AppDelegate:
-						</p>
-						<figure class="highlight">
-							<pre><code class="language-swift">func applicationShouldTerminate(_ sender: NSApplication) -&gt; NSApplication.TerminateReply {
-    if hasPendingChanges {
-        savePendingChanges()
-	return .terminateLater
-    }
+							<pre><code class="language-sql">CREATE TABLE Info (
+    Name TEXT UNIQUE NOT NULL,
+    Value TEXT
+);
 
-    return .terminateNow
-}
+CREATE TABLE Events (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT UNIQUE
+);
+
+CREATE TABLE Sites (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT UNIQUE
+);
+
+CREATE TABLE Players (
+    ID INTEGER PRIMARY KEY,
+    Name TEXT UNIQUE,
+    Elo INTEGER
+);
+
+CREATE TABLE Games (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    EventID INTEGER,
+    SiteID INTEGER,
+    Date TEXT,
+    Round INTEGER,
+    WhiteID INTEGER,
+    WhiteElo INTEGER,
+    BlackID INTEGER,
+    BlackElo INTEGER,
+    Result INTEGER,
+    TimeControl TEXT,
+    ECO TEXT,
+    PlyCount INTEGER,
+    FEN TEXT,
+    Moves BLOB,
+    FOREIGN KEY(EventID) REFERENCES Events,
+    FOREIGN KEY(SiteID) REFERENCES Sites,
+    FOREIGN KEY(WhiteID) REFERENCES Players,
+    FOREIGN KEY(BlackID) REFERENCES Players
+);
+
+CREATE INDEX IF NOT EXISTS games_date_idx ON Games(Date);
+CREATE INDEX IF NOT EXISTS games_white_idx ON Games(WhiteID);
+CREATE INDEX IF NOT EXISTS games_black_idx ON Games(BlackID);
+CREATE INDEX IF NOT EXISTS games_result_idx ON Games(Result);
+CREATE INDEX IF NOT EXISTS games_white_elo_idx ON Games(WhiteElo);
+CREATE INDEX IF NOT EXISTS games_black_elo_idx ON Games(BlackElo);
+CREATE INDEX IF NOT EXISTS games_plycount_idx ON Games(PlyCount);
 </code></pre>
 						</figure>
 						<p>
-							When you run your app in this state and quit it with pending changes the application won't be terminated. Whats left is to tell the process when you actually finished your save operation in order to terminate the application.
-							
-							Luckily for us there is API to do exactly that: <code>NSApp.reply(toApplicationShouldTerminate: true)</code>.
+							If you had a closer look at the schema you might have noticed that the <code>Moves</code> column is specified as a <code>BLOB</code>. The idea behind that design decision is discussed in our next chapter.
+						</p>
+						<h2>
+							Move Encoding
+						</h2>
+						<p>
+							When thinking about how to encode moves into the database several options come to mind. The obvious solution is to store the movetext just as a <code>TEXT</code> column and move on. I opted for encoding every chess move with only 2 bytes. This not only makes the actual data that is saved pretty small it also makes encoding and decoding moves trivial. Of course this could be optimized even further but weighting performance and ease of use against each other I ultimately found this solution to be the best fit for my needs.
 						</p>
 						<p>
-							To round things up this is how your <code>savePendingChanges</code> method should look like:
+							As we learned at the beginning of this blog post series a chess board has 64 squares and a move can be represented by moving a piece from one square to another square. The piece does not have to be stored itself, since this information is typically retrieved from a FEN string which encodes a chess board quite efficiently. There is a special case when moving a pawn to the backrank of your opponent resulting in promoting your pawn to a queen, knight, bishop or rook. So we need to account for that. If we represent the various promotion options with an integer enum we end up with a single integer ranging from 0-4 to encode a promotion information:
 						</p>
 						<figure class="highlight">
-							<pre><code class="language-swift">func savePendingChanges() {
-    doSomeWork {
-        NSApp.reply(toApplicationShouldTerminate: true)
-    }
+							<pre><code class="language-swift">enum Promotion: Int {
+	case empty
+	case queen
+	case bishop
+	case rook
+	case knight
 }
 </code></pre>
 						</figure>
-						<h3>
-							Conclusion
-						</h3>
 						<p>
-							Doing work just before the application quits actually is pretty straightforward to implement on macOS. One common pitfall is to miss the Info.plist entry I mentioned at the beginning of the post. Of course, just because this option exists, you probably do not want to run operations which take a long time. This inevitably will lead to bad UX for your customers. Try to save as often as you can without sacrificing performance or user experience of your application. By implementing the pattern explained in this blog post you will make sure to provide a reliable experience for your users.
+							With this in place a move representation can look something like this:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">typealias Square = Int
+
+extension Square {
+	var rank: Int {
+	    value &gt;&gt; 3
+	}
+	
+	var file: Int {
+	    value &amp; 0x7
+	}
+}
+
+struct Move: Hashable, Equatable, Sendable {
+    let from: Square
+    let to: Square
+    let promotion: Promotion
+}
+</code></pre>
+						</figure>
+						<p>
+							There is room for improvement though. You could represent a square with a struct conforming to <code>RawRepresentable</code> and <code>ExpressibleByIntegerLiteral</code> to actually not pollute the <code>Int</code> namespace with our extensions but this is something I haven't looked into yet. As a bonus I added some code to retrieve the file and rank of a given square.
+						</p>
+						<p>
+							Looking at the above representation of a move lets count how much bits we need to actually store this information.
+							
+							We need 6 bits for each square (2^6 = 64) and 2 bits (2^2 = 4) to store the promotion information adding up to 14 bits in total which easily fits in an UInt16 or 2 bytes. For completeness sake here are the respective encoding and decoding functions:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">init(encoded: UInt16) {
+    let from = encoded &amp; 63
+    let to = encoded &gt;&gt; 6 &amp; 63
+    let promotion = (encoded &gt;&gt; 12) &amp; 7
+    let promotionRole = Promotion(rawValue: Int(promotion))
+    self.init(from: Square(from), to: Int(to), promotion: promotionRole)
+}
+
+var encoded: UInt16 {
+    UInt16(from) | UInt16(to) &lt;&lt; 6 | (UInt16(promotion.rawValue)) &lt;&lt; 12
+}
+</code></pre>
+						</figure>
+						<p>
+							And with that lets move on our next part which will look at spaced repetition training of repertoires.
 						</p>
 						<small>Posted
-							<time><time datetime="2020-05-01">2020-05-01</time></time>
+							<time><time datetime="2024-10-31">2024-10-31</time></time>
 							in
-							<a href="/macos">macos</a></small>
+							<a href="/swift">swift</a></small>
 					</article>
 				</section>
 			</main>

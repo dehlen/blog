@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Writing a chess app (8/9): Using a chess engine locally
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/swift/writing-a-chess-app-8-9-using-a-chess-engine-locally">Writing a chess app (8/9): Using a chess engine locally</a>
+							</h1>
+						</header>
+						<h2>
+							Available engines
+						</h2>
+						<p>
+							When developing a chess application, you have several options for integrating a chess engine. The two most popular choices are: <a href="https://stockfishchess.org">Stockfish</a> and <a href="https://lczero.org">Leela Chess Zero</a>. Both engines are open source, extremly powerful and support the UCI engine protocol. For my project I chose to use Stockfish as it used by my favorite chess platform lichess and besides that considered as the best chess engine currently existing in terms of playing strength.
+						</p>
+						<h2>
+							UCI Engine Protocol
+						</h2>
+						<p><a href="https://backscattering.de/chess/uci/2006-04.txt">UCI protocol documentation</a></p>
+						<p>
+							The Universal Chess Interface (UCI) is a protocol that allows communication between chess engines and GUIs. It standardizes the way commands are sent and received, making it easier for us to integrate different engines into our applications.
+						</p>
+						<h3>
+							UCI Command Structure
+						</h3>
+						<p>
+							The UCI protocol consists of a series of text-based commands that the GUI sends to the engine, and responses that the engine sends back. Here’s a breakdown of some of the most common commands in the UCI protocol:
+						</p>
+						<h4>
+							1. Initialization Commands
+						</h4>
+						<ul>
+							<li>
+								<p><strong><code>uci</code></strong>: This command is sent by the GUI to initiate communication with the engine. The engine responds with its identity and capabilities.
+								</p>
+								<p><strong>Example</strong>:
+								</p>
+								<figure class="highlight">
+									<pre><code class="language-">&gt; uci &lt; id name Stockfish 15 &lt; uciok
+</code></pre>
+								</figure>
+							</li>
+							<li>
+								<p><strong><code>isready</code></strong>: This command checks if the engine is ready to receive new commands. The engine responds with <code>readyok</code> when it is ready.
+								</p>
+							</li>
+						</ul>
+						<h4>
+							2. Position Setup Commands
+						</h4>
+						<ul>
+							<li>
+								<p><strong><code>position</code></strong>: This command sets the position on the board. It can take two forms:
+								</p>
+								<ul>
+									<li>
+										<p><strong><code>position startpos</code></strong>: Initializes the board to the standard starting position.
+										</p>
+									</li>
+									<li>
+										<p><strong><code>position fen &lt;FEN&gt;</code></strong>: Sets the board to a specific configuration defined by the FEN string.
+										</p>
+									</li>
+								</ul>
+								<p><strong>Example</strong>:
+								</p>
+								<figure class="highlight">
+									<pre><code class="language-">&gt; position startpos
+</code></pre>
+								</figure>
+							</li>
+							<li>
+								<p><strong><code>setposition</code></strong>: Similar to <code>position</code>, but used to set a position without the need to specify moves.
+								</p>
+							</li>
+						</ul>
+						<h4>
+							3. Move Calculation Commands
+						</h4>
+						<ul>
+							<li>
+								<p><strong><code>go</code></strong>: This command instructs the engine to start calculating the best move. It can be accompanied by parameters such as:
+								</p>
+								<ul>
+									<li>
+										<p><strong><code>depth &lt;n&gt;</code></strong>: Limits the search to a specific depth.
+										</p>
+									</li>
+									<li>
+										<p><strong><code>time &lt;milliseconds&gt;</code></strong>: Limits the time the engine can spend calculating.
+										</p>
+									</li>
+									<li>
+										<p><strong><code>movetime &lt;milliseconds&gt;</code></strong>: Specifies the exact time to think for the current move.
+										</p>
+									</li>
+								</ul>
+								<p><strong>Example</strong>:
+								</p>
+								<figure class="highlight">
+									<pre><code class="language-">&gt; go movetime 2000
+</code></pre>
+								</figure>
+							</li>
+							<li>
+								<p><strong><code>stop</code></strong>: This command tells the engine to stop its calculations immediately. The engine will return the best move it has found so far.
+								</p>
+							</li>
+						</ul>
+						<h4>
+							4. Engine Options Commands
+						</h4>
+						<ul>
+							<li>
+								<p><strong><code>setoption name &lt;name&gt; value &lt;value&gt;</code></strong>: This command allows the GUI to set various options for the engine, such as adjusting its playing style or tuning specific parameters.
+								</p>
+								<p><strong>Example</strong>:
+								</p>
+								<figure class="highlight">
+									<pre><code class="language-">&gt; setoption name Hash value 2048
+</code></pre>
+								</figure>
+							</li>
+						</ul>
+						<h4>
+							5. Termination Commands
+						</h4>
+						<ul>
+							<li>
+								<p><strong><code>quit</code></strong>: This command is used to terminate the engine process. The engine will respond with a message indicating it is shutting down.
+								</p>
+							</li>
+						</ul>
+						<h3>
+							Example Interaction Flow
+						</h3>
+						<p>
+							To illustrate how UCI works in practice, let’s walk through a typical interaction between a GUI and a chess engine:
+						</p>
+						<ol>
+							<li>
+								<p><strong>Initialization</strong>:
+								</p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-">&gt; uci &lt; id name Stockfish 15 &lt; uciok
+</code></pre>
+						</figure>
+						<ol>
+							<li>
+								<p><strong>Setting Up the Position</strong>:
+								</p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-">&gt; position startpos
+</code></pre>
+						</figure>
+						<ol>
+							<li>
+								<p><strong>Instructing the Engine to Calculate a Move</strong>:
+								</p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-">&gt; go movetime 3000
+</code></pre>
+						</figure>
+						<ol>
+							<li>
+								<p><strong>Receiving the Best Move</strong>:
+								</p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-">&lt; bestmove e2e4 &lt; info depth 20 seldepth 30 score cp 25
+</code></pre>
+						</figure>
+						<ol>
+							<li>
+								<p><strong>Stopping the Engine (if needed)</strong>:
+								</p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-">&gt; stop &lt; bestmove e2e4
+</code></pre>
+						</figure>
+						<ol>
+							<li>
+								<p><strong>Terminating the Engine</strong>:
+								</p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-">&gt; quit
+</code></pre>
+						</figure>
+						<h2>
+							Redirect STDOUT and STDIN
+						</h2>
+						<p>
+							Now that we have chosen a chess engine and have an understanding how to communicate with it we should look at how to incorporate that into our iOS and macOS application. Since stockfish is written in C++ (<a href="https://github.com/official-stockfish/Stockfish">source code</a>) the best option to make the engine available to our Swift application is by bridging it in a Objective-C++ framework. I created a new Swift package with one target containing the stockfish source code as well as some wrapper implementation. When using the stockfish engine the source code expects you to send commands on stdin and receive the response on stdout. To make this work with our iOS application we create a new pipe for reading and one for writing and redirect stdin and stdout to those pipes. Fortunately a function to do exactly this already exists in the C standard library ready for us to use it.
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-objc">- (void)start {
+    // set up read pipe
+    _readPipe = [NSPipe pipe];
+    _pipeReadHandle = [_readPipe fileHandleForReading];
+
+    dup2([[_readPipe fileHandleForWriting] fileDescriptor], fileno(stdout));
+
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self
+     selector:@selector(readStdout:)
+     name:NSFileHandleReadCompletionNotification
+     object:_pipeReadHandle
+    ];
+
+    [_pipeReadHandle readInBackgroundAndNotify];
+
+    // set up write pipe
+    _writePipe = [NSPipe pipe];
+    _pipeWriteHandle = [_writePipe fileHandleForWriting];
+    dup2([[_writePipe fileHandleForReading] fileDescriptor], fileno(stdin));
+
+    _queue = dispatch_queue_create(&quot;ck-message-queue&quot;, DISPATCH_QUEUE_CONCURRENT);
+
+    dispatch_async(_queue, ^{
+        _engine-&gt;initialize();
+    });
+}
+
+- (void)stop {
+    [_pipeReadHandle closeFile];
+    [_pipeWriteHandle closeFile];
+
+    _readPipe = NULL;
+    _pipeReadHandle = NULL;
+
+    _writePipe = NULL;
+    _pipeWriteHandle = NULL;
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)sendCommand: (NSString*) command {
+    dispatch_sync(_queue, ^{
+        const char *cmd = [[command stringByAppendingString:@&quot;\n&quot;] UTF8String];
+        write([_pipeWriteHandle fileDescriptor], cmd, strlen(cmd));
+    });
+}
+
+# pragma mark Private
+
+- (void)readStdout: (NSNotification*) notification {
+    [_pipeReadHandle readInBackgroundAndNotify];
+
+    NSData *data = [[notification userInfo] objectForKey:NSFileHandleNotificationDataItem];
+    NSArray&lt;NSString *&gt; *output = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] componentsSeparatedByString:@&quot;\n&quot;];
+
+    [output enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        [self responseHandler](obj);
+    }];
+}
+</code></pre>
+						</figure>
+						<p>
+							With this wrapper in place we can start to implement the UCI protocol and interface with the chosen engine implementation.
+						</p>
+						<h2>
+							Using a chess engine
+						</h2>
+						<p>
+							We need 4 core components:
+						</p>
+						<ol>
+							<li>
+								<p>
+									A model to represent engine commands
+								</p>
+							</li>
+							<li>
+								<p>
+									A parser to parse engine responses
+								</p>
+							</li>
+							<li>
+								<p>
+									An interface to send commands to the engine and to receive responses from it (done)
+								</p>
+							</li>
+							<li>
+								<p>
+									An engine representation to bring all of this together
+								</p>
+							</li>
+						</ol>
+						<p>
+							For reference I included parts of this implementation for you to get a better understanding how my integration works. Please note that while I changed the implementation quite a bit in my current project this code was initially taken from this open source package: <a href="https://github.com/chesskit-app/chesskit-engine">chesskit-engine</a>.
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">public enum EngineCommand: Equatable {
+	case uci
+	case isready
+	case position(PositionString, moves: [String]? = nil)
+	...
+}
+
+class EngineResponseParser {
+    static func parse(response: String) -&gt; EngineResponse? {
+        let tokens = response.split { $0.isWhitespace || $0.isNewline } .map(String.init)
+        var iterator = tokens.makeIterator()
+
+        guard let command = iterator.next() else {
+            return nil
+        }
+
+        switch command {
+        case &quot;id&quot;:          return parseID(&amp;iterator)
+        case &quot;uciok&quot;:       return .uciok
+        case &quot;readyok&quot;:     return .readyok
+        case &quot;bestmove&quot;:    return parseBestMove(&amp;iterator)
+        case &quot;info&quot;:        return parseInfo(&amp;iterator)
+        default:            return nil
+        }
+    }
+
+    // ...
+}
+
+public class Engine {
+    private let messenger: EngineMessenger
+    public private(set) var isRunning = false
+    private var startupLoop: EngineSetupLoop
+
+    private let queue = DispatchQueue(
+        label: &quot;ck-engine-queue&quot;,
+        qos: .userInteractive
+    )
+
+    deinit {
+        stop()
+    }
+
+    public func start(
+        coreCount: Int? = nil,
+        multipv: Int = 1,
+        completion: @escaping () -&gt; Void = {}
+    ) {
+        startupLoop.startupDidComplete = {
+            self.isRunning = true
+            self.performInitialSetup(
+                coreCount: coreCount ?? ProcessInfo.processInfo.processorCount,
+                multipv: multipv
+            )
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
+
+        messenger.responseHandler = { [weak self] response in
+            guard let self else { return }
+
+            guard let parsed = EngineResponse(rawValue: response) else {
+                if !response.isEmpty {
+                    self.log(response)
+                }
+                return
+            }
+
+            if !self.isRunning, let next = startupLoop.nextCommand(given: parsed) {
+                self.send(command: next)
+            }
+            
+            DispatchQueue.main.async {
+                self.receiveResponse(parsed)
+            }
+        }
+
+        messenger.start()
+        send(command: .uci)
+    }
+
+    public func stop() {
+        guard isRunning else { return }
+
+        send(command: .stop)
+        send(command: .quit)
+        messenger.stop()
+
+        isRunning = false
+        initialSetupComplete = false
+    }
+	
+	public func send(command: EngineCommand) {
+        guard isRunning || [.uci, .isready].contains(command) else {
+            return
+        }
+
+        queue.sync {
+            messenger.sendCommand(command.rawValue)
+        }
+    }
+
+    public var receiveResponse: (_ response: EngineResponse) -&gt; Void = {
+        _ in
+    }
+
+    private var initialSetupComplete = false
+
+    private func performInitialSetup(coreCount: Int, multipv: Int) {
+        guard !initialSetupComplete else { return }
+
+        let fileOptions = [
+                &quot;EvalFile&quot;: &quot;nn-1111cefa1111&quot;,
+                &quot;EvalFileSmall&quot;: &quot;nn-37f18f62d772&quot;
+            ].compactMapValues {
+                Bundle.main.url(forResource: $0, withExtension: &quot;nnue&quot;)?.path()
+            }
+        fileOptions.map(EngineCommand.setoption).forEach(send)
+
+        send(command: .setoption(
+            id: &quot;Threads&quot;,
+            value: &quot;\(max(coreCount - 1, 1))&quot;
+        ))
+        send(command: .setoption(id: &quot;MultiPV&quot;, value: &quot;\(multipv)&quot;))
+
+        initialSetupComplete = true
+    }
+}
+</code></pre>
+						</figure>
+						<p>
+							If you are wondering what those EvalFiles are about here is a quick rundown for you:
+							
+							Both Stockfish and Leela Chess Zero require neural network files to be provided to the engine for computation. They can be downloaded on their respective website and will be added to the engine via the setoption command. You are free to chose your options on how to provide the engine with these files. You might want to consider downloading them at app launch or maybe you just bundle them with the application in the first place.
+						</p>
+						<h2>
+							Game Review
+						</h2>
+						<p>
+							One thing popular chess platforms like lichess offer to their users is a detailed game review analysis. It boils down to categorizing moves as blunders, mistakes and inaccuracies with the help of a chess engine. This information can provide great value when analyzing your games to quickly spot interesting parts of the game and to identify fields of improvements for your chess training.
+						</p>
+						<p>
+							Another useful metric is the average centipawn loss.
+							
+							Centipawn loss refers to the difference in evaluation scores given by a chess engine before and after a move. This score is expressed in centipawns, which is one-hundredth of a pawn. A lower centipawn loss indicates better move quality, while a higher centipawn loss suggests a poorer decision. The average centipawn loss further describes the average of all centipawn losses throughout the game. The calculation of this metric is done with the following algorithm:
+						</p>
+						<ol>
+							<li>
+								<p><strong>Analyze Each Move</strong>: After the game is completed, use a chess engine to analyze each move. For each move, record the evaluation score before and after the move.
+								</p>
+							</li>
+							<li>
+								<p><strong>Calculate Centipawn Loss for Each Move</strong>: <code>Centipawn Loss = Evaluation Before Move - Evaluation After Move</code>. This formula gives you the centipawn loss for each move. If the evaluation after the move is lower than before, the result will be a positive centipawn loss, indicating a drop in position quality.
+								</p>
+							</li>
+							<li>
+								<p><strong>Sum the Centipawn Losses</strong>: Add up all the individual centipawn losses for the moves made during the game.
+								</p>
+							</li>
+							<li>
+								<p><strong>Count the Number of Moves</strong>: Determine the total number of moves made in the game.
+								</p>
+							</li>
+							<li>
+								<p><strong>Calculate Average Centipawn Loss</strong>: <code>ACPL = Total Centipawn Loss / Number of Moves</code> This formula provides the average centipawn loss over the course of the game.
+								</p>
+							</li>
+						</ol>
+						<p>
+							As of this writing I did not have any time to look into that more closely but it is one of the features I would like to tackle next.
+						</p>
+						<h2>
+							Closing words
+						</h2>
+						<p>
+							Thats all I have for this topic. In the last part I'd like to draw a conclusion as well as say a few words about unit tests.
+						</p>
+						<small>Posted
+							<time><time datetime="2024-10-31">2024-10-31</time></time>
+							in
+							<a href="/swift">swift</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>

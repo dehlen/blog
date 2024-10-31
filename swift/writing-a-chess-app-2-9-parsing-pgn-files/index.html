@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Writing a chess app (2/9): Parsing pgn files
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/swift/writing-a-chess-app-2-9-parsing-pgn-files">Writing a chess app (2/9): Parsing pgn files</a>
+							</h1>
+						</header>
+						<p>
+							As learned in part 1 of this series a chess game can be represented via the Portable Game Notation. It is the de-facto standard to represent a chess game. So when building a chess application we need to deal with this file format and find a performant way to extract information out of it. One would think that there exists a ton of high-quality open-source packages to deal with this topic. Unfortunately I could find only a handful of really robust, performant solutions and none of them are built in Swift. I probably could have taken a Rust implementation or something similiar, compile a static library and write some shims around the API but this time I felt like it would be a fun challenge to come up with my own solution.
+						</p>
+						<p>
+							The problem with a lot of the existing implementations is that they either make extensive use of regex which hurts the performance quite a bit or they do not implement the full PGN specification. For example I only found a few implementations which actually dealt with comments in PGN files. Comments however are a pretty big part of my repertoires since they help me not only memorizing moves but also to understand them better. I briefly tried some parser generators based on some PGN grammar I found online but at least the Swift generators were too slow for my needs which is why I ultimately decided to built a custom PGN parser from the ground up.
+						</p>
+						<h2>
+							PGN Specification
+						</h2>
+						<p>
+							We already looked at PGN files on a high-level in part 1 of this blog post series. Now lets examine it a bit closer.
+						</p>
+						<p>
+							A PGN file typically consists of two main parts:
+						</p>
+						<ul>
+							<li>
+								<p><strong>Tags</strong>: These are metadata that provide information about the game.
+								</p>
+							</li>
+							<li>
+								<p><strong>Moves</strong>: The actual moves made during the game.
+								</p>
+							</li>
+						</ul>
+						<h3>
+							Tags
+						</h3>
+						<p>
+							Tags are enclosed in square brackets and provide various details about the game.
+						</p>
+						<p><strong>Example:</strong></p>
+						<ul>
+							<li>
+								<p><code>[Event &quot;Event Name&quot;]</code>: Name of the tournament or match.
+								</p>
+							</li>
+							<li>
+								<p><code>[Site &quot;Location&quot;]</code>: Where the game took place.
+								</p>
+							</li>
+							<li>
+								<p><code>[Date &quot;YYYY.MM.DD&quot;]</code>: Date of the game.
+								</p>
+							</li>
+							<li>
+								<p><code>[Round &quot;Round Number&quot;]</code>: Round in the tournament.
+								</p>
+							</li>
+							<li>
+								<p><code>[White &quot;Player Name&quot;]</code>: Name of the player with the white pieces.
+								</p>
+							</li>
+							<li>
+								<p><code>[Black &quot;Player Name&quot;]</code>: Name of the player with the black pieces.
+								</p>
+							</li>
+							<li>
+								<p><code>[Result &quot;Result&quot;]</code>: Outcome of the game (e.g., "1-0", "0-1", "1/2-1/2").
+								</p>
+							</li>
+						</ul>
+						<p>
+							There is a list of common tag names but potentially you can add any tag you like. The seven tags above are standard for a valid PGN file and are called the Seven Tag Roaster.
+						</p>
+						<h3>
+							Moves
+						</h3>
+						<p>
+							The moves of the game follow the tags and are recorded in standard algebraic notation. Each move is separated by a space, and turns are indicated by numbering:
+						</p>
+						<ul>
+							<li>
+								<p><strong>Move Number</strong>: Each full turn (White and Black) is numbered.
+								</p>
+							</li>
+							<li>
+								<p><strong>Move Notation</strong>: Moves are represented using standard algebraic notation
+								</p>
+							</li>
+						</ul>
+						<p><strong>Example:</strong></p>
+						<figure class="highlight">
+							<pre><code class="language-">1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. d3 d6 7. c3 O-O 8. Nbd2 Nb8 9. Re1 Nbd7 10. Nf1
+</code></pre>
+						</figure>
+						<h3>
+							Results
+						</h3>
+						<p>
+							At the end of the moves, the result is indicated using the Result tag. The possible results are:
+						</p>
+						<ul>
+							<li>
+								<p><code>&quot;1-0&quot;</code>: White wins
+								</p>
+							</li>
+							<li>
+								<p><code>&quot;0-1&quot;</code>: Black wins
+								</p>
+							</li>
+							<li>
+								<p><code>&quot;1/2-1/2&quot;</code>: Draw
+								</p>
+							</li>
+							<li>
+								<p><code>&quot;*&quot;</code>: Unknown/Ongoing
+								</p>
+							</li>
+						</ul>
+						<h3>
+							Comments
+						</h3>
+						<p>
+							Comments are inserted by either a <code>;</code> (a comment that continues to the end of the line) or a <code>{</code> (which continues until a <code>}</code>). Comments do not nest.
+						</p>
+						<p><strong>Example:</strong></p>
+						<figure class="highlight">
+							<pre><code class="language-">1. e4 e5 2. Nf3 {This is a common opening.} Nc6 3. Bb5
+</code></pre>
+						</figure>
+						<h3>
+							Variations
+						</h3>
+						<p>
+							A variation is a sequence of movetext containing one or more alternative moves enclosed in parentheses. The alternate move sequence given by a variation is one that may be legally played by first unplaying the move that appears immediately prior to the parantheses. Because a variation is a recursive construct, it may be nested.
+						</p>
+						<p><strong>Example:</strong></p>
+						<figure class="highlight">
+							<pre><code class="language-">1. e4 e5 2. Nf3 Nc6 (2... d6) 3. Bb5
+</code></pre>
+						</figure>
+						<h3>
+							Multiple Games
+						</h3>
+						<p>
+							A PGN file can contain multiple games, separated by an empty line.
+						</p>
+						<h3>
+							Encoding
+						</h3>
+						<p>
+							PGN files are typically encoded in UTF-8, which allows for the inclusion of special characters.
+						</p>
+						<h2>
+							Buffered reading
+						</h2>
+						<p>
+							PGN files can get quite large, or at least large enough to consider parser performance and the overall memory footprint when dealing with these files. This lead me to a rabbit hole researching various buffered reading solutions available for the iOS and macOS platforms. This is one area where I found various options which probably all will work for the given task. The most promising solution I found is to use <code>BufferedReader</code> from swift-nio <a href="https://swiftinit.org/docs/swift-nio/_niofilesystem/bufferedreader">API Documentation</a>. However at the end I did not want to include such a big dependency like swift-nio in my package. Therefore I opted for implementing a simple RingBuffer data structure with the help of <a href="https://github.com/michaeltyson/TPCircularBuffer">TPCircularBuffer</a> in combination with <code>FileHandle.read(upToCount:)</code> <a href="https://developer.apple.com/documentation/foundation/filehandle/3516317-read">API Documentation</a> to solve the task at hand. In the following I'll present you a trimmed down version of my solution:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">final class RingByteBuffer {
+    let size: Int
+    private var buffer: TPCircularBuffer
+    
+    init(size: Int) {
+        self.size = size
+        self.buffer = TPCircularBuffer()
+        TPCircularBufferInit(&amp;self.buffer, Int32(size))
+    }
+    
+    deinit {
+        TPCircularBufferCleanup(&amp;self.buffer)
+    }
+    
+    func enqueue(data: Data) -&gt; Bool {
+        return data.withUnsafeBytes { buffer -&gt; Bool in
+            guard let bytes = buffer.baseAddress?.assumingMemoryBound(to: UInt8.self) else {
+                return false
+            }
+            return TPCircularBufferProduceBytes(&amp;self.buffer, UnsafeRawPointer(bytes), Int32(data.count))
+        }
+    }
+    
+    func enqueue(_ bytes: UnsafeRawPointer, count: Int) -&gt; Bool {
+        return TPCircularBufferProduceBytes(&amp;self.buffer, bytes, Int32(count))
+    }
+    
+    func withMutableHeadBytes(_ f: (UnsafeMutableRawPointer, Int) -&gt; Int) {
+        var availableBytes: Int32 = 0
+        let bytes = TPCircularBufferHead(&amp;self.buffer, &amp;availableBytes)
+        let enqueuedBytes = f(bytes!, Int(availableBytes))
+        TPCircularBufferProduce(&amp;self.buffer, Int32(enqueuedBytes))
+    }
+    
+    func space() -&gt; (UnsafeMutableRawPointer, Int) {
+        var availableBytes: Int32 = 0
+        let bytes = TPCircularBufferHead(&amp;self.buffer, &amp;availableBytes)
+        return (bytes!, Int(availableBytes))
+    }
+    
+    func fill(_ count: Int) {
+        TPCircularBufferProduce(&amp;self.buffer, Int32(count))
+    }
+    
+    func dequeue(_ bytes: UnsafeMutableRawPointer, count: Int) -&gt; Int {
+        var availableBytes: Int32 = 0
+        let tail = TPCircularBufferTail(&amp;self.buffer, &amp;availableBytes)
+        
+        let copiedCount = min(count, Int(availableBytes))
+        memcpy(bytes, tail, copiedCount)
+        
+        TPCircularBufferConsume(&amp;self.buffer, Int32(copiedCount))
+        
+        return copiedCount
+    }
+    
+    func dequeue(count: Int) -&gt; Data {
+        var availableBytes: Int32 = 0
+        let tail = TPCircularBufferTail(&amp;self.buffer, &amp;availableBytes)
+        
+        let copiedCount = min(count, Int(availableBytes))
+        let bytes = malloc(copiedCount)!
+        memcpy(bytes, tail, copiedCount)
+        
+        TPCircularBufferConsume(&amp;self.buffer, Int32(copiedCount))
+        
+        return Data(bytesNoCopy: bytes.assumingMemoryBound(to: UInt8.self), count: copiedCount, deallocator: .free)
+    }
+    
+    func clear() {
+        TPCircularBufferClear(&amp;self.buffer)
+    }
+    
+    var availableBytes: Int {
+        var count: Int32 = 0
+        TPCircularBufferTail(&amp;self.buffer, &amp;count)
+        return Int(count)
+    }
+    
+    var data: [UInt8] {
+        var availableBytes: Int32 = 0
+        guard let tail = TPCircularBufferTail(&amp;self.buffer, &amp;availableBytes) else { return [] }
+        let pointer = tail.bindMemory(to: UInt8.self, capacity: Int(availableBytes))
+        return Array(UnsafeBufferPointer(start: pointer, count: Int(availableBytes)))
+    }
+}
+
+struct Buffer {
+    let size: Int
+    var inner: RingByteBuffer
+
+    init(size: Int) {
+        self.size = size
+        self.inner = RingByteBuffer(size: size * 2)
+    }
+}
+
+struct BufferedReader {
+    var inner: any Read
+    var buffer: Buffer
+    
+    init(url: URL, bufferSize: Int = 1024 * 8) throws {
+        let fileHandle = try FileHandle(forReadingFrom: url)
+        let fileHandleReader = FileHandleReader(fileHandle: fileHandle)
+        let buffer = Buffer(size: bufferSize)
+        self.inner = fileHandleReader
+        self.buffer = buffer
+    }
+
+    mutating func fillBufferAndPeek() -&gt; UInt8? {
+        while buffer.inner.availableBytes &lt; buffer.size {
+            do {
+                let (ptr, count) = buffer.inner.space()
+                let remainder = UnsafeMutableRawBufferPointer(start: ptr, count: count)
+                let size = try inner.read(into: remainder)
+                if size == 0 { break }
+                buffer.inner.fill(size)
+            } catch {
+                break
+            }
+        }
+
+        return buffer.inner.data.first
+    }
+
+    func data() -&gt; [UInt8] {
+        return buffer.inner.data
+    }
+
+    mutating func consume(_ n: Int) {
+        _ = buffer.inner.dequeue(count: n)
+    }
+
+    func peek() -&gt; UInt8? {
+        return buffer.inner.data.first
+    }
+
+    mutating func bump() -&gt; UInt8? {
+        let head = peek()
+        if head != nil {
+            consume(1)
+        }
+        return head
+    }
+
+    func remaining() -&gt; Int {
+        return buffer.inner.availableBytes
+    }
+
+    mutating func consumeAll() {
+        let remaining = buffer.inner.availableBytes
+        consume(remaining)
+    }
+}
+</code></pre>
+						</figure>
+						<p>
+							With this in place we can assure that the reader itself does not allocate (besides a single fixed-size buffer) which keeps the memory footprint of our solution to a minimum.
+						</p>
+						<h2>
+							Visitor pattern
+						</h2>
+						<p>
+							The Visitor Pattern is a design pattern that allows you to separate an algorithm from the object structure on which it operates. This is particularly useful in the context of a parser implementation, where you may want to perform various operations on a complex data structure without modifying the structure itself.
+						</p>
+						<p>
+							I chose this approach due to the following key points which I think are pretty valuable in terms of performance, flexibility and ease of use:
+						</p>
+						<ul>
+							<li>
+								<p>
+									The visitor can decide if and how to represent games in memory.
+								</p>
+							</li>
+							<li>
+								<p>
+									The reader does not validate move legality. This allows implementing support for custom chess variants, or delaying move validation.
+								</p>
+							</li>
+						</ul>
+						<p>
+							For reference here is the protocol I built to represent a visitor for the PGN parser implementation:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">protocol Visitor {
+    associatedtype VisitorResult
+
+    func beginGame()
+    
+    func beginHeaders()
+    func header(key: String, value: String)
+    func endHeaders()
+    
+    func san(_ san: String)
+    func nag(_ nag: Nag)
+    func comment(_ comment: String)
+    
+    func beginVariation()
+    func endVariation()
+    
+    func outcome(_ outcome: Outcome)
+    
+    func endGame() -&gt; VisitorResult
+}
+</code></pre>
+						</figure>
+						<h2>
+							Implementing a parser
+						</h2>
+						<p>
+							So now that we have a good understanding about the PGN file format, can read PGN files quite efficiently in terms of memory consumption and have a visitor interface in place to transform the parsed data all that is left is actually implementing the parsing logic to tell a concrete visitor instance about the parsed information.
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">mutating func readGame&lt;V: Visitor&gt;(visitor: V) throws -&gt; V.VisitorResult? {
+    reader.skipBom()
+    reader.skipWhitespace()
+    
+    guard let _ = reader.fillBufferAndPeek() else {
+        return nil
+    }
+    
+    visitor.beginGame()
+    visitor.beginHeaders()
+    try self.readHeaders(visitor: visitor)
+    visitor.endHeaders()
+    try self.readMoveText(visitor: visitor)
+
+    reader.skipWhitespace()
+    return visitor.endGame()
+}
+</code></pre>
+						</figure>
+						<h2>
+							Benchmarks
+						</h2>
+						<p>
+							One burning question remains unanswered though. How fast is it? To answer this question I ran some benchmarks on my implementation.
+						</p>
+						<p>
+							The benchmark was run with a PGN file I downloaded from the <a href="https://database.lichess.org/standard">Lichess database</a> (~ 1,000,000 games, ~ 1 GB uncompressed) on an Apple M1 MacBook Pro with 32 GB RAM.
+						</p>
+						<p>
+							My simple benchmark visitor counts up statistics on the PGN file (how many games are available in this file, etc.):
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-swift">class Stats {
+    var games: Int = 0
+    var headers: Int = 0
+    var sans: Int = 0
+    var nags: Int = 0
+    var comments: Int = 0
+    var variations: Int = 0
+    var outcomes: Int = 0
+}
+
+struct StatsVisitor: Visitor {
+    typealias VisitorResult = Stats
+    let stats = Stats()
+
+    func beginGame() {}
+    
+    func beginHeaders() {}
+    
+    func header(key: String, value: String) {
+        stats.headers += 1
+    }
+    
+    func endHeaders() {}
+    
+    func san(_ san: String) {
+        stats.sans += 1
+    }
+    
+    func nag(_ nag: PGNKit.Nag) {
+        stats.nags += 1
+    }
+    
+    func comment(_ comment: String) {
+        stats.comments += 1
+    }
+    
+    func beginVariation() {}
+    
+    func endVariation() {
+        stats.variations += 1
+    }
+    
+    func outcome(_ outcome: PGNKit.Outcome) {
+        stats.outcomes += 1
+    }
+    
+    func endGame() -&gt; Stats {
+        stats.games += 1
+        return stats
+    }
+}
+</code></pre>
+						</figure>
+						<p>
+							I then used the <a href="https://github.com/google/swift-benchmark">swift-benchmark</a> package to actually execute my test.
+						</p>
+						<p>
+							Here are the results:
+						</p>
+						<ul>
+							<li>
+								<p><strong>Time</strong>: 28,19s
+								</p>
+							</li>
+							<li>
+								<p><strong>Throughput</strong>: 38,12 MB/s
+								</p>
+							</li>
+						</ul>
+						<p>
+							To my eye it seems like there still is room for improvement comparing against highly optimized solutions build in different languages. However parsing 1 GB of chess games in about half a minute while being able to support the full specification is more than fine for my use case. My typical chess dataset is a couple of megabytes in size. At a later point I might want to revisit this implementation though and see if I can find the culprit slowing it down. For the moment I am more than happy with the results. What do you think?
+						</p>
+						<small>Posted
+							<time><time datetime="2024-10-31">2024-10-31</time></time>
+							in
+							<a href="/swift">swift</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>
