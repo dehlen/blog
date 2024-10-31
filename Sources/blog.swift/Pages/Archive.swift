@@ -7,7 +7,9 @@ struct Archive: Page {
     let pathComponents = [ "archive" ]
 
     func content() -> Node {
-        let nodes: [Node] = posts.sliced(by: [.year], for: \.date).map { (key: Date, value: [Post]) -> Node in
+        let nodes: [Node] = posts.sliced(by: [.year], for: \.date)
+            .sorted(by: { $0.key > $1.key })
+            .map { (key: Date, value: [Post]) -> Node in
             [
                 h2 { "\(key.formatted(.dateTime.year()))" },
                 ul {
