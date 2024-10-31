@@ -107,6 +107,11 @@ img {
   margin: 0 auto .5em;
 }
 
+video {
+  display: block;
+  margin: 0 auto;
+}
+
 /**
  * Highlight/Markup
  */

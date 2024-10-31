@@ -24,7 +24,9 @@ private final class ResourceGatheringVisitor: Visitor {
     let attributeByName = [
         "img": "src",
         "link": "href",
-        "script": "src"
+        "script": "src",
+        "video": "src",
+        "source": "src"
     ]
     
     let excludedValues = [
