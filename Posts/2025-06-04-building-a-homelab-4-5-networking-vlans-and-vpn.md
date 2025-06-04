@@ -8,8 +8,6 @@ category: homelab
 slug: building-a-homelab-4-5-networking-vlans-and-vpn
 ---
 
-# Building a Homelab (4/5): Networking, VLANs and VPN 
-
 > Why did the data cross the road? To get to the VLAN on the other side!.
 
 When we moved into our new home new CAT 7 cables were run throughout the whole house. That was the reason I wanted to get into networking infrastructure and to build my home network more professionally. Of course when you setup all this networking infrastructure you want to utilize it as well and so this blog post and my excitement for homelabs was born. When I shopped the new network gear I tried to plan ahead which is why the new devices are all Wifi 7 capable and I am able to utilize 10 GB SFP+ ports on my switch for some devices (f.e. for my NAS). To get things started here is a diagram of the deployed networking infrastructure: 
