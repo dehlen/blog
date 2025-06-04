@@ -175,6 +175,7 @@ From local DNS blocking to RSS reading and media streaming, everything is self-h
   </tbody>
 </table>
 
+
 All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
 
 This setup balances critical services (DNS) across two Pis for resilience, while keeping heavier services (media, apps) centralized on the Ubuntu VM.
