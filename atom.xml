@@ -19,10 +19,7 @@
 			A blog post series about my journey building a homelab
 		</summary>
 		<content type="html">
-			&lt;h1&gt;
-	Building a Homelab (5/5): Everything else
-&lt;/h1&gt;
-&lt;blockquote&gt;
+			&lt;blockquote&gt;
 	&lt;p&gt;
 		Why did the homelabber bring a book to the server room? Because with so much to learn, they needed a backup plan for their brain!
 	&lt;/p&gt;
@@ -77,37 +74,127 @@ sudo chown root:root /etc/cron.d/myjob
 &lt;h3&gt;
 	Cron Timing Syntax
 &lt;/h3&gt;
-&lt;p&gt;
-	| Field       | Allowed Values        | Description                  |
-	
-	|-------------|------------------------|------------------------------|
-	
-	| Minute      | 0–59                   | Minute of the hour           |
-	
-	| Hour        | 0–23                   | Hour of the day              |
-	
-	| Day of Month| 1–31                   | Day of the month             |
-	
-	| Month       | 1–12 or Jan–Dec        | Month of the year            |
-	
-	| Day of Week | 0–7 or Sun–Sat         | Day of the week (0 or 7 is Sunday) |
-&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Field
+			&lt;/th&gt;
+			&lt;th&gt;
+				Allowed Values
+			&lt;/th&gt;
+			&lt;th&gt;
+				Description
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Minute
+			&lt;/td&gt;
+			&lt;td&gt;
+				0–59
+			&lt;/td&gt;
+			&lt;td&gt;
+				Minute of the hour
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Hour
+			&lt;/td&gt;
+			&lt;td&gt;
+				0–23
+			&lt;/td&gt;
+			&lt;td&gt;
+				Hour of the day
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Day of Month
+			&lt;/td&gt;
+			&lt;td&gt;
+				1–31
+			&lt;/td&gt;
+			&lt;td&gt;
+				Day of the month
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Month
+			&lt;/td&gt;
+			&lt;td&gt;
+				1–12 or Jan–Dec
+			&lt;/td&gt;
+			&lt;td&gt;
+				Month of the year
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Day of Week
+			&lt;/td&gt;
+			&lt;td&gt;
+				0–7 or Sun–Sat
+			&lt;/td&gt;
+			&lt;td&gt;
+				Day of the week (0 or 7 is Sunday)
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;h4&gt;
 	Special Symbols
 &lt;/h4&gt;
-&lt;p&gt;
-	| Symbol | Meaning                   |
-	
-	|--------|----------------------------|
-	
-	| &lt;code&gt;*&lt;/code&gt;    | Every possible value       |
-	
-	| &lt;code&gt;,&lt;/code&gt;    | Value list separator       |
-	
-	| &lt;code&gt;-&lt;/code&gt;    | Range of values            |
-	
-	| &lt;code&gt;/&lt;/code&gt;    | Step values (e.g., &lt;code&gt;*/5&lt;/code&gt;)  |
-&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Symbol
+			&lt;/th&gt;
+			&lt;th&gt;
+				Meaning
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`*`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Every possible value
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`,`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Value list separator
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`-`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Range of values
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`/`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Step values (e.g., `*/5`)
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;h3&gt;
 	Checking if a Cron Job Runs
 &lt;/h3&gt;
@@ -201,29 +288,92 @@ sudo chown root:root /etc/cron.d/myjob
 &lt;h4&gt;
 	Explanation of Options
 &lt;/h4&gt;
-&lt;p&gt;
-	| Option           | Description                                                                 |
-	
-	|------------------|-----------------------------------------------------------------------------|
-	
-	| &lt;code&gt;daily&lt;/code&gt;          | Rotate logs every day                                                       |
-	
-	| &lt;code&gt;missingok&lt;/code&gt;      | Do not show error if log file is missing                                    |
-	
-	| &lt;code&gt;rotate 14&lt;/code&gt;      | Keep 14 old log files before deleting                                       |
-	
-	| &lt;code&gt;compress&lt;/code&gt;       | Compress rotated logs (using gzip by default)                              |
-	
-	| &lt;code&gt;delaycompress&lt;/code&gt;  | Delay compression until the next rotation (useful with apps that keep logs open) |
-	
-	| &lt;code&gt;notifempty&lt;/code&gt;     | Do not rotate empty log files                                               |
-	
-	| &lt;code&gt;create&lt;/code&gt;         | Create a new log file with specified permissions and ownership              |
-	
-	| &lt;code&gt;sharedscripts&lt;/code&gt;  | Run &lt;code&gt;postrotate&lt;/code&gt; script once, even if multiple logs are matched             |
-	
-	| &lt;code&gt;postrotate&lt;/code&gt;     | Script to run after rotation (e.g., to reload services)                     |
-&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Option
+			&lt;/th&gt;
+			&lt;th&gt;
+				Description
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`daily`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Rotate logs every day
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`missingok`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Do not show error if log file is missing
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`rotate 14`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Keep 14 old log files before deleting
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`compress`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Compress rotated logs (using gzip by default)
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`delaycompress`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Delay compression until the next rotation (useful with apps that keep logs open)
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`notifempty`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Do not rotate empty log files
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`create`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Create a new log file with specified permissions and ownership
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`sharedscripts`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Run `postrotate` script once, even if multiple logs are matched
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				`postrotate`
+			&lt;/td&gt;
+			&lt;td&gt;
+				Script to run after rotation (e.g., to reload services)
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;h3&gt;
 	Testing a Logrotate Rule
 &lt;/h3&gt;

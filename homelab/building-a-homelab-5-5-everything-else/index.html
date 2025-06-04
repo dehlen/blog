@@ -323,9 +323,6 @@ code:not(figure code), pre:not(figure pre) {
 								<a href="/homelab/building-a-homelab-5-5-everything-else">Building a homelab (5/5): Everything else</a>
 							</h1>
 						</header>
-						<h1>
-							Building a Homelab (5/5): Everything else
-						</h1>
 						<blockquote>
 							<p>
 								Why did the homelabber bring a book to the server room? Because with so much to learn, they needed a backup plan for their brain!
@@ -381,37 +378,127 @@ sudo chown root:root /etc/cron.d/myjob
 						<h3>
 							Cron Timing Syntax
 						</h3>
-						<p>
-							| Field       | Allowed Values        | Description                  |
-							
-							|-------------|------------------------|------------------------------|
-							
-							| Minute      | 0–59                   | Minute of the hour           |
-							
-							| Hour        | 0–23                   | Hour of the day              |
-							
-							| Day of Month| 1–31                   | Day of the month             |
-							
-							| Month       | 1–12 or Jan–Dec        | Month of the year            |
-							
-							| Day of Week | 0–7 or Sun–Sat         | Day of the week (0 or 7 is Sunday) |
-						</p>
+						<table>
+							<thead>
+								<tr>
+									<th>
+										Field
+									</th>
+									<th>
+										Allowed Values
+									</th>
+									<th>
+										Description
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										Minute
+									</td>
+									<td>
+										0–59
+									</td>
+									<td>
+										Minute of the hour
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Hour
+									</td>
+									<td>
+										0–23
+									</td>
+									<td>
+										Hour of the day
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Day of Month
+									</td>
+									<td>
+										1–31
+									</td>
+									<td>
+										Day of the month
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Month
+									</td>
+									<td>
+										1–12 or Jan–Dec
+									</td>
+									<td>
+										Month of the year
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Day of Week
+									</td>
+									<td>
+										0–7 or Sun–Sat
+									</td>
+									<td>
+										Day of the week (0 or 7 is Sunday)
+									</td>
+								</tr>
+							</tbody>
+						</table>
 						<h4>
 							Special Symbols
 						</h4>
-						<p>
-							| Symbol | Meaning                   |
-							
-							|--------|----------------------------|
-							
-							| <code>*</code>    | Every possible value       |
-							
-							| <code>,</code>    | Value list separator       |
-							
-							| <code>-</code>    | Range of values            |
-							
-							| <code>/</code>    | Step values (e.g., <code>*/5</code>)  |
-						</p>
+						<table>
+							<thead>
+								<tr>
+									<th>
+										Symbol
+									</th>
+									<th>
+										Meaning
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										`*`
+									</td>
+									<td>
+										Every possible value
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`,`
+									</td>
+									<td>
+										Value list separator
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`-`
+									</td>
+									<td>
+										Range of values
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`/`
+									</td>
+									<td>
+										Step values (e.g., `*/5`)
+									</td>
+								</tr>
+							</tbody>
+						</table>
 						<h3>
 							Checking if a Cron Job Runs
 						</h3>
@@ -505,29 +592,92 @@ sudo chown root:root /etc/cron.d/myjob
 						<h4>
 							Explanation of Options
 						</h4>
-						<p>
-							| Option           | Description                                                                 |
-							
-							|------------------|-----------------------------------------------------------------------------|
-							
-							| <code>daily</code>          | Rotate logs every day                                                       |
-							
-							| <code>missingok</code>      | Do not show error if log file is missing                                    |
-							
-							| <code>rotate 14</code>      | Keep 14 old log files before deleting                                       |
-							
-							| <code>compress</code>       | Compress rotated logs (using gzip by default)                              |
-							
-							| <code>delaycompress</code>  | Delay compression until the next rotation (useful with apps that keep logs open) |
-							
-							| <code>notifempty</code>     | Do not rotate empty log files                                               |
-							
-							| <code>create</code>         | Create a new log file with specified permissions and ownership              |
-							
-							| <code>sharedscripts</code>  | Run <code>postrotate</code> script once, even if multiple logs are matched             |
-							
-							| <code>postrotate</code>     | Script to run after rotation (e.g., to reload services)                     |
-						</p>
+						<table>
+							<thead>
+								<tr>
+									<th>
+										Option
+									</th>
+									<th>
+										Description
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										`daily`
+									</td>
+									<td>
+										Rotate logs every day
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`missingok`
+									</td>
+									<td>
+										Do not show error if log file is missing
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`rotate 14`
+									</td>
+									<td>
+										Keep 14 old log files before deleting
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`compress`
+									</td>
+									<td>
+										Compress rotated logs (using gzip by default)
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`delaycompress`
+									</td>
+									<td>
+										Delay compression until the next rotation (useful with apps that keep logs open)
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`notifempty`
+									</td>
+									<td>
+										Do not rotate empty log files
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`create`
+									</td>
+									<td>
+										Create a new log file with specified permissions and ownership
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`sharedscripts`
+									</td>
+									<td>
+										Run `postrotate` script once, even if multiple logs are matched
+									</td>
+								</tr>
+								<tr>
+									<td>
+										`postrotate`
+									</td>
+									<td>
+										Script to run after rotation (e.g., to reload services)
+									</td>
+								</tr>
+							</tbody>
+						</table>
 						<h3>
 							Testing a Logrotate Rule
 						</h3>
