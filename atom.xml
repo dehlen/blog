@@ -816,10 +816,7 @@ sudo chown root:root /etc/cron.d/myjob
 			A blog post series about my journey building a homelab
 		</summary>
 		<content type="html">
-			&lt;h1&gt;
-	Building a Homelab (2/5): Renovate and Komodo for Auto Deployments (GitOps)
-&lt;/h1&gt;
-&lt;blockquote&gt;
+			&lt;blockquote&gt;
 	&lt;p&gt;
 		If it is not in git it doesn&apos;t exist.
 	&lt;/p&gt;
