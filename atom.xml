@@ -311,6 +311,502 @@ sudo chown root:root /etc/cron.d/myjob
 		</content>
 	</entry>
 	<entry>
+		<title type="text">Building a homelab (4/5): Networking, VLANs and VPN</title>
+		<id>https://davidvonk.dev/homelab/building-a-homelab-4-5-networking-vlans-and-vpn</id>
+		<link href="https://davidvonk.dev/homelab/building-a-homelab-4-5-networking-vlans-and-vpn" rel="alternate">
+		</link>
+		<updated>2025-06-04T17:15:00Z</updated>
+		<summary type="text">
+			A blog post series about my journey building a homelab
+		</summary>
+		<content type="html">
+			&lt;h1&gt;
+	Building a Homelab (4/5): Networking, VLANs and VPN
+&lt;/h1&gt;
+&lt;blockquote&gt;
+	&lt;p&gt;
+		Why did the data cross the road? To get to the VLAN on the other side!.
+	&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;
+	When we moved into our new home new CAT 7 cables were run throughout the whole house. That was the reason I wanted to get into networking infrastructure and to build my home network more professionally. Of course when you setup all this networking infrastructure you want to utilize it as well and so this blog post and my excitement for homelabs was born. When I shopped the new network gear I tried to plan ahead which is why the new devices are all Wifi 7 capable and I am able to utilize 10 GB SFP+ ports on my switch for some devices (f.e. for my NAS). To get things started here is a diagram of the deployed networking infrastructure:
+&lt;/p&gt;
+&lt;div class=&quot;image&quot;&gt;
+	&lt;img alt=&quot;An image showing a diagram of my network infrastructure.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/network.png&quot; width=&quot;463.5&quot;/&gt;
+&lt;/div&gt;
+&lt;h2&gt;
+	VLANs
+&lt;/h2&gt;
+&lt;p&gt;
+	To segregate my network I make use of VLANs. This is important to me first and foremost to improve the security of my network. F.e. IoT devices do not get access to any other devices in my home. If not necessary they won&apos;t get internet access either!
+&lt;/p&gt;
+&lt;p&gt;
+	I also deploy a VLAN especially for the devices of my kids. This way I can add specific content filters for their devices which I do not want to deploy on a device to device basis or on the main network. I am able to securely host servers in a DMZ or provide guests with a guest network. At the moment my current setup looks like this:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			VLAN1: Default
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			VLAN10: Trusted
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			VLAN20: IOT
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			VLAN30: Kids
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			VLAN90: Guest
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			VLAN254: Management
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	I also disabled the auto-scale network option in the VLAN settings. With that I can set static IPs in the range 192.168.VLANID.1 - 192.168.VLANID.100. Everything above 100 is an IP address provided via DHCP. Whenever I see an IP address in my network I can quickly glance at it and directly extract the information whether it is a static or dynamic IP address and which VLAN it is in.
+&lt;/p&gt;
+&lt;p&gt;
+	To secure the VLANs I deploy the new zone-based firewall from Unifi in my network. By default Unifi routes between VLANs. I opted for blocking access between VLANs by default and only allowing the absolute minimum needed. For example my trusted devices can access IoT devices to control the lighting but the lights itself do not have access to any other devices deployed in my infrastructure.
+&lt;/p&gt;
+&lt;h2&gt;
+	🌐 VPN
+&lt;/h2&gt;
+&lt;p&gt;
+	In a previous part I told you that I run my services in my LAN only. However sometimes you are on the go and still want access to your passwords/media library/etc... .
+	
+	The problem with most internet service providers in Germany nowadays is that you won&apos;t get a static IPv4 address any longer. This isn&apos;t technically an issue but it leads to a bit more work for us to successfully connect through a VPN connection into our local network. It boils down to two options:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Use a DynDNS service to automatically send your dynamic IPv4 address to this service which then can resolve your current public IPv4 address for a given hostname
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 addres however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	At the moment I could use option 1, however I already know that the ISP bringing fiber optics to our home will only provide CGNat. To be future proof I opted for option 2 and rented a cheap VPS for 0,50€ / month.
+&lt;/p&gt;
+&lt;p&gt;
+	Here are the steps I took to create this tunnel:
+&lt;/p&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Install wireguard on VPS
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Open the wireguard tunnel port in the firewall
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Create a port forwarding in &lt;code&gt;/etc/sysctl.conf&lt;/code&gt; to forward all IPv4 traffic
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Create secure wireguard key pairs
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Create a wireguard config to connect this wireguard server to a wireguard client in your home network. It is recommended to list every possible peer seperate to be able to better control who has access to this VPN connection
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Start the wireguard server
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	I then created a wireguard client on my Unifi Router and connected it to the deployed wireguard server. I also added a static route and the needed firewall rules on my router to be able to access the needed devices in my infrastructure from the private VPN network.
+&lt;/p&gt;
+&lt;p&gt;
+	The last step is to add a wireguard client to your private devices and add a config to it. If everything is setup correctly your device (f.e. Smartphone) will connect to the public IPv4 address of your VPS. Every request is then forwarded through the existing VPN tunnel connection to your router where the VPN client is active.
+&lt;/p&gt;
+&lt;h2&gt;
+	📞 Addendum: Telephony
+&lt;/h2&gt;
+&lt;p&gt;
+	When I migrated from my former setup to the new Unifi devices one problem was left to be solved: telephony. The old router could be used as a telephone base station speaking the DECT protocol. Fortunately my old router has the option to function as an IP-Client and to use an existing internet connection. I set it up like that and disabled any WLAN networks. If you have the same situation in your network currently I strongly suggest to look for an option like that as this setup seems to work perfectly fine.
+&lt;/p&gt;
+&lt;h2&gt;
+	➡️ Up Next
+&lt;/h2&gt;
+&lt;p&gt;
+	In the last part I want to draw a conclusion and talk about all the topics I did not mention yet:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Task scheduling with cron
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Rotating log files with logrotate
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Proxmox Hypervisor
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Backups
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Hardening SSH access
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Filesystems
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+		</content>
+	</entry>
+	<entry>
+		<title type="text">Building a homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps</title>
+		<id>https://davidvonk.dev/homelab/building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps</id>
+		<link href="https://davidvonk.dev/homelab/building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps" rel="alternate">
+		</link>
+		<updated>2025-06-04T16:15:00Z</updated>
+		<summary type="text">
+			A blog post series about my journey building a homelab
+		</summary>
+		<content type="html">
+			&lt;h1&gt;
+	Building a Homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps
+&lt;/h1&gt;
+&lt;blockquote&gt;
+	&lt;p&gt;
+		Empower your digital life: In a world of clouds, I choose to build my own — where privacy reigns and my data is truly mine.
+	&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;
+	In Part 1, I introduced my homelab setup. In Part 2, I covered the GitOps pipeline with Renovate and Komodo. Now let’s look at the actual applications that make this environment useful.
+&lt;/p&gt;
+&lt;p&gt;
+	From local DNS blocking to RSS reading and media streaming, everything is self-hosted. And since I’m running on a mix of Pi boards and a Proxmox VM, distribution of services matters just as much as the apps themselves.
+&lt;/p&gt;
+&lt;h2&gt;
+	Service Distribution Overview
+&lt;/h2&gt;
+&lt;h3&gt;
+	Proxmox VM srv-prod-01
+&lt;/h3&gt;
+&lt;p&gt;
+	| Service          | Description                    |
+	
+	| ---------------- | ------------------------------ |
+	
+	| ArchiveBox       | Bookmark Archival              |
+	
+	| Audiobookshelf   | Audiobook Management           |
+	
+	| Calibre          | EBook Management               |
+	
+	| Dozzle           | Logs Monitoring                |
+	
+	| Homeassistant    | Homeautomation, HomeKit Bridge |
+	
+	| Homepage         | Home Dashboard                 |
+	
+	| Immich           | Photo Library                  |
+	
+	| Jellyfin         | Media Server                   |
+	
+	| Komodo           | Docker Management              |
+	
+	| Komodo Periphery | Docker Management Agent        |
+	
+	| Komodo ntfy      | Alerter Bridge                 |
+	
+	| Libation         | Audibook Downloader            |
+	
+	| Mealie           | Recipe Management              |
+	
+	| MeTube           | Video &amp; Audio Downloader       |
+	
+	| Miniflux         | RSS                            |
+	
+	| ntfy             | Push Service                   |
+	
+	| Paperless        | Document Management            |
+	
+	| Penpot           | Design Tool                    |
+	
+	| SABnzbd          | Usenet Downloader              |
+	
+	| Traefik          | Reverse Proxy, SSL, etc.       |
+	
+	| Tubesync         | Video &amp; Audio Downloader       |
+	
+	| Uptime Kuma      | Monitoring                     |
+	
+	| Vaultwarden      | Password Management            |
+&lt;/p&gt;
+&lt;h3&gt;
+	RPI DNS01
+&lt;/h3&gt;
+&lt;p&gt;
+	| Service           | Description              |
+	
+	| ----------------- | ------------------------ |
+	
+	| Adguard Home      | DNS Server               |
+	
+	| Adguard Home Sync | Adguard Home Config Sync |
+	
+	| Dozzle Agent      | Logs Agent               |
+	
+	| Komodo Periphery  | Docker Management Agent  |
+&lt;/p&gt;
+&lt;h3&gt;
+	RPI DNS02
+&lt;/h3&gt;
+&lt;p&gt;
+	| Service          | Description             |
+	
+	| ---------------- | ----------------------- |
+	
+	| Adguard Home     | DNS Server              |
+	
+	| Dozzle Agent     | Logs Agent              |
+	
+	| Komodo Periphery | Docker Management Agent |
+	
+	All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
+&lt;/p&gt;
+&lt;p&gt;
+	This setup balances critical services (DNS) across two Pis for resilience, while keeping heavier services (media, apps) centralized on the Ubuntu VM.
+&lt;/p&gt;
+&lt;h2&gt;
+	Local DNS with Adguard Home
+&lt;/h2&gt;
+&lt;p&gt;
+	AdGuard Home is my go-to solution for local DNS with ad and tracker blocking. I run two independent instances — one on each Pi — to ensure redundancy.
+&lt;/p&gt;
+&lt;p&gt;
+	Why two instances?
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Ensures DNS still works if one Pi reboots or fails
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Provides distributed DNS for clients across VLANs
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Enables load distribution and fault tolerance
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	To keep their configs in sync, I run &lt;a href=&quot;https://github.com/bakito/adguardhome-sync&quot;&gt;adguardhome-sync&lt;/a&gt; on dns01:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;services:
+  adguardhome-sync:
+    image: lscr.io/linuxserver/adguardhome-sync:v0.7.6-ls138@sha256:21b0311d8e0aecca093f6aa0c15a91e293de108d86477da768816eb75af130bb
+    container_name: adguardhome-sync
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-UTC}
+    volumes:
+      - ${VOLUME_PATH}/config:/config
+    ports:
+      - 8090:8080
+    restart: unless-stopped
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	The mounted config file then adds dns02 as a sync target. This way every change I make on dns01 will automatically be reflected on dns02 as well.
+&lt;/p&gt;
+&lt;div class=&quot;image&quot;&gt;
+	&lt;img alt=&quot;An image showing the adguard web UI.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/adguard.png&quot; width=&quot;463.5&quot;/&gt;
+&lt;/div&gt;
+&lt;h2&gt;
+	📈 Monitoring with Uptime Kuma
+&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/louislam/uptime-kuma&quot;&gt;Uptime Kuma&lt;/a&gt; runs in a Docker container on the Ubuntu VM. It monitors:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			My public WireGuard endpoint
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			All internal apps via their Traefik routes / docker containers
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			DNS uptime on both Pi nodes
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			External services like GitHub and my VPS
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Cron Jobs and Backup Tasks
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	It’s lightweight, supports alerting, and even shows response time history.
+&lt;/p&gt;
+&lt;div class=&quot;image&quot;&gt;
+	&lt;img alt=&quot;An image showing the uptime-kuma web UI.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/uptime-kuma.png&quot; width=&quot;463.5&quot;/&gt;
+&lt;/div&gt;
+&lt;h2&gt;
+	📚 Logging with Dozzle
+&lt;/h2&gt;
+&lt;p&gt;
+	Each of my Raspberry Pis runs a Dozzle agent, which streams container logs to the central Dozzle instance. Log files written to disk are available through a seperate output stream I create. This gives me:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			One place to view logs from every device
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Live log tailing via browser
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Easy debugging if something breaks
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	On the central VM, I run the Dozzle web UI and configure it to connect to the remote agents or output streams:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;dozzle:
+    image: amir20/dozzle:v8.12.20@sha256:6e3c64615e15493dbd2a476650d17b1b0038ba7dbd3cfe1a611df64ed57e602a
+    container_name: dozzle
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - internal
+      - proxy
+    environment:
+      - DOZZLE_LEVEL=${DOZZLE_LEVEL}
+      - DOZZLE_ENABLE_ACTIONS=${DOZZLE_ENABLE_ACTIONS}
+      - DOZZLE_ENABLE_SHELL=${DOZZLE_ENABLE_SHELL}
+      - DOZZLE_NO_ANALYTICS=${DOZZLE_NO_ANALYTICS}
+      - DOZZLE_FILTER=${DOZZLE_FILTER}
+      - DOZZLE_AUTH_PROVIDER=${DOZZLE_AUTH_PROVIDER}
+      - DOZZLE_HOSTNAME=${DOZZLE_HOSTNAME}
+      - DOZZLE_REMOTE_AGENT=${DOZZLE_REMOTE_AGENT}
+    volumes:
+      - ${VOLUME_PATH}/data:/data
+      - ${VOLUME_PATH}/certs:/certs
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - &amp;quot;traefik.enable=true&amp;quot;
+      - &amp;quot;traefik.http.routers.dozzle.rule=Host(`mydomain.de`)&amp;quot;
+      - &amp;quot;traefik.http.routers.dozzle.entrypoints=https&amp;quot;
+      - &amp;quot;traefik.http.routers.dozzle.tls=true&amp;quot;
+      - &amp;quot;traefik.http.services.dozzle.loadbalancer.server.port=8080&amp;quot;
+      - &amp;quot;traefik.docker.network=proxy&amp;quot;
+
+  # example of an output stream
+  dozzle-traefik:
+    container_name: dozzle-traefik
+    image: alpine@sha256:6662067ba6f090f8a2c8b5b50309692be03bffef2729b453425edd4f26343377
+    volumes:
+      - ${TRAEFIK_LOG}:/var/log/stream.log
+    command:
+      - tail
+      - -f
+      - /var/log/stream.log
+    network_mode: none
+    restart: unless-stopped
+    labels:
+      - dev.dozzle.group=traefik
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;div class=&quot;image&quot;&gt;
+	&lt;img alt=&quot;An image showing the dozzle web UI.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/dozzle.png&quot; width=&quot;463.5&quot;/&gt;
+&lt;/div&gt;
+&lt;h2&gt;
+	🛜 Traefik: The Ingress Brain
+&lt;/h2&gt;
+&lt;p&gt;
+	Every internal service is routed through Traefik, my reverse proxy of choice. Key features in my setup:
+&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Automatic TLS via Let&apos;s Encrypt
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Internal-only DNS resolution (e.g., mydomain.de)
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Container labels define routing rules declaratively
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	In Adguard Home i added &lt;code&gt;Custom DNS Rewrite&lt;/code&gt; rule. Whenever my DNS server gets a request to resolve the IP address for &lt;code&gt;*.mydomain.de&lt;/code&gt; it points to my traefik instance which then routes based on the host name to the actual docker containers or machines. Since traefik comes certbot/acme out of the box I can use my own domain to SSL encrypt this connection with a certificate requested from Let&apos;s Encrypt. To set things up I mostly followed this tutorial here so I won&apos;t go into detail: &lt;a href=&quot;https://technotim.live/posts/traefik-3-docker-certificates/&quot;&gt;Traefik Tutorial&lt;/a&gt;.
+&lt;/p&gt;
+&lt;h2&gt;
+	➡️ Conclusion
+&lt;/h2&gt;
+&lt;p&gt;
+	Once you feel the excitement and joy of deploying actually useful apps to your homelab there is no step back. Watching a movie on Jellyfin, reading my RSS feeds through Miniflux, storing passwords in my own, private vaultwarden instance just feels very rewarding. On top I can access these services via my own custom domain SSL encrypted, although I do not expose them to the internet. In the next part we have a closer look at my network setup and how I stepped up my game here.
+&lt;/p&gt;
+		</content>
+	</entry>
+	<entry>
 		<title type="text">Building a homelab (1/5): The big picture</title>
 		<id>https://davidvonk.dev/homelab/building-a-homelab-1-5-the-big-picture</id>
 		<link href="https://davidvonk.dev/homelab/building-a-homelab-1-5-the-big-picture" rel="alternate">
@@ -956,502 +1452,6 @@ executions = [
 &lt;/h2&gt;
 &lt;p&gt;
 	In the next post, I’ll break down the actual containers I run, how they’re distributed across machines, and how I handle DNS, logging, and synchronization (like AdGuardHome Sync across two Pis).
-&lt;/p&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">Building a homelab (4/5): Networking, VLANs and VPN</title>
-		<id>https://davidvonk.dev/homelab/building-a-homelab-4-5-networking-vlans-and-vpn</id>
-		<link href="https://davidvonk.dev/homelab/building-a-homelab-4-5-networking-vlans-and-vpn" rel="alternate">
-		</link>
-		<updated>2025-06-04T14:15:00Z</updated>
-		<summary type="text">
-			A blog post series about my journey building a homelab
-		</summary>
-		<content type="html">
-			&lt;h1&gt;
-	Building a Homelab (4/5): Networking, VLANs and VPN
-&lt;/h1&gt;
-&lt;blockquote&gt;
-	&lt;p&gt;
-		Why did the data cross the road? To get to the VLAN on the other side!.
-	&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;
-	When we moved into our new home new CAT 7 cables were run throughout the whole house. That was the reason I wanted to get into networking infrastructure and to build my home network more professionally. Of course when you setup all this networking infrastructure you want to utilize it as well and so this blog post and my excitement for homelabs was born. When I shopped the new network gear I tried to plan ahead which is why the new devices are all Wifi 7 capable and I am able to utilize 10 GB SFP+ ports on my switch for some devices (f.e. for my NAS). To get things started here is a diagram of the deployed networking infrastructure:
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image showing a diagram of my network infrastructure.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/network.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;h2&gt;
-	VLANs
-&lt;/h2&gt;
-&lt;p&gt;
-	To segregate my network I make use of VLANs. This is important to me first and foremost to improve the security of my network. F.e. IoT devices do not get access to any other devices in my home. If not necessary they won&apos;t get internet access either!
-&lt;/p&gt;
-&lt;p&gt;
-	I also deploy a VLAN especially for the devices of my kids. This way I can add specific content filters for their devices which I do not want to deploy on a device to device basis or on the main network. I am able to securely host servers in a DMZ or provide guests with a guest network. At the moment my current setup looks like this:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			VLAN1: Default
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			VLAN10: Trusted
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			VLAN20: IOT
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			VLAN30: Kids
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			VLAN90: Guest
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			VLAN254: Management
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	I also disabled the auto-scale network option in the VLAN settings. With that I can set static IPs in the range 192.168.VLANID.1 - 192.168.VLANID.100. Everything above 100 is an IP address provided via DHCP. Whenever I see an IP address in my network I can quickly glance at it and directly extract the information whether it is a static or dynamic IP address and which VLAN it is in.
-&lt;/p&gt;
-&lt;p&gt;
-	To secure the VLANs I deploy the new zone-based firewall from Unifi in my network. By default Unifi routes between VLANs. I opted for blocking access between VLANs by default and only allowing the absolute minimum needed. For example my trusted devices can access IoT devices to control the lighting but the lights itself do not have access to any other devices deployed in my infrastructure.
-&lt;/p&gt;
-&lt;h2&gt;
-	🌐 VPN
-&lt;/h2&gt;
-&lt;p&gt;
-	In a previous part I told you that I run my services in my LAN only. However sometimes you are on the go and still want access to your passwords/media library/etc... .
-	
-	The problem with most internet service providers in Germany nowadays is that you won&apos;t get a static IPv4 address any longer. This isn&apos;t technically an issue but it leads to a bit more work for us to successfully connect through a VPN connection into our local network. It boils down to two options:
-&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Use a DynDNS service to automatically send your dynamic IPv4 address to this service which then can resolve your current public IPv4 address for a given hostname
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 addres however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;
-	At the moment I could use option 1, however I already know that the ISP bringing fiber optics to our home will only provide CGNat. To be future proof I opted for option 2 and rented a cheap VPS for 0,50€ / month.
-&lt;/p&gt;
-&lt;p&gt;
-	Here are the steps I took to create this tunnel:
-&lt;/p&gt;
-&lt;ol&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Install wireguard on VPS
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Open the wireguard tunnel port in the firewall
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Create a port forwarding in &lt;code&gt;/etc/sysctl.conf&lt;/code&gt; to forward all IPv4 traffic
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Create secure wireguard key pairs
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Create a wireguard config to connect this wireguard server to a wireguard client in your home network. It is recommended to list every possible peer seperate to be able to better control who has access to this VPN connection
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Start the wireguard server
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;
-	I then created a wireguard client on my Unifi Router and connected it to the deployed wireguard server. I also added a static route and the needed firewall rules on my router to be able to access the needed devices in my infrastructure from the private VPN network.
-&lt;/p&gt;
-&lt;p&gt;
-	The last step is to add a wireguard client to your private devices and add a config to it. If everything is setup correctly your device (f.e. Smartphone) will connect to the public IPv4 address of your VPS. Every request is then forwarded through the existing VPN tunnel connection to your router where the VPN client is active.
-&lt;/p&gt;
-&lt;h2&gt;
-	📞 Addendum: Telephony
-&lt;/h2&gt;
-&lt;p&gt;
-	When I migrated from my former setup to the new Unifi devices one problem was left to be solved: telephony. The old router could be used as a telephone base station speaking the DECT protocol. Fortunately my old router has the option to function as an IP-Client and to use an existing internet connection. I set it up like that and disabled any WLAN networks. If you have the same situation in your network currently I strongly suggest to look for an option like that as this setup seems to work perfectly fine.
-&lt;/p&gt;
-&lt;h2&gt;
-	➡️ Up Next
-&lt;/h2&gt;
-&lt;p&gt;
-	In the last part I want to draw a conclusion and talk about all the topics I did not mention yet:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Task scheduling with cron
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Rotating log files with logrotate
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Proxmox Hypervisor
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Backups
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Hardening SSH access
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Filesystems
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">Building a homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps</title>
-		<id>https://davidvonk.dev/homelab/building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps</id>
-		<link href="https://davidvonk.dev/homelab/building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps" rel="alternate">
-		</link>
-		<updated>2025-06-04T14:15:00Z</updated>
-		<summary type="text">
-			A blog post series about my journey building a homelab
-		</summary>
-		<content type="html">
-			&lt;h1&gt;
-	Building a Homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps
-&lt;/h1&gt;
-&lt;blockquote&gt;
-	&lt;p&gt;
-		Empower your digital life: In a world of clouds, I choose to build my own — where privacy reigns and my data is truly mine.
-	&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;
-	In Part 1, I introduced my homelab setup. In Part 2, I covered the GitOps pipeline with Renovate and Komodo. Now let’s look at the actual applications that make this environment useful.
-&lt;/p&gt;
-&lt;p&gt;
-	From local DNS blocking to RSS reading and media streaming, everything is self-hosted. And since I’m running on a mix of Pi boards and a Proxmox VM, distribution of services matters just as much as the apps themselves.
-&lt;/p&gt;
-&lt;h2&gt;
-	Service Distribution Overview
-&lt;/h2&gt;
-&lt;h3&gt;
-	Proxmox VM srv-prod-01
-&lt;/h3&gt;
-&lt;p&gt;
-	| Service          | Description                    |
-	
-	| ---------------- | ------------------------------ |
-	
-	| ArchiveBox       | Bookmark Archival              |
-	
-	| Audiobookshelf   | Audiobook Management           |
-	
-	| Calibre          | EBook Management               |
-	
-	| Dozzle           | Logs Monitoring                |
-	
-	| Homeassistant    | Homeautomation, HomeKit Bridge |
-	
-	| Homepage         | Home Dashboard                 |
-	
-	| Immich           | Photo Library                  |
-	
-	| Jellyfin         | Media Server                   |
-	
-	| Komodo           | Docker Management              |
-	
-	| Komodo Periphery | Docker Management Agent        |
-	
-	| Komodo ntfy      | Alerter Bridge                 |
-	
-	| Libation         | Audibook Downloader            |
-	
-	| Mealie           | Recipe Management              |
-	
-	| MeTube           | Video &amp; Audio Downloader       |
-	
-	| Miniflux         | RSS                            |
-	
-	| ntfy             | Push Service                   |
-	
-	| Paperless        | Document Management            |
-	
-	| Penpot           | Design Tool                    |
-	
-	| SABnzbd          | Usenet Downloader              |
-	
-	| Traefik          | Reverse Proxy, SSL, etc.       |
-	
-	| Tubesync         | Video &amp; Audio Downloader       |
-	
-	| Uptime Kuma      | Monitoring                     |
-	
-	| Vaultwarden      | Password Management            |
-&lt;/p&gt;
-&lt;h3&gt;
-	RPI DNS01
-&lt;/h3&gt;
-&lt;p&gt;
-	| Service           | Description              |
-	
-	| ----------------- | ------------------------ |
-	
-	| Adguard Home      | DNS Server               |
-	
-	| Adguard Home Sync | Adguard Home Config Sync |
-	
-	| Dozzle Agent      | Logs Agent               |
-	
-	| Komodo Periphery  | Docker Management Agent  |
-&lt;/p&gt;
-&lt;h3&gt;
-	RPI DNS02
-&lt;/h3&gt;
-&lt;p&gt;
-	| Service          | Description             |
-	
-	| ---------------- | ----------------------- |
-	
-	| Adguard Home     | DNS Server              |
-	
-	| Dozzle Agent     | Logs Agent              |
-	
-	| Komodo Periphery | Docker Management Agent |
-	
-	All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
-&lt;/p&gt;
-&lt;p&gt;
-	This setup balances critical services (DNS) across two Pis for resilience, while keeping heavier services (media, apps) centralized on the Ubuntu VM.
-&lt;/p&gt;
-&lt;h2&gt;
-	Local DNS with Adguard Home
-&lt;/h2&gt;
-&lt;p&gt;
-	AdGuard Home is my go-to solution for local DNS with ad and tracker blocking. I run two independent instances — one on each Pi — to ensure redundancy.
-&lt;/p&gt;
-&lt;p&gt;
-	Why two instances?
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Ensures DNS still works if one Pi reboots or fails
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Provides distributed DNS for clients across VLANs
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Enables load distribution and fault tolerance
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	To keep their configs in sync, I run &lt;a href=&quot;https://github.com/bakito/adguardhome-sync&quot;&gt;adguardhome-sync&lt;/a&gt; on dns01:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;services:
-  adguardhome-sync:
-    image: lscr.io/linuxserver/adguardhome-sync:v0.7.6-ls138@sha256:21b0311d8e0aecca093f6aa0c15a91e293de108d86477da768816eb75af130bb
-    container_name: adguardhome-sync
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ:-UTC}
-    volumes:
-      - ${VOLUME_PATH}/config:/config
-    ports:
-      - 8090:8080
-    restart: unless-stopped
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	The mounted config file then adds dns02 as a sync target. This way every change I make on dns01 will automatically be reflected on dns02 as well.
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image showing the adguard web UI.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/adguard.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;h2&gt;
-	📈 Monitoring with Uptime Kuma
-&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/louislam/uptime-kuma&quot;&gt;Uptime Kuma&lt;/a&gt; runs in a Docker container on the Ubuntu VM. It monitors:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			My public WireGuard endpoint
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			All internal apps via their Traefik routes / docker containers
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			DNS uptime on both Pi nodes
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			External services like GitHub and my VPS
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Cron Jobs and Backup Tasks
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	It’s lightweight, supports alerting, and even shows response time history.
-&lt;/p&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image showing the uptime-kuma web UI.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/uptime-kuma.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;h2&gt;
-	📚 Logging with Dozzle
-&lt;/h2&gt;
-&lt;p&gt;
-	Each of my Raspberry Pis runs a Dozzle agent, which streams container logs to the central Dozzle instance. Log files written to disk are available through a seperate output stream I create. This gives me:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			One place to view logs from every device
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Live log tailing via browser
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Easy debugging if something breaks
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	On the central VM, I run the Dozzle web UI and configure it to connect to the remote agents or output streams:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-yaml&quot;&gt;dozzle:
-    image: amir20/dozzle:v8.12.20@sha256:6e3c64615e15493dbd2a476650d17b1b0038ba7dbd3cfe1a611df64ed57e602a
-    container_name: dozzle
-    security_opt:
-      - no-new-privileges:true
-    restart: unless-stopped
-    networks:
-      - internal
-      - proxy
-    environment:
-      - DOZZLE_LEVEL=${DOZZLE_LEVEL}
-      - DOZZLE_ENABLE_ACTIONS=${DOZZLE_ENABLE_ACTIONS}
-      - DOZZLE_ENABLE_SHELL=${DOZZLE_ENABLE_SHELL}
-      - DOZZLE_NO_ANALYTICS=${DOZZLE_NO_ANALYTICS}
-      - DOZZLE_FILTER=${DOZZLE_FILTER}
-      - DOZZLE_AUTH_PROVIDER=${DOZZLE_AUTH_PROVIDER}
-      - DOZZLE_HOSTNAME=${DOZZLE_HOSTNAME}
-      - DOZZLE_REMOTE_AGENT=${DOZZLE_REMOTE_AGENT}
-    volumes:
-      - ${VOLUME_PATH}/data:/data
-      - ${VOLUME_PATH}/certs:/certs
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - &amp;quot;traefik.enable=true&amp;quot;
-      - &amp;quot;traefik.http.routers.dozzle.rule=Host(`mydomain.de`)&amp;quot;
-      - &amp;quot;traefik.http.routers.dozzle.entrypoints=https&amp;quot;
-      - &amp;quot;traefik.http.routers.dozzle.tls=true&amp;quot;
-      - &amp;quot;traefik.http.services.dozzle.loadbalancer.server.port=8080&amp;quot;
-      - &amp;quot;traefik.docker.network=proxy&amp;quot;
-
-  # example of an output stream
-  dozzle-traefik:
-    container_name: dozzle-traefik
-    image: alpine@sha256:6662067ba6f090f8a2c8b5b50309692be03bffef2729b453425edd4f26343377
-    volumes:
-      - ${TRAEFIK_LOG}:/var/log/stream.log
-    command:
-      - tail
-      - -f
-      - /var/log/stream.log
-    network_mode: none
-    restart: unless-stopped
-    labels:
-      - dev.dozzle.group=traefik
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;div class=&quot;image&quot;&gt;
-	&lt;img alt=&quot;An image showing the dozzle web UI.&quot; loading=&quot;lazy&quot; src=&quot;/img/building-a-homelab/dozzle.png&quot; width=&quot;463.5&quot;/&gt;
-&lt;/div&gt;
-&lt;h2&gt;
-	🛜 Traefik: The Ingress Brain
-&lt;/h2&gt;
-&lt;p&gt;
-	Every internal service is routed through Traefik, my reverse proxy of choice. Key features in my setup:
-&lt;/p&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Automatic TLS via Let&apos;s Encrypt
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Internal-only DNS resolution (e.g., mydomain.de)
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Container labels define routing rules declaratively
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	In Adguard Home i added &lt;code&gt;Custom DNS Rewrite&lt;/code&gt; rule. Whenever my DNS server gets a request to resolve the IP address for &lt;code&gt;*.mydomain.de&lt;/code&gt; it points to my traefik instance which then routes based on the host name to the actual docker containers or machines. Since traefik comes certbot/acme out of the box I can use my own domain to SSL encrypt this connection with a certificate requested from Let&apos;s Encrypt. To set things up I mostly followed this tutorial here so I won&apos;t go into detail: &lt;a href=&quot;https://technotim.live/posts/traefik-3-docker-certificates/&quot;&gt;Traefik Tutorial&lt;/a&gt;.
-&lt;/p&gt;
-&lt;h2&gt;
-	➡️ Conclusion
-&lt;/h2&gt;
-&lt;p&gt;
-	Once you feel the excitement and joy of deploying actually useful apps to your homelab there is no step back. Watching a movie on Jellyfin, reading my RSS feeds through Miniflux, storing passwords in my own, private vaultwarden instance just feels very rewarding. On top I can access these services via my own custom domain SSL encrypted, although I do not expose them to the internet. In the next part we have a closer look at my network setup and how I stepped up my game here.
 &lt;/p&gt;
 		</content>
 	</entry>
