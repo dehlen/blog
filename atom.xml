@@ -954,9 +954,6 @@ sudo chown root:root /etc/cron.d/myjob
 	&lt;/tbody&gt;
 &lt;/table&gt;
 &lt;p&gt;
-	All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
-&lt;/p&gt;
-&lt;p&gt;
 	This setup balances critical services (DNS) across two Pis for resilience, while keeping heavier services (media, apps) centralized on the Ubuntu VM.
 &lt;/p&gt;
 &lt;h2&gt;
