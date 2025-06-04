@@ -29,18 +29,52 @@ Over time, it’s grown into a robust, self-sufficient ecosystem that closely mi
 
 ## 💻 Hardware Overview
 
-| Device                        | Role                        |
-| ----------------------------- | --------------------------- |
-| Draytek Vigor 167             | DSL Modem                   |
-| UniFi Express 7               | Router                      |
-| UniFi Pro Max 16 Switch       | Switch                      |
-| U7 Pro Wall, U7 Lite (2x)     | Access Points               |
-| FritzBox 7490                 | DECT Telephone Base Station |
-| RPI 3 Model B                 | DNS 01                      |
-| RPI 3 Model B+                | DNS 02 Failover             |
-| GMKTEC Nucbox M5 Plus Mini PC | Proxmox Host                |
-| Main NAS                      | Synology DS923+             |
-| Backup NAS                    | Synology DS918              |
+<table>
+    <tr>
+        <td>Device</td>
+        <td>Role</td>
+    </tr>
+    <tr>
+        <td>Draytek Vigor 167</td>
+        <td>DSL Modem</td>
+    </tr>
+    <tr>
+        <td>UniFi Express 7</td>
+        <td>Router</td>
+    </tr>
+    <tr>
+        <td>UniFi Pro Max 16 Switch</td>
+        <td>Switch</td>
+    </tr>
+    <tr>
+        <td>U7 Pro Wall, U7 Lite (2x)</td>
+        <td>Access Points</td>
+    </tr>
+    <tr>
+        <td>FritzBox 7490</td>
+        <td>DECT Telephone Base Station</td>
+    </tr>
+    <tr>
+        <td>RPI 3 Model B</td>
+        <td>DNS 01</td>
+    </tr>
+    <tr>
+        <td>RPI 3 Model B+</td>
+        <td>DNS 02 Failover</td>
+    </tr>
+    <tr>
+        <td>GMKTEC Nucbox M5 Plus Mini PC</td>
+        <td>Proxmox Host</td>
+    </tr>
+    <tr>
+        <td>Main NAS</td>
+        <td>Synology DS923+</td>
+    </tr>
+    <tr>
+        <td>Backup NAS</td>
+        <td>Synology DS918</td>
+    </tr>
+</table>
 
 ## 🛜 Networking Layout
 
