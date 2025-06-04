@@ -8,8 +8,6 @@ category: homelab
 slug: building-a-homelab-1-5-the-big-picture
 ---
 
-# Building a Homelab (1/5): The Big Picture 
-
 > Home is where your lab is.
 
 I’ve always been fascinated by infrastructure — how services run behind the scenes, how networks talk to each other, and how automation can bring order to chaos. That’s what led me to build and maintain a fully self-hosted homelab, not just for tinkering, but for actual day-to-day use.
