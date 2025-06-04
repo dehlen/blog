@@ -1229,10 +1229,7 @@ executions = [
 			A blog post series about my journey building a homelab
 		</summary>
 		<content type="html">
-			&lt;h1&gt;
-	Building a Homelab (1/5): The Big Picture
-&lt;/h1&gt;
-&lt;blockquote&gt;
+			&lt;blockquote&gt;
 	&lt;p&gt;
 		Home is where your lab is.
 	&lt;/p&gt;
