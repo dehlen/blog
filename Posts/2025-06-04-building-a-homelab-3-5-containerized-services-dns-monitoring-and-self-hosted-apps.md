@@ -1,6 +1,6 @@
 ---
 color: C07309
-date: 2025-06-04T14:15:00Z
+date: 2025-06-04T16:15:00Z
 description: A blog post series about my journey building a homelab
 project: true
 title: Building a homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps 
