@@ -42,7 +42,7 @@ extension Layout {
                     meta(content: "David v.Knobelsdorff", name: "author")
                     meta(content: "David v.Knobelsdorff", name: "publisher")
                     meta(content: "David v.Knobelsdorff", name: "copyright")
-
+                    meta(content: "A personal tech blog exploring iOS and macOS development with Swift, alongside passions like chess, self-hosting and other curious tech projects and perspectives.", name: "description")
                     meta(content: "width=device-width, initial-scale=1.0", name: "viewport")
 
                     meta(content: "interest-cohort=()", httpEquiv: "Permissions-Policy")
