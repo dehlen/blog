@@ -1278,94 +1278,98 @@ executions = [
 	💻 Hardware Overview
 &lt;/h2&gt;
 &lt;table&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			Device
-		&lt;/td&gt;
-		&lt;td&gt;
-			Role
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			Draytek Vigor 167
-		&lt;/td&gt;
-		&lt;td&gt;
-			DSL Modem
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			UniFi Express 7
-		&lt;/td&gt;
-		&lt;td&gt;
-			Router
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			UniFi Pro Max 16 Switch
-		&lt;/td&gt;
-		&lt;td&gt;
-			Switch
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			U7 Pro Wall, U7 Lite (2x)
-		&lt;/td&gt;
-		&lt;td&gt;
-			Access Points
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			FritzBox 7490
-		&lt;/td&gt;
-		&lt;td&gt;
-			DECT Telephone Base Station
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			RPI 3 Model B
-		&lt;/td&gt;
-		&lt;td&gt;
-			DNS 01
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			RPI 3 Model B+
-		&lt;/td&gt;
-		&lt;td&gt;
-			DNS 02 Failover
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			GMKTEC Nucbox M5 Plus Mini PC
-		&lt;/td&gt;
-		&lt;td&gt;
-			Proxmox Host
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			Main NAS
-		&lt;/td&gt;
-		&lt;td&gt;
-			Synology DS923+
-		&lt;/td&gt;
-	&lt;/tr&gt;
-	&lt;tr&gt;
-		&lt;td&gt;
-			Backup NAS
-		&lt;/td&gt;
-		&lt;td&gt;
-			Synology DS918
-		&lt;/td&gt;
-	&lt;/tr&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Device
+			&lt;/th&gt;
+			&lt;th&gt;
+				Role
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Draytek Vigor 167
+			&lt;/td&gt;
+			&lt;td&gt;
+				DSL Modem
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				UniFi Express 7
+			&lt;/td&gt;
+			&lt;td&gt;
+				Router
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				UniFi Pro Max 16 Switch
+			&lt;/td&gt;
+			&lt;td&gt;
+				Switch
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				U7 Pro Wall, U7 Lite (2x)
+			&lt;/td&gt;
+			&lt;td&gt;
+				Access Points
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				FritzBox 7490
+			&lt;/td&gt;
+			&lt;td&gt;
+				DECT Telephone Base Station
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				RPI 3 Model B
+			&lt;/td&gt;
+			&lt;td&gt;
+				DNS 01
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				RPI 3 Model B+
+			&lt;/td&gt;
+			&lt;td&gt;
+				DNS 02 Failover
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				GMKTEC Nucbox M5 Plus Mini PC
+			&lt;/td&gt;
+			&lt;td&gt;
+				Proxmox Host
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Main NAS
+			&lt;/td&gt;
+			&lt;td&gt;
+				Synology DS923+
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Backup NAS
+			&lt;/td&gt;
+			&lt;td&gt;
+				Synology DS918
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
 &lt;/table&gt;
 &lt;h2&gt;
 	🛜 Networking Layout
@@ -1406,87 +1410,295 @@ executions = [
 &lt;h3&gt;
 	Proxmox VM srv-prod-01
 &lt;/h3&gt;
-&lt;p&gt;
-	| Service          | Description                    |
-	
-	| ---------------- | ------------------------------ |
-	
-	| ArchiveBox       | Bookmark Archival              |
-	
-	| Audiobookshelf   | Audiobook Management           |
-	
-	| Calibre          | EBook Management               |
-	
-	| Dozzle           | Logs Monitoring                |
-	
-	| Homeassistant    | Homeautomation, HomeKit Bridge |
-	
-	| Homepage         | Home Dashboard                 |
-	
-	| Immich           | Photo Library                  |
-	
-	| Jellyfin         | Media Server                   |
-	
-	| Komodo           | Docker Management              |
-	
-	| Komodo Periphery | Docker Management Agent        |
-	
-	| Komodo ntfy      | Alerter Bridge                 |
-	
-	| Libation         | Audibook Downloader            |
-	
-	| Mealie           | Recipe Management              |
-	
-	| MeTube           | Video &amp; Audio Downloader       |
-	
-	| Miniflux         | RSS                            |
-	
-	| ntfy             | Push Service                   |
-	
-	| Paperless        | Document Management            |
-	
-	| Penpot           | Design Tool                    |
-	
-	| SABnzbd          | Usenet Downloader              |
-	
-	| Traefik          | Reverse Proxy, SSL, etc.       |
-	
-	| Tubesync         | Video &amp; Audio Downloader       |
-	
-	| Uptime Kuma      | Monitoring                     |
-	
-	| Vaultwarden      | Password Management            |
-&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Service
+			&lt;/th&gt;
+			&lt;th&gt;
+				Description
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				ArchiveBox
+			&lt;/td&gt;
+			&lt;td&gt;
+				Bookmark Archival
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Audiobookshelf
+			&lt;/td&gt;
+			&lt;td&gt;
+				Audiobook Management
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Calibre
+			&lt;/td&gt;
+			&lt;td&gt;
+				EBook Management
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Dozzle
+			&lt;/td&gt;
+			&lt;td&gt;
+				Logs Monitoring
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Homeassistant
+			&lt;/td&gt;
+			&lt;td&gt;
+				Homeautomation, HomeKit Bridge
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Homepage
+			&lt;/td&gt;
+			&lt;td&gt;
+				Home Dashboard
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Immich
+			&lt;/td&gt;
+			&lt;td&gt;
+				Photo Library
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Jellyfin
+			&lt;/td&gt;
+			&lt;td&gt;
+				Media Server
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Komodo
+			&lt;/td&gt;
+			&lt;td&gt;
+				Docker Management
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Komodo Periphery
+			&lt;/td&gt;
+			&lt;td&gt;
+				Docker Management Agent
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Komodo ntfy
+			&lt;/td&gt;
+			&lt;td&gt;
+				Alerter Bridge
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Libation
+			&lt;/td&gt;
+			&lt;td&gt;
+				Audibook Downloader
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Mealie
+			&lt;/td&gt;
+			&lt;td&gt;
+				Recipe Management
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				MeTube
+			&lt;/td&gt;
+			&lt;td&gt;
+				Video &amp; Audio Downloader
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Miniflux
+			&lt;/td&gt;
+			&lt;td&gt;
+				RSS
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				ntfy
+			&lt;/td&gt;
+			&lt;td&gt;
+				Push Service
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Paperless
+			&lt;/td&gt;
+			&lt;td&gt;
+				Document Management
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Penpot
+			&lt;/td&gt;
+			&lt;td&gt;
+				Design Tool
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				SABnzbd
+			&lt;/td&gt;
+			&lt;td&gt;
+				Usenet Downloader
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Traefik
+			&lt;/td&gt;
+			&lt;td&gt;
+				Reverse Proxy, SSL, etc.
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Tubesync
+			&lt;/td&gt;
+			&lt;td&gt;
+				Video &amp; Audio Downloader
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Uptime Kuma
+			&lt;/td&gt;
+			&lt;td&gt;
+				Monitoring
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Vaultwarden
+			&lt;/td&gt;
+			&lt;td&gt;
+				Password Management
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;h3&gt;
 	RPI DNS01
 &lt;/h3&gt;
-&lt;p&gt;
-	| Service           | Description              |
-	
-	| ----------------- | ------------------------ |
-	
-	| Adguard Home      | DNS Server               |
-	
-	| Adguard Home Sync | Adguard Home Config Sync |
-	
-	| Dozzle Agent      | Logs Agent               |
-	
-	| Komodo Periphery  | Docker Management Agent  |
-&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Service
+			&lt;/th&gt;
+			&lt;th&gt;
+				Description
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Adguard Home
+			&lt;/td&gt;
+			&lt;td&gt;
+				DNS Server
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Adguard Home Sync
+			&lt;/td&gt;
+			&lt;td&gt;
+				Adguard Home Config Sync
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Dozzle Agent
+			&lt;/td&gt;
+			&lt;td&gt;
+				Logs Agent
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Komodo Periphery
+			&lt;/td&gt;
+			&lt;td&gt;
+				Docker Management Agent
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;h3&gt;
 	RPI DNS02
 &lt;/h3&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+		&lt;tr&gt;
+			&lt;th&gt;
+				Service
+			&lt;/th&gt;
+			&lt;th&gt;
+				Description
+			&lt;/th&gt;
+		&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Adguard Home
+			&lt;/td&gt;
+			&lt;td&gt;
+				DNS Server
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Dozzle Agent
+			&lt;/td&gt;
+			&lt;td&gt;
+				Logs Agent
+			&lt;/td&gt;
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+				Komodo Periphery
+			&lt;/td&gt;
+			&lt;td&gt;
+				Docker Management Agent
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
 &lt;p&gt;
-	| Service          | Description             |
-	
-	| ---------------- | ----------------------- |
-	
-	| Adguard Home     | DNS Server              |
-	
-	| Dozzle Agent     | Logs Agent              |
-	
-	| Komodo Periphery | Docker Management Agent |
-	
 	All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
 &lt;/p&gt;
 &lt;h2&gt;
