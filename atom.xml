@@ -1277,31 +1277,96 @@ executions = [
 &lt;h2&gt;
 	💻 Hardware Overview
 &lt;/h2&gt;
-&lt;p&gt;
-	| Device                        | Role                        |
-	
-	| ----------------------------- | --------------------------- |
-	
-	| Draytek Vigor 167             | DSL Modem                   |
-	
-	| UniFi Express 7               | Router                      |
-	
-	| UniFi Pro Max 16 Switch       | Switch                      |
-	
-	| U7 Pro Wall, U7 Lite (2x)     | Access Points               |
-	
-	| FritzBox 7490                 | DECT Telephone Base Station |
-	
-	| RPI 3 Model B                 | DNS 01                      |
-	
-	| RPI 3 Model B+                | DNS 02 Failover             |
-	
-	| GMKTEC Nucbox M5 Plus Mini PC | Proxmox Host                |
-	
-	| Main NAS                      | Synology DS923+             |
-	
-	| Backup NAS                    | Synology DS918              |
-&lt;/p&gt;
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			Device
+		&lt;/td&gt;
+		&lt;td&gt;
+			Role
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			Draytek Vigor 167
+		&lt;/td&gt;
+		&lt;td&gt;
+			DSL Modem
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			UniFi Express 7
+		&lt;/td&gt;
+		&lt;td&gt;
+			Router
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			UniFi Pro Max 16 Switch
+		&lt;/td&gt;
+		&lt;td&gt;
+			Switch
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			U7 Pro Wall, U7 Lite (2x)
+		&lt;/td&gt;
+		&lt;td&gt;
+			Access Points
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			FritzBox 7490
+		&lt;/td&gt;
+		&lt;td&gt;
+			DECT Telephone Base Station
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			RPI 3 Model B
+		&lt;/td&gt;
+		&lt;td&gt;
+			DNS 01
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			RPI 3 Model B+
+		&lt;/td&gt;
+		&lt;td&gt;
+			DNS 02 Failover
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			GMKTEC Nucbox M5 Plus Mini PC
+		&lt;/td&gt;
+		&lt;td&gt;
+			Proxmox Host
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			Main NAS
+		&lt;/td&gt;
+		&lt;td&gt;
+			Synology DS923+
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			Backup NAS
+		&lt;/td&gt;
+		&lt;td&gt;
+			Synology DS918
+		&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
 &lt;h2&gt;
 	🛜 Networking Layout
 &lt;/h2&gt;
