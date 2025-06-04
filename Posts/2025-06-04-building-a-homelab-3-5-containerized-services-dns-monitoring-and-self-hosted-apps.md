@@ -8,8 +8,6 @@ category: homelab
 slug: building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps
 ---
 
-# Building a Homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps
-
 > Empower your digital life: In a world of clouds, I choose to build my own — where privacy reigns and my data is truly mine.
 
 In Part 1, I introduced my homelab setup. In Part 2, I covered the GitOps pipeline with Renovate and Komodo. Now let’s look at the actual applications that make this environment useful.
@@ -20,48 +18,163 @@ From local DNS blocking to RSS reading and media streaming, everything is self-h
 
 ### Proxmox VM srv-prod-01
 
-| Service          | Description                    |
-| ---------------- | ------------------------------ |
-| ArchiveBox       | Bookmark Archival              |
-| Audiobookshelf   | Audiobook Management           |
-| Calibre          | EBook Management               |
-| Dozzle           | Logs Monitoring                |
-| Homeassistant    | Homeautomation, HomeKit Bridge |
-| Homepage         | Home Dashboard                 |
-| Immich           | Photo Library                  |
-| Jellyfin         | Media Server                   |
-| Komodo           | Docker Management              |
-| Komodo Periphery | Docker Management Agent        |
-| Komodo ntfy      | Alerter Bridge                 |
-| Libation         | Audibook Downloader            |
-| Mealie           | Recipe Management              |
-| MeTube           | Video & Audio Downloader       |
-| Miniflux         | RSS                            |
-| ntfy             | Push Service                   |
-| Paperless        | Document Management            |
-| Penpot           | Design Tool                    |
-| SABnzbd          | Usenet Downloader              |
-| Traefik          | Reverse Proxy, SSL, etc.       |
-| Tubesync         | Video & Audio Downloader       |
-| Uptime Kuma      | Monitoring                     |
-| Vaultwarden      | Password Management            |
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ArchiveBox</td>
+      <td>Bookmark Archival</td>
+    </tr>
+    <tr>
+      <td>Audiobookshelf</td>
+      <td>Audiobook Management</td>
+    </tr>
+    <tr>
+      <td>Calibre</td>
+      <td>EBook Management</td>
+    </tr>
+    <tr>
+      <td>Dozzle</td>
+      <td>Logs Monitoring</td>
+    </tr>
+    <tr>
+      <td>Homeassistant</td>
+      <td>Homeautomation, HomeKit Bridge</td>
+    </tr>
+    <tr>
+      <td>Homepage</td>
+      <td>Home Dashboard</td>
+    </tr>
+    <tr>
+      <td>Immich</td>
+      <td>Photo Library</td>
+    </tr>
+    <tr>
+      <td>Jellyfin</td>
+      <td>Media Server</td>
+    </tr>
+    <tr>
+      <td>Komodo</td>
+      <td>Docker Management</td>
+    </tr>
+    <tr>
+      <td>Komodo Periphery</td>
+      <td>Docker Management Agent</td>
+    </tr>
+    <tr>
+      <td>Komodo ntfy</td>
+      <td>Alerter Bridge</td>
+    </tr>
+    <tr>
+      <td>Libation</td>
+      <td>Audibook Downloader</td>
+    </tr>
+    <tr>
+      <td>Mealie</td>
+      <td>Recipe Management</td>
+    </tr>
+    <tr>
+      <td>MeTube</td>
+      <td>Video &amp; Audio Downloader</td>
+    </tr>
+    <tr>
+      <td>Miniflux</td>
+      <td>RSS</td>
+    </tr>
+    <tr>
+      <td>ntfy</td>
+      <td>Push Service</td>
+    </tr>
+    <tr>
+      <td>Paperless</td>
+      <td>Document Management</td>
+    </tr>
+    <tr>
+      <td>Penpot</td>
+      <td>Design Tool</td>
+    </tr>
+    <tr>
+      <td>SABnzbd</td>
+      <td>Usenet Downloader</td>
+    </tr>
+    <tr>
+      <td>Traefik</td>
+      <td>Reverse Proxy, SSL, etc.</td>
+    </tr>
+    <tr>
+      <td>Tubesync</td>
+      <td>Video &amp; Audio Downloader</td>
+    </tr>
+    <tr>
+      <td>Uptime Kuma</td>
+      <td>Monitoring</td>
+    </tr>
+    <tr>
+      <td>Vaultwarden</td>
+      <td>Password Management</td>
+    </tr>
+  </tbody>
+</table>
 
 ### RPI DNS01
 
-| Service           | Description              |
-| ----------------- | ------------------------ |
-| Adguard Home      | DNS Server               |
-| Adguard Home Sync | Adguard Home Config Sync |
-| Dozzle Agent      | Logs Agent               |
-| Komodo Periphery  | Docker Management Agent  |
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Adguard Home</td>
+      <td>DNS Server</td>
+    </tr>
+    <tr>
+      <td>Adguard Home Sync</td>
+      <td>Adguard Home Config Sync</td>
+    </tr>
+    <tr>
+      <td>Dozzle Agent</td>
+      <td>Logs Agent</td>
+    </tr>
+    <tr>
+      <td>Komodo Periphery</td>
+      <td>Docker Management Agent</td>
+    </tr>
+  </tbody>
+</table>
 
 ### RPI DNS02
 
-| Service          | Description             |
-| ---------------- | ----------------------- |
-| Adguard Home     | DNS Server              |
-| Dozzle Agent     | Logs Agent              |
-| Komodo Periphery | Docker Management Agent |
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Adguard Home</td>
+      <td>DNS Server</td>
+    </tr>
+    <tr>
+      <td>Dozzle Agent</td>
+      <td>Logs Agent</td>
+    </tr>
+    <tr>
+      <td>Komodo Periphery</td>
+      <td>Docker Management Agent</td>
+    </tr>
+  </tbody>
+</table>
+
 All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
 
 This setup balances critical services (DNS) across two Pis for resilience, while keeping heavier services (media, apps) centralized on the Ubuntu VM.
