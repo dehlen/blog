@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="A personal tech blog exploring iOS and macOS development with Swift, alongside passions like chess, self-hosting and other curious tech projects and perspectives." name="description"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Building a homelab (2/5): Renovate and Komodo for Auto Deployments (GitOps)
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/homelab/building-a-homelab-2-5-gitops-renovate-and-komodo-for-auto-deployments">Building a homelab (2/5): Renovate and Komodo for Auto Deployments (GitOps)</a>
+							</h1>
+						</header>
+						<h1>
+							Building a Homelab (2/5): Renovate and Komodo for Auto Deployments (GitOps)
+						</h1>
+						<blockquote>
+							<p>
+								If it is not in git it doesn't exist.
+							</p>
+						</blockquote>
+						<p>
+							Keeping containers updated in a homelab can quickly become a chore — especially when you’re managing multiple services, distributed across devices, and sensitive to downtime. That’s why I adopted a GitOps workflow using <a href="https://github.com/renovatebot/renovate">Renovate</a> for updates and <a href="https://komo.do">Komodo</a> to orchestrate my Docker Compose deployments.
+						</p>
+						<p>
+							This post will walk you through how I’ve set that up: from repo layout to cron jobs to automatic deployments across my Pi nodes and main VM.
+						</p>
+						<h2>
+							🛠️ Repo Structure
+						</h2>
+						<p>
+							I manage everything via a single GitHub repository that acts as the source of truth for my homelab. Here’s a simplified structure:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-">.
+├── README.md
+├── containers
+│   ├── dns01
+│   ├── dns02
+│   └── srv-prod-01
+├── docs
+│   ├── attachments
+│   ├── docker
+│   ├── machines
+│   ├── misc
+│   ├── network
+│   ├── services
+│   └── tasks
+├── dotfiles
+│   ├── bash_aliases
+│   └── gitconfig
+├── komodo.toml
+├── renovate.json
+├── scripts
+│   └── update-komodo.sh
+└── tasks
+    ├── deprecated
+    ├── docker-cleanup
+    ├── dsm-config-backup
+    ├── github-backup
+    ├── ip-backup
+    ├── monitor-remote-backup
+    ├── renovate
+    ├── rss-backup
+    └── vps
+</code></pre>
+						</figure>
+						<p>
+							Each stack has its own compose.yaml and optionally an .env file. This allows me to keep configurations isolated per node and have Komodo pick them up automatically.
+							
+							The whole Komodo configuration is also stored in this repository (komodo.toml). This allows me to even create new docker-compose projects just by pushing to the git repository.
+						</p>
+						<h2>
+							🔄 Automated Updates with Renovate
+						</h2>
+						<p><a href="https://github.com/renovatebot/renovate">Renovate</a> is a powerful dependency updater that I run on a schedule via cron. It scans all Docker Compose files and automatically:
+						</p>
+						<ul>
+							<li>
+								<p>
+									Detects outdated images
+								</p>
+							</li>
+							<li>
+								<p>
+									Creates pull requests with version bumps
+								</p>
+							</li>
+							<li>
+								<p>
+									Groups updates if desired (e.g., all linuxserver.io containers)
+								</p>
+							</li>
+						</ul>
+						<p>
+							To set this up I added a renovate.json in the root of my repository:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://docs.renovatebot.com/renovate-schema.json&quot;,
+  &quot;extends&quot;: [
+    &quot;config:recommended&quot;,
+    &quot;docker:pinDigests&quot;,
+    &quot;docker:enableMajor&quot;
+  ],
+  &quot;labels&quot;: [
+    &quot;renovate&quot;
+  ],
+  &quot;dependencyDashboard&quot;: true,
+  &quot;ignoreTests&quot;: true,
+  &quot;enabledManagers&quot;: [
+    &quot;docker-compose&quot;,
+    &quot;pip_requirements&quot;,
+    &quot;custom.regex&quot;
+  ],
+  &quot;customManagers&quot;: [
+    {
+      &quot;customType&quot;: &quot;regex&quot;,
+      &quot;managerFilePatterns&quot;: [
+        &quot;/^tasks/renovate/entrypoint\\.sh$/&quot;
+      ],
+      &quot;matchStrings&quot;: [
+	&quot;RENOVATE_VERSION=\&quot;(?&lt;currentValue&gt;.*?)(?:@(?&lt;currentDigest&gt;sha256:[a-f0-9]+))?\&quot;&quot;
+      ],
+      &quot;depNameTemplate&quot;: &quot;renovate/renovate&quot;,
+      &quot;autoReplaceStringTemplate&quot;: &quot;RENOVATE_VERSION=\&quot;{{{newValue}}}@{{{newDigest}}}\&quot;&quot;,
+      &quot;datasourceTemplate&quot;: &quot;docker&quot;
+    }
+  ],
+  &quot;docker-compose&quot;: {
+    &quot;managerFilePatterns&quot;: [
+      &quot;/(^|/)(?:docker-)?compose[^/]*\\.ya?ml(?:.j2)?$/&quot;
+    ]
+  },
+  &quot;packageRules&quot;: [
+    {
+      &quot;matchDatasources&quot;: [&quot;docker&quot;],
+      &quot;matchUpdateTypes&quot;: [&quot;digest&quot;],
+      &quot;enabled&quot;: false
+    }
+  ]
+}
+</code></pre>
+						</figure>
+						<p>
+							I then added a new cronjob on my main server to trigger the renovatebot every 30 minutes:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-">*/30 * * * * root /opt/repos/homelab/tasks/renovate/entrypoint.sh &gt;&gt; /mnt/data/Logs/tasks/renovate.log 2&gt;&amp;1
+</code></pre>
+						</figure>
+						<p>
+							The entrypoint.sh script triggers the renovatebot via docker:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-sh">RENOVATE_VERSION=&quot;40.40.1@sha256:ef85bf681b6a94e1a2a8afdcdeff8caa2fb92d7926538657671e8118ea03dffd&quot;
+
+docker run --rm \
+  --env-file &quot;${ENV_FILE}&quot; \
+  -v &quot;${CONFIG_JS_FILE}:/usr/src/app/config.js&quot; \
+  &quot;renovate/renovate:${RENOVATE_VERSION}&quot;
+</code></pre>
+						</figure>
+						<p>
+							This ultimately results in Pull Requests like the following:
+						</p>
+						<div class="image">
+							<img alt="An image showing a pull request a renovate bot added to a GitHub repository." loading="lazy" src="/img/building-a-homelab/renovate-pull-request.png" width="463.5"/>
+						</div>
+						<p>
+							When I merge one of these PRs, it triggers Komodo to redeploy only the affected stack — no need for a full redeploy or even SSHing into anything.
+						</p>
+						<h2>
+							🦖 Komodo: Deploying to the Edge
+						</h2>
+						<p><a href="https://komo.do">Komodo</a> is the core deployment engine. Think of it like a minimal orchestrator for docker-compose, but smarter and Git-aware.
+						</p>
+						<ul>
+							<li>
+								<p>
+									The central agent runs on the Ubuntu VM
+								</p>
+							</li>
+							<li>
+								<p>
+									The periphery agents run on my Raspberry Pis
+								</p>
+							</li>
+							<li>
+								<p>
+									All agents receive their stack definitions from the GitHub repo
+								</p>
+							</li>
+						</ul>
+						<p>
+							When a PR is merged and the repository is synced, Komodo checks which stacks changed and selectively redeploys them on the right nodes.
+						</p>
+						<h3>
+							How it knows what to redeploy:
+						</h3>
+						<ul>
+							<li>
+								<p>
+									Each stack is tagged with a deployment target (e.g., pi-dns1, core, etc.)
+								</p>
+							</li>
+							<li>
+								<p>
+									Komodo watches the main branch and computes diffs
+								</p>
+							</li>
+							<li>
+								<p>
+									Changed Compose files → redeploy those stacks only
+								</p>
+							</li>
+						</ul>
+						<p>
+							Komodo is setup via systemd or docker compose. I opted for the docker compose approach.
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-yaml">services:
+  mongo:
+    image: mongo:8.0.9@sha256:3e8fd506d185ea100867c9da5f90414cee744d1545449038c60190f3fd3cc274
+    container_name: komodo-mongo-db
+    labels:
+      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+    command: --quiet --wiredTigerCacheSizeGB 0.25
+    restart: unless-stopped
+    volumes:
+      - ${MONGO_DATA_PATH}:/data/db
+      - ${MONGO_CONFIG_PATH}:/data/configdb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${KOMODO_DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${KOMODO_DB_PASSWORD}
+    networks:
+      - internal
+  
+  core:
+    image: ghcr.io/moghtech/komodo-core:1.18.0@sha256:b65ee6d2af592841e610aee19951995ac89fd2046db451b77ccbf82506f19f41
+    container_name: komodo
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    env_file: ./.env
+    environment:
+      KOMODO_DATABASE_ADDRESS: mongo:27017
+      KOMODO_DATABASE_USERNAME: ${KOMODO_DB_USERNAME}
+      KOMODO_DATABASE_PASSWORD: ${KOMODO_DB_PASSWORD}
+    networks:
+      - proxy
+      - internal
+      - periphery
+    labels:
+      - &quot;komodo.skip=true&quot; # Prevent Komodo from stopping with StopAllContainers
+      - &quot;traefik.enable=true&quot;
+      - &quot;traefik.http.routers.komodo.rule=Host(`mydomain.de`)&quot;
+      - &quot;traefik.http.routers.komodo.entrypoints=https&quot;
+      - &quot;traefik.http.routers.komodo.tls=true&quot;
+      - &quot;traefik.http.services.komodo.loadbalancer.server.port=9120&quot;
+      - &quot;traefik.docker.network=proxy&quot;
+    volumes:
+      - ${REPO_CACHE_PATH}:/repo-cache
+
+  komodo-ntfy:
+    image: foxxmd/komodo-ntfy-alerter:0.0.8@sha256:df8dc93c22c23092c9e19c1b4581c30a04be125f8cfee57cd8537b8abbdb5b16
+    container_name: komodo-ntfy
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    networks:
+      - internal
+    ports:
+      - &quot;7000:7000&quot;
+
+networks:
+  proxy:
+    external: true
+  periphery:
+    external: true
+  internal:
+</code></pre>
+						</figure>
+						<p>
+							On all machines runs a periphery agent to connect those servers to the core komodo instance:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-yaml">services:
+  periphery:
+    image: ghcr.io/moghtech/komodo-periphery:1.18.0@sha256:fb12dd26fcb964ac95c0c669cca6efd4dc8c9e3a147f7873835f23727058292f
+    container_name: periphery
+    labels:
+      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+    restart: unless-stopped
+    env_file: ./.env
+    networks:
+      - periphery
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/proc
+      - ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}:${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}
+      - ${PERIPHERY_REPO_DIR:-/etc/komodo/repos}:${PERIPHERY_REPO_DIR:-/etc/komodo/repos}
+
+networks:
+  periphery:
+    external: true
+</code></pre>
+						</figure>
+						<p>
+							I then configured the Komodo instance through the UI. I added a Resource Sync to automatically sync changes made in the Komodo UI to my GitHub repository. Next I added alerters (via ntfy) to get notifications whenever an interesting update happens through Komodo. I also added my GitHub repository and my docker compose stacks to Komodo. Last but not least I added a procedure to run hourly to check for updates in the GitHub repository and redeploy any changed stacks. Here is the configuration for this specific action:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-toml">[[procedure]]
+name = &quot;pull-and-deploy&quot;
+description = &quot;Pulls stack-repo, deploys stacks&quot;
+config.schedule = &quot;0 0 * * * *&quot;
+config.schedule_format = &quot;Cron&quot;
+
+[[procedure.config.stage]]
+name = &quot;Pull Repo&quot;
+enabled = true
+executions = [
+  { execution.type = &quot;PullRepo&quot;, execution.params.repo = &quot;homelab&quot;, enabled = true }
+]
+
+[[procedure.config.stage]]
+name = &quot;Update Stacks&quot;
+enabled = true
+executions = [
+  { execution.type = &quot;BatchDeployStackIfChanged&quot;, execution.params.pattern = &quot;*&quot;, enabled = true }
+]
+
+[[procedure.config.stage]]
+name = &quot;Prune System&quot;
+enabled = true
+executions = [
+  { execution.type = &quot;PruneSystem&quot;, execution.params.server = &quot;dns01&quot;, enabled = true },
+  { execution.type = &quot;PruneSystem&quot;, execution.params.server = &quot;dns02&quot;, enabled = true },
+  { execution.type = &quot;PruneSystem&quot;, execution.params.server = &quot;srv-prod-01&quot;, enabled = true }
+]
+</code></pre>
+						</figure>
+						<div class="image">
+							<img alt="An image showing the Komodo web UI." loading="lazy" src="/img/building-a-homelab/komodo.png" width="463.5"/>
+						</div>
+						<h2>
+							🔁 The Full Update Lifecycle
+						</h2>
+						<ol>
+							<li>
+								<p>
+									Renovate runs via cron and checks for new image tags
+								</p>
+							</li>
+							<li>
+								<p>
+									It creates a PR in GitHub with the updated image version
+								</p>
+							</li>
+							<li>
+								<p>
+									I review and merge the PR
+								</p>
+							</li>
+							<li>
+								<p>
+									Komodo pulls the updated config
+								</p>
+							</li>
+							<li>
+								<p>
+									It calculates diffs and triggers a targeted redeploy
+								</p>
+							</li>
+							<li>
+								<p>
+									The updated service is rebuilt and restarted
+								</p>
+							</li>
+						</ol>
+						<p>
+							Zero manual SSH needed. Logs and container status can be checked in Dozzle from any machine (more on that in a later part).
+						</p>
+						<h2>
+							✅ Why This Works So Well
+						</h2>
+						<ul>
+							<li>
+								<p>
+									Idempotency: The same inputs always yield the same stack state
+								</p>
+							</li>
+							<li>
+								<p>
+									Minimal intervention: I only merge PRs, the rest is automated
+								</p>
+							</li>
+							<li>
+								<p>
+									Fast rollback: Revert a commit → auto rollback
+								</p>
+							</li>
+							<li>
+								<p>
+									Clear audit trail: Everything is version-controlled in Git
+								</p>
+							</li>
+						</ul>
+						<h2>
+							🔜 Up Next: Services That Power the Homelab
+						</h2>
+						<p>
+							In the next post, I’ll break down the actual containers I run, how they’re distributed across machines, and how I handle DNS, logging, and synchronization (like AdGuardHome Sync across two Pis).
+						</p>
+						<small>Posted
+							<time><time datetime="2025-06-04">2025-06-04</time></time>
+							in
+							<a href="/homelab">homelab</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="A personal tech blog exploring iOS and macOS development with Swift, alongside passions like chess, self-hosting and other curious tech projects and perspectives." name="description"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Building a homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/homelab/building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps">Building a homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps</a>
+							</h1>
+						</header>
+						<h1>
+							Building a Homelab (3/5): Containerized Services: DNS, Monitoring, and Self-Hosted Apps
+						</h1>
+						<blockquote>
+							<p>
+								Empower your digital life: In a world of clouds, I choose to build my own — where privacy reigns and my data is truly mine.
+							</p>
+						</blockquote>
+						<p>
+							In Part 1, I introduced my homelab setup. In Part 2, I covered the GitOps pipeline with Renovate and Komodo. Now let’s look at the actual applications that make this environment useful.
+						</p>
+						<p>
+							From local DNS blocking to RSS reading and media streaming, everything is self-hosted. And since I’m running on a mix of Pi boards and a Proxmox VM, distribution of services matters just as much as the apps themselves.
+						</p>
+						<h2>
+							Service Distribution Overview
+						</h2>
+						<h3>
+							Proxmox VM srv-prod-01
+						</h3>
+						<p>
+							| Service          | Description                    |
+							
+							| ---------------- | ------------------------------ |
+							
+							| ArchiveBox       | Bookmark Archival              |
+							
+							| Audiobookshelf   | Audiobook Management           |
+							
+							| Calibre          | EBook Management               |
+							
+							| Dozzle           | Logs Monitoring                |
+							
+							| Homeassistant    | Homeautomation, HomeKit Bridge |
+							
+							| Homepage         | Home Dashboard                 |
+							
+							| Immich           | Photo Library                  |
+							
+							| Jellyfin         | Media Server                   |
+							
+							| Komodo           | Docker Management              |
+							
+							| Komodo Periphery | Docker Management Agent        |
+							
+							| Komodo ntfy      | Alerter Bridge                 |
+							
+							| Libation         | Audibook Downloader            |
+							
+							| Mealie           | Recipe Management              |
+							
+							| MeTube           | Video & Audio Downloader       |
+							
+							| Miniflux         | RSS                            |
+							
+							| ntfy             | Push Service                   |
+							
+							| Paperless        | Document Management            |
+							
+							| Penpot           | Design Tool                    |
+							
+							| SABnzbd          | Usenet Downloader              |
+							
+							| Traefik          | Reverse Proxy, SSL, etc.       |
+							
+							| Tubesync         | Video & Audio Downloader       |
+							
+							| Uptime Kuma      | Monitoring                     |
+							
+							| Vaultwarden      | Password Management            |
+						</p>
+						<h3>
+							RPI DNS01
+						</h3>
+						<p>
+							| Service           | Description              |
+							
+							| ----------------- | ------------------------ |
+							
+							| Adguard Home      | DNS Server               |
+							
+							| Adguard Home Sync | Adguard Home Config Sync |
+							
+							| Dozzle Agent      | Logs Agent               |
+							
+							| Komodo Periphery  | Docker Management Agent  |
+						</p>
+						<h3>
+							RPI DNS02
+						</h3>
+						<p>
+							| Service          | Description             |
+							
+							| ---------------- | ----------------------- |
+							
+							| Adguard Home     | DNS Server              |
+							
+							| Dozzle Agent     | Logs Agent              |
+							
+							| Komodo Periphery | Docker Management Agent |
+							
+							All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
+						</p>
+						<p>
+							This setup balances critical services (DNS) across two Pis for resilience, while keeping heavier services (media, apps) centralized on the Ubuntu VM.
+						</p>
+						<h2>
+							Local DNS with Adguard Home
+						</h2>
+						<p>
+							AdGuard Home is my go-to solution for local DNS with ad and tracker blocking. I run two independent instances — one on each Pi — to ensure redundancy.
+						</p>
+						<p>
+							Why two instances?
+						</p>
+						<ul>
+							<li>
+								<p>
+									Ensures DNS still works if one Pi reboots or fails
+								</p>
+							</li>
+							<li>
+								<p>
+									Provides distributed DNS for clients across VLANs
+								</p>
+							</li>
+							<li>
+								<p>
+									Enables load distribution and fault tolerance
+								</p>
+							</li>
+						</ul>
+						<p>
+							To keep their configs in sync, I run <a href="https://github.com/bakito/adguardhome-sync">adguardhome-sync</a> on dns01:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-yaml">services:
+  adguardhome-sync:
+    image: lscr.io/linuxserver/adguardhome-sync:v0.7.6-ls138@sha256:21b0311d8e0aecca093f6aa0c15a91e293de108d86477da768816eb75af130bb
+    container_name: adguardhome-sync
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-UTC}
+    volumes:
+      - ${VOLUME_PATH}/config:/config
+    ports:
+      - 8090:8080
+    restart: unless-stopped
+</code></pre>
+						</figure>
+						<p>
+							The mounted config file then adds dns02 as a sync target. This way every change I make on dns01 will automatically be reflected on dns02 as well.
+						</p>
+						<div class="image">
+							<img alt="An image showing the adguard web UI." loading="lazy" src="/img/building-a-homelab/adguard.png" width="463.5"/>
+						</div>
+						<h2>
+							📈 Monitoring with Uptime Kuma
+						</h2>
+						<p><a href="https://github.com/louislam/uptime-kuma">Uptime Kuma</a> runs in a Docker container on the Ubuntu VM. It monitors:
+						</p>
+						<ul>
+							<li>
+								<p>
+									My public WireGuard endpoint
+								</p>
+							</li>
+							<li>
+								<p>
+									All internal apps via their Traefik routes / docker containers
+								</p>
+							</li>
+							<li>
+								<p>
+									DNS uptime on both Pi nodes
+								</p>
+							</li>
+							<li>
+								<p>
+									External services like GitHub and my VPS
+								</p>
+							</li>
+							<li>
+								<p>
+									Cron Jobs and Backup Tasks
+								</p>
+							</li>
+						</ul>
+						<p>
+							It’s lightweight, supports alerting, and even shows response time history.
+						</p>
+						<div class="image">
+							<img alt="An image showing the uptime-kuma web UI." loading="lazy" src="/img/building-a-homelab/uptime-kuma.png" width="463.5"/>
+						</div>
+						<h2>
+							📚 Logging with Dozzle
+						</h2>
+						<p>
+							Each of my Raspberry Pis runs a Dozzle agent, which streams container logs to the central Dozzle instance. Log files written to disk are available through a seperate output stream I create. This gives me:
+						</p>
+						<ul>
+							<li>
+								<p>
+									One place to view logs from every device
+								</p>
+							</li>
+							<li>
+								<p>
+									Live log tailing via browser
+								</p>
+							</li>
+							<li>
+								<p>
+									Easy debugging if something breaks
+								</p>
+							</li>
+						</ul>
+						<p>
+							On the central VM, I run the Dozzle web UI and configure it to connect to the remote agents or output streams:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-yaml">dozzle:
+    image: amir20/dozzle:v8.12.20@sha256:6e3c64615e15493dbd2a476650d17b1b0038ba7dbd3cfe1a611df64ed57e602a
+    container_name: dozzle
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - internal
+      - proxy
+    environment:
+      - DOZZLE_LEVEL=${DOZZLE_LEVEL}
+      - DOZZLE_ENABLE_ACTIONS=${DOZZLE_ENABLE_ACTIONS}
+      - DOZZLE_ENABLE_SHELL=${DOZZLE_ENABLE_SHELL}
+      - DOZZLE_NO_ANALYTICS=${DOZZLE_NO_ANALYTICS}
+      - DOZZLE_FILTER=${DOZZLE_FILTER}
+      - DOZZLE_AUTH_PROVIDER=${DOZZLE_AUTH_PROVIDER}
+      - DOZZLE_HOSTNAME=${DOZZLE_HOSTNAME}
+      - DOZZLE_REMOTE_AGENT=${DOZZLE_REMOTE_AGENT}
+    volumes:
+      - ${VOLUME_PATH}/data:/data
+      - ${VOLUME_PATH}/certs:/certs
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - &quot;traefik.enable=true&quot;
+      - &quot;traefik.http.routers.dozzle.rule=Host(`mydomain.de`)&quot;
+      - &quot;traefik.http.routers.dozzle.entrypoints=https&quot;
+      - &quot;traefik.http.routers.dozzle.tls=true&quot;
+      - &quot;traefik.http.services.dozzle.loadbalancer.server.port=8080&quot;
+      - &quot;traefik.docker.network=proxy&quot;
+
+  # example of an output stream
+  dozzle-traefik:
+    container_name: dozzle-traefik
+    image: alpine@sha256:6662067ba6f090f8a2c8b5b50309692be03bffef2729b453425edd4f26343377
+    volumes:
+      - ${TRAEFIK_LOG}:/var/log/stream.log
+    command:
+      - tail
+      - -f
+      - /var/log/stream.log
+    network_mode: none
+    restart: unless-stopped
+    labels:
+      - dev.dozzle.group=traefik
+</code></pre>
+						</figure>
+						<div class="image">
+							<img alt="An image showing the dozzle web UI." loading="lazy" src="/img/building-a-homelab/dozzle.png" width="463.5"/>
+						</div>
+						<h2>
+							🛜 Traefik: The Ingress Brain
+						</h2>
+						<p>
+							Every internal service is routed through Traefik, my reverse proxy of choice. Key features in my setup:
+						</p>
+						<ul>
+							<li>
+								<p>
+									Automatic TLS via Let's Encrypt
+								</p>
+							</li>
+							<li>
+								<p>
+									Internal-only DNS resolution (e.g., mydomain.de)
+								</p>
+							</li>
+							<li>
+								<p>
+									Container labels define routing rules declaratively
+								</p>
+							</li>
+						</ul>
+						<p>
+							In Adguard Home i added <code>Custom DNS Rewrite</code> rule. Whenever my DNS server gets a request to resolve the IP address for <code>*.mydomain.de</code> it points to my traefik instance which then routes based on the host name to the actual docker containers or machines. Since traefik comes certbot/acme out of the box I can use my own domain to SSL encrypt this connection with a certificate requested from Let's Encrypt. To set things up I mostly followed this tutorial here so I won't go into detail: <a href="https://technotim.live/posts/traefik-3-docker-certificates/">Traefik Tutorial</a>.
+						</p>
+						<h2>
+							➡️ Conclusion
+						</h2>
+						<p>
+							Once you feel the excitement and joy of deploying actually useful apps to your homelab there is no step back. Watching a movie on Jellyfin, reading my RSS feeds through Miniflux, storing passwords in my own, private vaultwarden instance just feels very rewarding. On top I can access these services via my own custom domain SSL encrypted, although I do not expose them to the internet. In the next part we have a closer look at my network setup and how I stepped up my game here.
+						</p>
+						<small>Posted
+							<time><time datetime="2025-06-04">2025-06-04</time></time>
+							in
+							<a href="/homelab">homelab</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>

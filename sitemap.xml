@@ -28,6 +28,30 @@
 		<changefreq>weekly</changefreq>
 	</url>
 	<url>
+		<loc>https://davidvonk.dev/homelab</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/homelab/building-a-homelab-1-5-the-big-picture</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/homelab/building-a-homelab-2-5-gitops-renovate-and-komodo-for-auto-deployments</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/homelab/building-a-homelab-3-5-containerized-services-dns-monitoring-and-self-hosted-apps</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/homelab/building-a-homelab-4-5-networking-vlans-and-vpn</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/homelab/building-a-homelab-5-5-everything-else</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
 		<loc>https://davidvonk.dev/macos</loc>
 		<changefreq>weekly</changefreq>
 	</url>

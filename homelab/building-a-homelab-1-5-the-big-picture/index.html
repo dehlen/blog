@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="A personal tech blog exploring iOS and macOS development with Swift, alongside passions like chess, self-hosting and other curious tech projects and perspectives." name="description"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Building a homelab (1/5): The big picture
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/homelab/building-a-homelab-1-5-the-big-picture">Building a homelab (1/5): The big picture</a>
+							</h1>
+						</header>
+						<h1>
+							Building a Homelab (1/5): The Big Picture
+						</h1>
+						<blockquote>
+							<p>
+								Home is where your lab is.
+							</p>
+						</blockquote>
+						<p>
+							I’ve always been fascinated by infrastructure — how services run behind the scenes, how networks talk to each other, and how automation can bring order to chaos. That’s what led me to build and maintain a fully self-hosted homelab, not just for tinkering, but for actual day-to-day use.
+						</p>
+						<p>
+							This blog series walks you through every part of my homelab — from the nuts and bolts of the network stack to the GitOps pipeline that drives automated updates and deployment.
+						</p>
+						<h2>
+							❓ Why I Built This
+						</h2>
+						<p>
+							Like many who run homelabs, my goals were:
+						</p>
+						<ul>
+							<li>
+								<p>
+									Learning by doing (networking, infrastructure-as-code, automation)
+								</p>
+							</li>
+							<li>
+								<p>
+									Host my own services (newsreader, media, monitoring, DNS, etc.)
+								</p>
+							</li>
+							<li>
+								<p>
+									Improve privacy and control over my own data
+								</p>
+							</li>
+							<li>
+								<p>
+									Build a resilient, automated, low-touch system
+								</p>
+							</li>
+						</ul>
+						<p>
+							Over time, it’s grown into a robust, self-sufficient ecosystem that closely mimics professional infrastructure, just at a smaller scale.
+						</p>
+						<h2>
+							💻 Hardware Overview
+						</h2>
+						<p>
+							| Device                        | Role                        |
+							
+							| ----------------------------- | --------------------------- |
+							
+							| Draytek Vigor 167             | DSL Modem                   |
+							
+							| UniFi Express 7               | Router                      |
+							
+							| UniFi Pro Max 16 Switch       | Switch                      |
+							
+							| U7 Pro Wall, U7 Lite (2x)     | Access Points               |
+							
+							| FritzBox 7490                 | DECT Telephone Base Station |
+							
+							| RPI 3 Model B                 | DNS 01                      |
+							
+							| RPI 3 Model B+                | DNS 02 Failover             |
+							
+							| GMKTEC Nucbox M5 Plus Mini PC | Proxmox Host                |
+							
+							| Main NAS                      | Synology DS923+             |
+							
+							| Backup NAS                    | Synology DS918              |
+						</p>
+						<h2>
+							🛜 Networking Layout
+						</h2>
+						<ul>
+							<li>
+								<p>
+									VLANs segment my devices by function (e.g., IOT, guests, infrastructure, work)
+								</p>
+							</li>
+							<li>
+								<p>
+									Multiple SSIDs are broadcasted for each VLAN through UniFi APs
+								</p>
+							</li>
+							<li>
+								<p>
+									All cabling in the house runs to the central UniFi switch
+								</p>
+							</li>
+							<li>
+								<p>
+									Internet comes in via PPPoE through a DSL modem
+								</p>
+							</li>
+						</ul>
+						<p>
+							This physical setup gives me both strong performance and clean network segmentation.
+							
+							Also once fiber optics will finally be available in our home I'll be able to just switch out the DSL Modem and the network should function exactly the same. We will have a closer look at the networking infrastructure in part 4 of this series.
+						</p>
+						<h2>
+							📱 Core Services
+						</h2>
+						<p>
+							Most of my services run in Docker and are deployed via Komodo:
+						</p>
+						<h3>
+							Proxmox VM srv-prod-01
+						</h3>
+						<p>
+							| Service          | Description                    |
+							
+							| ---------------- | ------------------------------ |
+							
+							| ArchiveBox       | Bookmark Archival              |
+							
+							| Audiobookshelf   | Audiobook Management           |
+							
+							| Calibre          | EBook Management               |
+							
+							| Dozzle           | Logs Monitoring                |
+							
+							| Homeassistant    | Homeautomation, HomeKit Bridge |
+							
+							| Homepage         | Home Dashboard                 |
+							
+							| Immich           | Photo Library                  |
+							
+							| Jellyfin         | Media Server                   |
+							
+							| Komodo           | Docker Management              |
+							
+							| Komodo Periphery | Docker Management Agent        |
+							
+							| Komodo ntfy      | Alerter Bridge                 |
+							
+							| Libation         | Audibook Downloader            |
+							
+							| Mealie           | Recipe Management              |
+							
+							| MeTube           | Video & Audio Downloader       |
+							
+							| Miniflux         | RSS                            |
+							
+							| ntfy             | Push Service                   |
+							
+							| Paperless        | Document Management            |
+							
+							| Penpot           | Design Tool                    |
+							
+							| SABnzbd          | Usenet Downloader              |
+							
+							| Traefik          | Reverse Proxy, SSL, etc.       |
+							
+							| Tubesync         | Video & Audio Downloader       |
+							
+							| Uptime Kuma      | Monitoring                     |
+							
+							| Vaultwarden      | Password Management            |
+						</p>
+						<h3>
+							RPI DNS01
+						</h3>
+						<p>
+							| Service           | Description              |
+							
+							| ----------------- | ------------------------ |
+							
+							| Adguard Home      | DNS Server               |
+							
+							| Adguard Home Sync | Adguard Home Config Sync |
+							
+							| Dozzle Agent      | Logs Agent               |
+							
+							| Komodo Periphery  | Docker Management Agent  |
+						</p>
+						<h3>
+							RPI DNS02
+						</h3>
+						<p>
+							| Service          | Description             |
+							
+							| ---------------- | ----------------------- |
+							
+							| Adguard Home     | DNS Server              |
+							
+							| Dozzle Agent     | Logs Agent              |
+							
+							| Komodo Periphery | Docker Management Agent |
+							
+							All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
+						</p>
+						<h2>
+							🔐 Secure Remote Access
+						</h2>
+						<p>
+							For secure external access, I run a WireGuard VPN through a VPS with a static IPv4 address. This lets me:
+						</p>
+						<ul>
+							<li>
+								<p>
+									Connect back home from anywhere
+								</p>
+							</li>
+							<li>
+								<p>
+									Route selected traffic over WireGuard
+								</p>
+							</li>
+							<li>
+								<p>
+									Secure inbound services without exposing ports directly
+								</p>
+							</li>
+						</ul>
+						<p>
+							I will detail the setup in part 4 when we have a look at the overall networking infrastructure.
+						</p>
+						<p>
+							We will also look at other deployed mechanism to harden the overall security of my homelab in the final part of this series, f.e. securing SSH access to my machines.
+						</p>
+						<small>Posted
+							<time><time datetime="2025-06-04">2025-06-04</time></time>
+							in
+							<a href="/homelab">homelab</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>

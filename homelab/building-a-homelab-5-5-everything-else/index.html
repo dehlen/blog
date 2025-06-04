@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="A personal tech blog exploring iOS and macOS development with Swift, alongside passions like chess, self-hosting and other curious tech projects and perspectives." name="description"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Building a homelab (5/5): Everything else
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+		<script async src="/js/prism.js">
+		</script>
+		<link href="/css/prism.css" rel="stylesheet"/>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/homelab/building-a-homelab-5-5-everything-else">Building a homelab (5/5): Everything else</a>
+							</h1>
+						</header>
+						<h1>
+							Building a Homelab (5/5): Everything else
+						</h1>
+						<blockquote>
+							<p>
+								Why did the homelabber bring a book to the server room? Because with so much to learn, they needed a backup plan for their brain!
+							</p>
+						</blockquote>
+						<p>
+							In the last 4 blog posts we learned a lot about building a homelab and what even is possible. However there are still a lot of topics to dive into. In this last post I want to have a quick look at a few of them.
+						</p>
+						<h2>
+							Task scheduling with cron
+						</h2>
+						<p>
+							On my homeserver I not only run a handful of services I also need to schedule tasks throughout the day. These involve the renovate bot discussed in part 2 but also backup tasks etc. When implementing this I took a deep dive into cron which I want to share with you here.
+						</p>
+						<p><code>cron</code> is a time-based job scheduler in Unix-like systems, including Ubuntu. It allows users and administrators to schedule scripts or commands to run at specific times or intervals automatically. It is widely used for repetitive tasks like backups, system maintenance, or monitoring.
+						</p>
+						<p>
+							Ubuntu uses <code>cron</code> via the <code>cron</code> package, which installs the daemon and required configuration directories.
+						</p>
+						<h3>
+							Adding a New Cron Job (Using <code>/etc/cron.d/</code>)
+						</h3>
+						<p>
+							To add a system-level cron job, create a file in <code>/etc/cron.d/</code>:
+						</p>
+						<h4>
+							Example: <code>/etc/cron.d/myjob</code></h4>
+						<figure class="highlight">
+							<pre><code class="language-cron"># Run a script every day at 2:30 AM
+30 2 * * * root /usr/local/bin/myscript.sh
+</code></pre>
+						</figure>
+						<ul>
+							<li>
+								<p>
+									The file must be owned by <code>root</code> and should have permissions <code>644</code>.
+								</p>
+							</li>
+							<li>
+								<p>
+									Always specify the <strong>user</strong> to run the command (e.g., <code>root</code>, <code>ubuntu</code>, etc.).
+								</p>
+							</li>
+						</ul>
+						<p>
+							Set permissions with:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">sudo chmod 644 /etc/cron.d/myjob
+sudo chown root:root /etc/cron.d/myjob
+</code></pre>
+						</figure>
+						<h3>
+							Cron Timing Syntax
+						</h3>
+						<p>
+							| Field       | Allowed Values        | Description                  |
+							
+							|-------------|------------------------|------------------------------|
+							
+							| Minute      | 0–59                   | Minute of the hour           |
+							
+							| Hour        | 0–23                   | Hour of the day              |
+							
+							| Day of Month| 1–31                   | Day of the month             |
+							
+							| Month       | 1–12 or Jan–Dec        | Month of the year            |
+							
+							| Day of Week | 0–7 or Sun–Sat         | Day of the week (0 or 7 is Sunday) |
+						</p>
+						<h4>
+							Special Symbols
+						</h4>
+						<p>
+							| Symbol | Meaning                   |
+							
+							|--------|----------------------------|
+							
+							| <code>*</code>    | Every possible value       |
+							
+							| <code>,</code>    | Value list separator       |
+							
+							| <code>-</code>    | Range of values            |
+							
+							| <code>/</code>    | Step values (e.g., <code>*/5</code>)  |
+						</p>
+						<h3>
+							Checking if a Cron Job Runs
+						</h3>
+						<ol>
+							<li>
+								<p><strong>Check Logs</strong></p>
+							</li>
+						</ol>
+						<figure class="highlight">
+							<pre><code class="language-bash">grep CRON /var/log/syslog
+</code></pre>
+						</figure>
+						<p>
+							Or for recent entries:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">journalctl -u cron.service
+</code></pre>
+						</figure>
+						<ol>
+							<li>
+								<p><strong>Add Logging in Your Script</strong></p>
+							</li>
+						</ol>
+						<p>
+							Add output redirection in your cron job:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-cron">30 2 * * * root /usr/local/bin/myscript.sh &gt;&gt; /var/log/myscript.log 2&gt;&amp;1
+</code></pre>
+						</figure>
+						<h3>
+							Restarting Cron to Enable New Jobs
+						</h3>
+						<p>
+							After adding or modifying files in <code>/etc/cron.d/</code>, restart the cron service:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">sudo systemctl restart cron
+</code></pre>
+						</figure>
+						<p>
+							To check cron status:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">systemctl status cron
+</code></pre>
+						</figure>
+						<p>
+							Ensure that the new job file is valid and has the proper permissions. Invalid files or missing users will cause the job to be ignored.
+						</p>
+						<h2>
+							Rotating log files with logrotate
+						</h2>
+						<p><code>logrotate</code> is a utility used on Ubuntu (and other Linux distributions) to manage the automatic rotation, compression, removal, and mailing of log files. It helps prevent logs from consuming too much disk space and keeps log directories organized.
+						</p>
+						<p>
+							On Ubuntu, <code>logrotate</code> is typically run daily via a cron job managed by <code>systemd</code> timer units.
+						</p>
+						<p>
+							Ubuntu uses <code>systemd</code> to manage scheduled tasks. You can check the timer for logrotate using:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">systemctl status logrotate.timer
+</code></pre>
+						</figure>
+						<h3>
+							Defining a Custom Rule
+						</h3>
+						<p>
+							To rotate logs for a custom application, create a file in <code>/etc/logrotate.d/</code>:
+						</p>
+						<h4>
+							Example: <code>/etc/logrotate.d/myapp</code></h4>
+						<figure class="highlight">
+							<pre><code class="language-conf">/var/log/myapp/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 myuser mygroup
+    sharedscripts
+    postrotate
+        systemctl reload myapp.service &gt; /dev/null 2&gt;/dev/null || true
+    endscript
+}
+</code></pre>
+						</figure>
+						<h4>
+							Explanation of Options
+						</h4>
+						<p>
+							| Option           | Description                                                                 |
+							
+							|------------------|-----------------------------------------------------------------------------|
+							
+							| <code>daily</code>          | Rotate logs every day                                                       |
+							
+							| <code>missingok</code>      | Do not show error if log file is missing                                    |
+							
+							| <code>rotate 14</code>      | Keep 14 old log files before deleting                                       |
+							
+							| <code>compress</code>       | Compress rotated logs (using gzip by default)                              |
+							
+							| <code>delaycompress</code>  | Delay compression until the next rotation (useful with apps that keep logs open) |
+							
+							| <code>notifempty</code>     | Do not rotate empty log files                                               |
+							
+							| <code>create</code>         | Create a new log file with specified permissions and ownership              |
+							
+							| <code>sharedscripts</code>  | Run <code>postrotate</code> script once, even if multiple logs are matched             |
+							
+							| <code>postrotate</code>     | Script to run after rotation (e.g., to reload services)                     |
+						</p>
+						<h3>
+							Testing a Logrotate Rule
+						</h3>
+						<p>
+							To simulate and debug log rotation without making changes:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">sudo logrotate -d /etc/logrotate.conf
+</code></pre>
+						</figure>
+						<p>
+							To force log rotation:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">sudo logrotate -f /etc/logrotate.conf
+</code></pre>
+						</figure>
+						<p>
+							To test a specific configuration file:
+						</p>
+						<figure class="highlight">
+							<pre><code class="language-bash">sudo logrotate -d /etc/logrotate.d/myapp
+</code></pre>
+						</figure>
+						<p>
+							Check <code>/var/lib/logrotate/status</code> to see the last time files were rotated.
+						</p>
+						<h2>
+							Proxmox Hypervisor
+						</h2>
+						<p>
+							As a blogger showcasing my private homelab, I can confidently say that Proxmox Hypervisor is a game-changer for anyone looking to dive into virtualization. Being open-source, it not only provides a cost-effective solution but also comes with a thriving community that’s always ready to help and share knowledge. The combination of KVM and LXC allows me to run both virtual machines and containers seamlessly, while its user-friendly web interface makes management a breeze. With features like live migration and built-in backup solutions, I can experiment with different setups without worrying about downtime. Proxmox has truly empowered my homelab journey, making it a solid choice for maximizing my hardware and exploring new possibilities!
+						</p>
+						<h2>
+							Backups
+						</h2>
+						<p>
+							I’ve implemented a robust 3-2-1 backup strategy using two Synology NAS storage solutions alongside a Proxmox Backup Server for all my VMs running in the Proxmox Hypervisor. This approach ensures that I have three copies of my data, stored on two different types of media, with one copy kept offsite for added security.
+						</p>
+						<p>
+							The Proxmox Backup Server allows for incredibly fast snapshot backups, enabling me to capture the state of my VMs almost instantly without significant downtime.
+						</p>
+						<p>
+							To ensure the integrity of my backups, I regularly verify checksums, which helps confirm that my data is stable and recoverable.
+						</p>
+						<p>
+							In the event of a failure, restoring from these backups is straightforward and efficient, giving me peace of mind that my homelab is well-protected against data loss. This comprehensive backup strategy not only safeguards my projects but also allows me to experiment and innovate without fear!
+						</p>
+						<h2>
+							Hardening SSH access
+						</h2>
+						<p>
+							Hardening SSH access to my private machines is essential for enhancing security, and there are a few straightforward steps I take to achieve this.
+						</p>
+						<p>
+							First, I change the default SSH port from 22 to something less predictable by creating a separate configuration file in the <code>/etc/ssh/sshd_config.d/</code> directory, which allows me to add my custom settings without cluttering the main <code>sshd_config</code> file. This modular approach not only keeps my configurations organized but also makes it easier to manage and troubleshoot changes in the future.
+						</p>
+						<p>
+							Next, I create a convenient SSH config file at <code>~/.ssh/config</code> to streamline my connections, adding entries like <code>Host myserver</code> followed by <code>HostName myserver.example.com</code> and <code>Port 2222</code> (or whatever port I chose).
+						</p>
+						<p>
+							Most importantly, I configure SSH to use only public key authentication by setting <code>PasswordAuthentication no</code> in my custom config file. This approach significantly reduces the risk of brute-force attacks, as it requires a private key for access, making it a best practice for securing my homelab environment.
+						</p>
+						<h2>
+							Filesystems
+						</h2>
+						<h3>
+							Btrfs on Synology NAS
+						</h3>
+						<p>
+							In my homelab, I run Btrfs on two Synology NAS machines, taking advantage of its advanced features like snapshotting, built-in RAID, and efficient data compression. Btrfs allows me to create point-in-time snapshots of my data, making it easy to roll back to previous states in case of accidental deletions or corruption. Additionally, its self-healing capabilities ensure data integrity by automatically detecting and repairing errors, providing me with peace of mind.
+						</p>
+						<h3>
+							ZFS on Proxmox Host
+						</h3>
+						<p>
+							On my Proxmox host, I utilize ZFS on NVMe SSDs, which offers exceptional performance and reliability. ZFS is renowned for its robust data protection features, including checksumming for data integrity and the ability to create snapshots and clones efficiently. The combination of ZFS's advanced RAID options allows me to choose an appropriate RAID type that balances redundancy and performance, ensuring that my virtual machines are both fast and secure.
+						</p>
+						<h3>
+							Redundancy and Reliability
+						</h3>
+						<p>
+							By leveraging both Btrfs and ZFS, I have created a resilient storage architecture in my homelab. The RAID configurations on both systems provide redundancy, safeguarding my data against hardware failures while allowing me to enjoy the unique strengths of each filesystem. This thoughtful approach to storage not only enhances performance but also ensures that my data remains safe and accessible, no matter the circumstances.
+						</p>
+						<small>Posted
+							<time><time datetime="2025-06-04">2025-06-04</time></time>
+							in
+							<a href="/homelab">homelab</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8"/>
+		<meta content="en-US" http-equiv="content-language"/>
+		<meta content="David v.Knobelsdorff" name="author"/>
+		<meta content="David v.Knobelsdorff" name="publisher"/>
+		<meta content="David v.Knobelsdorff" name="copyright"/>
+		<meta content="A personal tech blog exploring iOS and macOS development with Swift, alongside passions like chess, self-hosting and other curious tech projects and perspectives." name="description"/>
+		<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+		<meta content="interest-cohort=()" http-equiv="Permissions-Policy"/>
+		<link href="/atom.xml" rel="alternate" title="RSS Feed for davidvonk.dev" type="application/atom+xml"/>
+		<link href="https://chaos.social/@dvk" rel="me"/>
+		<link href="/favicon.ico" rel="shortcut icon"/>
+		<link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
+		<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+		<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
+		<link href="/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
+		<link href="/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
+		<title>
+			Building a homelab (4/5): Networking, VLANs and VPN
+			– davidvonk.dev
+		</title>
+		<style>
+			/**
+ * Light theme variables
+ */
+@import url("https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700");
+
+:root {
+  --base-color: #000;
+  --border: dashed 1px rgba(0, 0, 0, 1);
+  --selection-background: rgba(0, 0, 0, 0.99);
+  --selection-text: #FFF;
+  --background-color: #FFF;
+  --text-color: var(--base-color);
+  --placeholder-color: var(--base-color);
+  --link-color: var(--base-color);
+}
+
+/**
+ * Style variables
+ */
+/**
+ * Global
+ */
+body {
+  background-color: var(--background-color);
+  margin: 0 auto;
+  padding: 0;
+  font-family: "Source Code Pro", monospace;
+  font-size: 12.5px;
+  color: var(--text-color);
+  text-align: left;
+  line-height: 1.5 !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-size: 12.5px;
+  margin: 0px;
+  margin-top: 22px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+p, ul, ol {
+  margin: 0px;
+  color: var(--text-color);
+}
+
+a {
+  text-decoration: underline;
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+@media only screen and (max-device-width: 500px) {
+
+  * {
+    font-size: 12px !important;
+  }
+}
+
+/**
+ * Layout
+ */
+
+.layout {
+  width: 90%;
+  max-width: 600px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+p {
+  word-wrap: break-word;
+  word-break: break-word;
+  margin-bottom: 15px;
+}
+
+footer {
+  color: var(--text-color);
+  border-top: var(--border);
+  margin: 20px auto 15px;
+  padding-top: 10px;
+  text-align: right;
+}
+
+header {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+header p {
+  text-align: left;
+  margin: 0;
+}
+
+footer {
+  margin-bottom: 20px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  height: auto;
+  margin: 0 auto .5em;
+}
+
+video {
+  display: block;
+  margin: 0 auto;
+}
+
+/**
+ * Highlight/Markup
+ */
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+::-moz-selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}
+
+/**
+ * Lists
+ */
+
+ul {
+    list-style-type: '- ';
+}
+
+/**
+ * Header/Navigation
+ */
+#navigation {
+  border-top: var(--border);
+  border-bottom: var(--border);
+  margin-bottom: 25px;
+}
+
+#navigation ul {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding-left: 0px;
+  list-style-type: none;
+  text-align: right;
+}
+
+#navigation ul li {
+  display: inline;
+  margin-left: 10px;
+}
+
+#navigation ul li a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+#navigation ul li a:hover {
+  text-decoration: none;
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+/**
+ * Form
+ */
+
+input, select, textarea {
+  padding: 0;
+  margin: 0;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border: none;
+}
+
+input[type=text], select, textarea {
+  width: 100%;
+  resize: none;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  caret-color: var(--text-color);
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+}
+
+input, select, textarea, textarea::-webkit-input-placeholder {
+  text-indent: 0px;
+}
+
+::placeholder {
+  color: var(--placeholder-color);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+::-ms-input-placeholder {
+  color: var(--placeholder-color);
+}
+
+input[type=submit] {
+  font-size: 12.5px;
+  font-family: "Source Code Pro", monospace;
+  line-height: 1.5;
+  cursor: pointer;
+  color: var(--link-color);
+  background-color: var(--background-color);
+}
+
+input[type=submit]:hover {
+  color: var(--background-color);
+  background-color: var(--base-color);
+}
+
+*:focus {
+  outline: none;
+}
+
+textarea {
+  vertical-align: top;
+}
+
+/**
+* Code
+*/
+article code, article pre {
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+}
+
+article .highlight {
+    margin: 0 auto;
+    font-family: "Source Code Pro", monospace;
+    font-size: 12.5px;
+    border-radius: 4px;
+    overflow-x: scroll;
+}
+
+code:not(figure code), pre:not(figure pre) {
+    font-style: italic;
+}
+
+@media (prefers-color-scheme: dark) {
+  /**
+ * Dark theme variables
+ */
+  
+  :root {
+    --base-color: #DBDBDB;
+    --border: dashed 1px rgba(219, 219, 219, 0.9);
+    --selection-background: rgba(219, 219, 219, 0.99);
+    --selection-text: #000;
+    --background-color: #000;
+    --text-color: var(--base-color);
+    --placeholder-color: var(--base-color);
+    --link-color: var(--base-color);
+  }
+}
+
+		</style>
+	</head>
+	<body>
+		<div class="layout">
+			<header id="header">
+				<nav id="navigation">
+					<ul>
+						<li>
+							<a href="/">/</a>
+						</li>
+						<li>
+							<a href="/archive">/archive</a>
+						</li>
+						<li>
+							<a href="/about">/about</a>
+						</li>
+						<li>
+							<a href="/atom.xml">/rss</a>
+						</li>
+					</ul>
+				</nav>
+			</header>
+			<main>
+				<section id="content">
+					<article>
+						<header>
+							<h1>
+								<a href="/homelab/building-a-homelab-4-5-networking-vlans-and-vpn">Building a homelab (4/5): Networking, VLANs and VPN</a>
+							</h1>
+						</header>
+						<h1>
+							Building a Homelab (4/5): Networking, VLANs and VPN
+						</h1>
+						<blockquote>
+							<p>
+								Why did the data cross the road? To get to the VLAN on the other side!.
+							</p>
+						</blockquote>
+						<p>
+							When we moved into our new home new CAT 7 cables were run throughout the whole house. That was the reason I wanted to get into networking infrastructure and to build my home network more professionally. Of course when you setup all this networking infrastructure you want to utilize it as well and so this blog post and my excitement for homelabs was born. When I shopped the new network gear I tried to plan ahead which is why the new devices are all Wifi 7 capable and I am able to utilize 10 GB SFP+ ports on my switch for some devices (f.e. for my NAS). To get things started here is a diagram of the deployed networking infrastructure:
+						</p>
+						<div class="image">
+							<img alt="An image showing a diagram of my network infrastructure." loading="lazy" src="/img/building-a-homelab/network.png" width="463.5"/>
+						</div>
+						<h2>
+							VLANs
+						</h2>
+						<p>
+							To segregate my network I make use of VLANs. This is important to me first and foremost to improve the security of my network. F.e. IoT devices do not get access to any other devices in my home. If not necessary they won't get internet access either!
+						</p>
+						<p>
+							I also deploy a VLAN especially for the devices of my kids. This way I can add specific content filters for their devices which I do not want to deploy on a device to device basis or on the main network. I am able to securely host servers in a DMZ or provide guests with a guest network. At the moment my current setup looks like this:
+						</p>
+						<ul>
+							<li>
+								<p>
+									VLAN1: Default
+								</p>
+							</li>
+							<li>
+								<p>
+									VLAN10: Trusted
+								</p>
+							</li>
+							<li>
+								<p>
+									VLAN20: IOT
+								</p>
+							</li>
+							<li>
+								<p>
+									VLAN30: Kids
+								</p>
+							</li>
+							<li>
+								<p>
+									VLAN90: Guest
+								</p>
+							</li>
+							<li>
+								<p>
+									VLAN254: Management
+								</p>
+							</li>
+						</ul>
+						<p>
+							I also disabled the auto-scale network option in the VLAN settings. With that I can set static IPs in the range 192.168.VLANID.1 - 192.168.VLANID.100. Everything above 100 is an IP address provided via DHCP. Whenever I see an IP address in my network I can quickly glance at it and directly extract the information whether it is a static or dynamic IP address and which VLAN it is in.
+						</p>
+						<p>
+							To secure the VLANs I deploy the new zone-based firewall from Unifi in my network. By default Unifi routes between VLANs. I opted for blocking access between VLANs by default and only allowing the absolute minimum needed. For example my trusted devices can access IoT devices to control the lighting but the lights itself do not have access to any other devices deployed in my infrastructure.
+						</p>
+						<h2>
+							🌐 VPN
+						</h2>
+						<p>
+							In a previous part I told you that I run my services in my LAN only. However sometimes you are on the go and still want access to your passwords/media library/etc... .
+							
+							The problem with most internet service providers in Germany nowadays is that you won't get a static IPv4 address any longer. This isn't technically an issue but it leads to a bit more work for us to successfully connect through a VPN connection into our local network. It boils down to two options:
+						</p>
+						<ol>
+							<li>
+								<p>
+									Use a DynDNS service to automatically send your dynamic IPv4 address to this service which then can resolve your current public IPv4 address for a given hostname
+								</p>
+							</li>
+							<li>
+								<p>
+									If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 addres however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
+								</p>
+							</li>
+						</ol>
+						<p>
+							At the moment I could use option 1, however I already know that the ISP bringing fiber optics to our home will only provide CGNat. To be future proof I opted for option 2 and rented a cheap VPS for 0,50€ / month.
+						</p>
+						<p>
+							Here are the steps I took to create this tunnel:
+						</p>
+						<ol>
+							<li>
+								<p>
+									Install wireguard on VPS
+								</p>
+							</li>
+							<li>
+								<p>
+									Open the wireguard tunnel port in the firewall
+								</p>
+							</li>
+							<li>
+								<p>
+									Create a port forwarding in <code>/etc/sysctl.conf</code> to forward all IPv4 traffic
+								</p>
+							</li>
+							<li>
+								<p>
+									Create secure wireguard key pairs
+								</p>
+							</li>
+							<li>
+								<p>
+									Create a wireguard config to connect this wireguard server to a wireguard client in your home network. It is recommended to list every possible peer seperate to be able to better control who has access to this VPN connection
+								</p>
+							</li>
+							<li>
+								<p>
+									Start the wireguard server
+								</p>
+							</li>
+						</ol>
+						<p>
+							I then created a wireguard client on my Unifi Router and connected it to the deployed wireguard server. I also added a static route and the needed firewall rules on my router to be able to access the needed devices in my infrastructure from the private VPN network.
+						</p>
+						<p>
+							The last step is to add a wireguard client to your private devices and add a config to it. If everything is setup correctly your device (f.e. Smartphone) will connect to the public IPv4 address of your VPS. Every request is then forwarded through the existing VPN tunnel connection to your router where the VPN client is active.
+						</p>
+						<h2>
+							📞 Addendum: Telephony
+						</h2>
+						<p>
+							When I migrated from my former setup to the new Unifi devices one problem was left to be solved: telephony. The old router could be used as a telephone base station speaking the DECT protocol. Fortunately my old router has the option to function as an IP-Client and to use an existing internet connection. I set it up like that and disabled any WLAN networks. If you have the same situation in your network currently I strongly suggest to look for an option like that as this setup seems to work perfectly fine.
+						</p>
+						<h2>
+							➡️ Up Next
+						</h2>
+						<p>
+							In the last part I want to draw a conclusion and talk about all the topics I did not mention yet:
+						</p>
+						<ul>
+							<li>
+								<p>
+									Task scheduling with cron
+								</p>
+							</li>
+							<li>
+								<p>
+									Rotating log files with logrotate
+								</p>
+							</li>
+							<li>
+								<p>
+									Proxmox Hypervisor
+								</p>
+							</li>
+							<li>
+								<p>
+									Backups
+								</p>
+							</li>
+							<li>
+								<p>
+									Hardening SSH access
+								</p>
+							</li>
+							<li>
+								<p>
+									Filesystems
+								</p>
+							</li>
+						</ul>
+						<small>Posted
+							<time><time datetime="2025-06-04">2025-06-04</time></time>
+							in
+							<a href="/homelab">homelab</a></small>
+					</article>
+				</section>
+			</main>
+			<footer>
+				follow me on 
+				<a href="https://chaos.social/@dvk">mastodon</a>
+			</footer>
+		</div>
+	</body>
+</html>
