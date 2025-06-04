@@ -6,9 +6,310 @@
 	</author>
 	<title type="text">davidvonk.dev</title>
 	<id>https://davidvonk.dev</id>
-	<updated>2025-06-04T14:15:00Z</updated>
+	<updated>2025-06-04T18:15:00Z</updated>
 	<link href="https://davidvonk.dev/atom.xml" rel="self">
 	</link>
+	<entry>
+		<title type="text">Building a homelab (5/5): Everything else</title>
+		<id>https://davidvonk.dev/homelab/building-a-homelab-5-5-everything-else</id>
+		<link href="https://davidvonk.dev/homelab/building-a-homelab-5-5-everything-else" rel="alternate">
+		</link>
+		<updated>2025-06-04T18:15:00Z</updated>
+		<summary type="text">
+			A blog post series about my journey building a homelab
+		</summary>
+		<content type="html">
+			&lt;h1&gt;
+	Building a Homelab (5/5): Everything else
+&lt;/h1&gt;
+&lt;blockquote&gt;
+	&lt;p&gt;
+		Why did the homelabber bring a book to the server room? Because with so much to learn, they needed a backup plan for their brain!
+	&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;
+	In the last 4 blog posts we learned a lot about building a homelab and what even is possible. However there are still a lot of topics to dive into. In this last post I want to have a quick look at a few of them.
+&lt;/p&gt;
+&lt;h2&gt;
+	Task scheduling with cron
+&lt;/h2&gt;
+&lt;p&gt;
+	On my homeserver I not only run a handful of services I also need to schedule tasks throughout the day. These involve the renovate bot discussed in part 2 but also backup tasks etc. When implementing this I took a deep dive into cron which I want to share with you here.
+&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;cron&lt;/code&gt; is a time-based job scheduler in Unix-like systems, including Ubuntu. It allows users and administrators to schedule scripts or commands to run at specific times or intervals automatically. It is widely used for repetitive tasks like backups, system maintenance, or monitoring.
+&lt;/p&gt;
+&lt;p&gt;
+	Ubuntu uses &lt;code&gt;cron&lt;/code&gt; via the &lt;code&gt;cron&lt;/code&gt; package, which installs the daemon and required configuration directories.
+&lt;/p&gt;
+&lt;h3&gt;
+	Adding a New Cron Job (Using &lt;code&gt;/etc/cron.d/&lt;/code&gt;)
+&lt;/h3&gt;
+&lt;p&gt;
+	To add a system-level cron job, create a file in &lt;code&gt;/etc/cron.d/&lt;/code&gt;:
+&lt;/p&gt;
+&lt;h4&gt;
+	Example: &lt;code&gt;/etc/cron.d/myjob&lt;/code&gt;&lt;/h4&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-cron&quot;&gt;# Run a script every day at 2:30 AM
+30 2 * * * root /usr/local/bin/myscript.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			The file must be owned by &lt;code&gt;root&lt;/code&gt; and should have permissions &lt;code&gt;644&lt;/code&gt;.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Always specify the &lt;strong&gt;user&lt;/strong&gt; to run the command (e.g., &lt;code&gt;root&lt;/code&gt;, &lt;code&gt;ubuntu&lt;/code&gt;, etc.).
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;
+	Set permissions with:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo chmod 644 /etc/cron.d/myjob
+sudo chown root:root /etc/cron.d/myjob
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	Cron Timing Syntax
+&lt;/h3&gt;
+&lt;p&gt;
+	| Field       | Allowed Values        | Description                  |
+	
+	|-------------|------------------------|------------------------------|
+	
+	| Minute      | 0–59                   | Minute of the hour           |
+	
+	| Hour        | 0–23                   | Hour of the day              |
+	
+	| Day of Month| 1–31                   | Day of the month             |
+	
+	| Month       | 1–12 or Jan–Dec        | Month of the year            |
+	
+	| Day of Week | 0–7 or Sun–Sat         | Day of the week (0 or 7 is Sunday) |
+&lt;/p&gt;
+&lt;h4&gt;
+	Special Symbols
+&lt;/h4&gt;
+&lt;p&gt;
+	| Symbol | Meaning                   |
+	
+	|--------|----------------------------|
+	
+	| &lt;code&gt;*&lt;/code&gt;    | Every possible value       |
+	
+	| &lt;code&gt;,&lt;/code&gt;    | Value list separator       |
+	
+	| &lt;code&gt;-&lt;/code&gt;    | Range of values            |
+	
+	| &lt;code&gt;/&lt;/code&gt;    | Step values (e.g., &lt;code&gt;*/5&lt;/code&gt;)  |
+&lt;/p&gt;
+&lt;h3&gt;
+	Checking if a Cron Job Runs
+&lt;/h3&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Check Logs&lt;/strong&gt;&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;grep CRON /var/log/syslog
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	Or for recent entries:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;journalctl -u cron.service
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;ol&gt;
+	&lt;li&gt;
+		&lt;p&gt;&lt;strong&gt;Add Logging in Your Script&lt;/strong&gt;&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;
+	Add output redirection in your cron job:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-cron&quot;&gt;30 2 * * * root /usr/local/bin/myscript.sh &amp;gt;&amp;gt; /var/log/myscript.log 2&amp;gt;&amp;amp;1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	Restarting Cron to Enable New Jobs
+&lt;/h3&gt;
+&lt;p&gt;
+	After adding or modifying files in &lt;code&gt;/etc/cron.d/&lt;/code&gt;, restart the cron service:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo systemctl restart cron
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	To check cron status:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;systemctl status cron
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	Ensure that the new job file is valid and has the proper permissions. Invalid files or missing users will cause the job to be ignored.
+&lt;/p&gt;
+&lt;h2&gt;
+	Rotating log files with logrotate
+&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;logrotate&lt;/code&gt; is a utility used on Ubuntu (and other Linux distributions) to manage the automatic rotation, compression, removal, and mailing of log files. It helps prevent logs from consuming too much disk space and keeps log directories organized.
+&lt;/p&gt;
+&lt;p&gt;
+	On Ubuntu, &lt;code&gt;logrotate&lt;/code&gt; is typically run daily via a cron job managed by &lt;code&gt;systemd&lt;/code&gt; timer units.
+&lt;/p&gt;
+&lt;p&gt;
+	Ubuntu uses &lt;code&gt;systemd&lt;/code&gt; to manage scheduled tasks. You can check the timer for logrotate using:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;systemctl status logrotate.timer
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h3&gt;
+	Defining a Custom Rule
+&lt;/h3&gt;
+&lt;p&gt;
+	To rotate logs for a custom application, create a file in &lt;code&gt;/etc/logrotate.d/&lt;/code&gt;:
+&lt;/p&gt;
+&lt;h4&gt;
+	Example: &lt;code&gt;/etc/logrotate.d/myapp&lt;/code&gt;&lt;/h4&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-conf&quot;&gt;/var/log/myapp/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 myuser mygroup
+    sharedscripts
+    postrotate
+        systemctl reload myapp.service &amp;gt; /dev/null 2&amp;gt;/dev/null || true
+    endscript
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;h4&gt;
+	Explanation of Options
+&lt;/h4&gt;
+&lt;p&gt;
+	| Option           | Description                                                                 |
+	
+	|------------------|-----------------------------------------------------------------------------|
+	
+	| &lt;code&gt;daily&lt;/code&gt;          | Rotate logs every day                                                       |
+	
+	| &lt;code&gt;missingok&lt;/code&gt;      | Do not show error if log file is missing                                    |
+	
+	| &lt;code&gt;rotate 14&lt;/code&gt;      | Keep 14 old log files before deleting                                       |
+	
+	| &lt;code&gt;compress&lt;/code&gt;       | Compress rotated logs (using gzip by default)                              |
+	
+	| &lt;code&gt;delaycompress&lt;/code&gt;  | Delay compression until the next rotation (useful with apps that keep logs open) |
+	
+	| &lt;code&gt;notifempty&lt;/code&gt;     | Do not rotate empty log files                                               |
+	
+	| &lt;code&gt;create&lt;/code&gt;         | Create a new log file with specified permissions and ownership              |
+	
+	| &lt;code&gt;sharedscripts&lt;/code&gt;  | Run &lt;code&gt;postrotate&lt;/code&gt; script once, even if multiple logs are matched             |
+	
+	| &lt;code&gt;postrotate&lt;/code&gt;     | Script to run after rotation (e.g., to reload services)                     |
+&lt;/p&gt;
+&lt;h3&gt;
+	Testing a Logrotate Rule
+&lt;/h3&gt;
+&lt;p&gt;
+	To simulate and debug log rotation without making changes:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo logrotate -d /etc/logrotate.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	To force log rotation:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo logrotate -f /etc/logrotate.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	To test a specific configuration file:
+&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;
+	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo logrotate -d /etc/logrotate.d/myapp
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;
+	Check &lt;code&gt;/var/lib/logrotate/status&lt;/code&gt; to see the last time files were rotated.
+&lt;/p&gt;
+&lt;h2&gt;
+	Proxmox Hypervisor
+&lt;/h2&gt;
+&lt;p&gt;
+	As a blogger showcasing my private homelab, I can confidently say that Proxmox Hypervisor is a game-changer for anyone looking to dive into virtualization. Being open-source, it not only provides a cost-effective solution but also comes with a thriving community that’s always ready to help and share knowledge. The combination of KVM and LXC allows me to run both virtual machines and containers seamlessly, while its user-friendly web interface makes management a breeze. With features like live migration and built-in backup solutions, I can experiment with different setups without worrying about downtime. Proxmox has truly empowered my homelab journey, making it a solid choice for maximizing my hardware and exploring new possibilities!
+&lt;/p&gt;
+&lt;h2&gt;
+	Backups
+&lt;/h2&gt;
+&lt;p&gt;
+	I’ve implemented a robust 3-2-1 backup strategy using two Synology NAS storage solutions alongside a Proxmox Backup Server for all my VMs running in the Proxmox Hypervisor. This approach ensures that I have three copies of my data, stored on two different types of media, with one copy kept offsite for added security.
+&lt;/p&gt;
+&lt;p&gt;
+	The Proxmox Backup Server allows for incredibly fast snapshot backups, enabling me to capture the state of my VMs almost instantly without significant downtime.
+&lt;/p&gt;
+&lt;p&gt;
+	To ensure the integrity of my backups, I regularly verify checksums, which helps confirm that my data is stable and recoverable.
+&lt;/p&gt;
+&lt;p&gt;
+	In the event of a failure, restoring from these backups is straightforward and efficient, giving me peace of mind that my homelab is well-protected against data loss. This comprehensive backup strategy not only safeguards my projects but also allows me to experiment and innovate without fear!
+&lt;/p&gt;
+&lt;h2&gt;
+	Hardening SSH access
+&lt;/h2&gt;
+&lt;p&gt;
+	Hardening SSH access to my private machines is essential for enhancing security, and there are a few straightforward steps I take to achieve this.
+&lt;/p&gt;
+&lt;p&gt;
+	First, I change the default SSH port from 22 to something less predictable by creating a separate configuration file in the &lt;code&gt;/etc/ssh/sshd_config.d/&lt;/code&gt; directory, which allows me to add my custom settings without cluttering the main &lt;code&gt;sshd_config&lt;/code&gt; file. This modular approach not only keeps my configurations organized but also makes it easier to manage and troubleshoot changes in the future.
+&lt;/p&gt;
+&lt;p&gt;
+	Next, I create a convenient SSH config file at &lt;code&gt;~/.ssh/config&lt;/code&gt; to streamline my connections, adding entries like &lt;code&gt;Host myserver&lt;/code&gt; followed by &lt;code&gt;HostName myserver.example.com&lt;/code&gt; and &lt;code&gt;Port 2222&lt;/code&gt; (or whatever port I chose).
+&lt;/p&gt;
+&lt;p&gt;
+	Most importantly, I configure SSH to use only public key authentication by setting &lt;code&gt;PasswordAuthentication no&lt;/code&gt; in my custom config file. This approach significantly reduces the risk of brute-force attacks, as it requires a private key for access, making it a best practice for securing my homelab environment.
+&lt;/p&gt;
+&lt;h2&gt;
+	Filesystems
+&lt;/h2&gt;
+&lt;h3&gt;
+	Btrfs on Synology NAS
+&lt;/h3&gt;
+&lt;p&gt;
+	In my homelab, I run Btrfs on two Synology NAS machines, taking advantage of its advanced features like snapshotting, built-in RAID, and efficient data compression. Btrfs allows me to create point-in-time snapshots of my data, making it easy to roll back to previous states in case of accidental deletions or corruption. Additionally, its self-healing capabilities ensure data integrity by automatically detecting and repairing errors, providing me with peace of mind.
+&lt;/p&gt;
+&lt;h3&gt;
+	ZFS on Proxmox Host
+&lt;/h3&gt;
+&lt;p&gt;
+	On my Proxmox host, I utilize ZFS on NVMe SSDs, which offers exceptional performance and reliability. ZFS is renowned for its robust data protection features, including checksumming for data integrity and the ability to create snapshots and clones efficiently. The combination of ZFS&apos;s advanced RAID options allows me to choose an appropriate RAID type that balances redundancy and performance, ensuring that my virtual machines are both fast and secure.
+&lt;/p&gt;
+&lt;h3&gt;
+	Redundancy and Reliability
+&lt;/h3&gt;
+&lt;p&gt;
+	By leveraging both Btrfs and ZFS, I have created a resilient storage architecture in my homelab. The RAID configurations on both systems provide redundancy, safeguarding my data against hardware failures while allowing me to enjoy the unique strengths of each filesystem. This thoughtful approach to storage not only enhances performance but also ensures that my data remains safe and accessible, no matter the circumstances.
+&lt;/p&gt;
+		</content>
+	</entry>
 	<entry>
 		<title type="text">Building a homelab (1/5): The big picture</title>
 		<id>https://davidvonk.dev/homelab/building-a-homelab-1-5-the-big-picture</id>
@@ -1151,307 +1452,6 @@ executions = [
 &lt;/h2&gt;
 &lt;p&gt;
 	Once you feel the excitement and joy of deploying actually useful apps to your homelab there is no step back. Watching a movie on Jellyfin, reading my RSS feeds through Miniflux, storing passwords in my own, private vaultwarden instance just feels very rewarding. On top I can access these services via my own custom domain SSL encrypted, although I do not expose them to the internet. In the next part we have a closer look at my network setup and how I stepped up my game here.
-&lt;/p&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">Building a homelab (5/5): Everything else</title>
-		<id>https://davidvonk.dev/homelab/building-a-homelab-5-5-everything-else</id>
-		<link href="https://davidvonk.dev/homelab/building-a-homelab-5-5-everything-else" rel="alternate">
-		</link>
-		<updated>2025-06-04T14:15:00Z</updated>
-		<summary type="text">
-			A blog post series about my journey building a homelab
-		</summary>
-		<content type="html">
-			&lt;h1&gt;
-	Building a Homelab (5/5): Everything else
-&lt;/h1&gt;
-&lt;blockquote&gt;
-	&lt;p&gt;
-		Why did the homelabber bring a book to the server room? Because with so much to learn, they needed a backup plan for their brain!
-	&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;
-	In the last 4 blog posts we learned a lot about building a homelab and what even is possible. However there are still a lot of topics to dive into. In this last post I want to have a quick look at a few of them.
-&lt;/p&gt;
-&lt;h2&gt;
-	Task scheduling with cron
-&lt;/h2&gt;
-&lt;p&gt;
-	On my homeserver I not only run a handful of services I also need to schedule tasks throughout the day. These involve the renovate bot discussed in part 2 but also backup tasks etc. When implementing this I took a deep dive into cron which I want to share with you here.
-&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;cron&lt;/code&gt; is a time-based job scheduler in Unix-like systems, including Ubuntu. It allows users and administrators to schedule scripts or commands to run at specific times or intervals automatically. It is widely used for repetitive tasks like backups, system maintenance, or monitoring.
-&lt;/p&gt;
-&lt;p&gt;
-	Ubuntu uses &lt;code&gt;cron&lt;/code&gt; via the &lt;code&gt;cron&lt;/code&gt; package, which installs the daemon and required configuration directories.
-&lt;/p&gt;
-&lt;h3&gt;
-	Adding a New Cron Job (Using &lt;code&gt;/etc/cron.d/&lt;/code&gt;)
-&lt;/h3&gt;
-&lt;p&gt;
-	To add a system-level cron job, create a file in &lt;code&gt;/etc/cron.d/&lt;/code&gt;:
-&lt;/p&gt;
-&lt;h4&gt;
-	Example: &lt;code&gt;/etc/cron.d/myjob&lt;/code&gt;&lt;/h4&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-cron&quot;&gt;# Run a script every day at 2:30 AM
-30 2 * * * root /usr/local/bin/myscript.sh
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;ul&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			The file must be owned by &lt;code&gt;root&lt;/code&gt; and should have permissions &lt;code&gt;644&lt;/code&gt;.
-		&lt;/p&gt;
-	&lt;/li&gt;
-	&lt;li&gt;
-		&lt;p&gt;
-			Always specify the &lt;strong&gt;user&lt;/strong&gt; to run the command (e.g., &lt;code&gt;root&lt;/code&gt;, &lt;code&gt;ubuntu&lt;/code&gt;, etc.).
-		&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;
-	Set permissions with:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo chmod 644 /etc/cron.d/myjob
-sudo chown root:root /etc/cron.d/myjob
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;h3&gt;
-	Cron Timing Syntax
-&lt;/h3&gt;
-&lt;p&gt;
-	| Field       | Allowed Values        | Description                  |
-	
-	|-------------|------------------------|------------------------------|
-	
-	| Minute      | 0–59                   | Minute of the hour           |
-	
-	| Hour        | 0–23                   | Hour of the day              |
-	
-	| Day of Month| 1–31                   | Day of the month             |
-	
-	| Month       | 1–12 or Jan–Dec        | Month of the year            |
-	
-	| Day of Week | 0–7 or Sun–Sat         | Day of the week (0 or 7 is Sunday) |
-&lt;/p&gt;
-&lt;h4&gt;
-	Special Symbols
-&lt;/h4&gt;
-&lt;p&gt;
-	| Symbol | Meaning                   |
-	
-	|--------|----------------------------|
-	
-	| &lt;code&gt;*&lt;/code&gt;    | Every possible value       |
-	
-	| &lt;code&gt;,&lt;/code&gt;    | Value list separator       |
-	
-	| &lt;code&gt;-&lt;/code&gt;    | Range of values            |
-	
-	| &lt;code&gt;/&lt;/code&gt;    | Step values (e.g., &lt;code&gt;*/5&lt;/code&gt;)  |
-&lt;/p&gt;
-&lt;h3&gt;
-	Checking if a Cron Job Runs
-&lt;/h3&gt;
-&lt;ol&gt;
-	&lt;li&gt;
-		&lt;p&gt;&lt;strong&gt;Check Logs&lt;/strong&gt;&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ol&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;grep CRON /var/log/syslog
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Or for recent entries:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;journalctl -u cron.service
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;ol&gt;
-	&lt;li&gt;
-		&lt;p&gt;&lt;strong&gt;Add Logging in Your Script&lt;/strong&gt;&lt;/p&gt;
-	&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;
-	Add output redirection in your cron job:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-cron&quot;&gt;30 2 * * * root /usr/local/bin/myscript.sh &amp;gt;&amp;gt; /var/log/myscript.log 2&amp;gt;&amp;amp;1
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;h3&gt;
-	Restarting Cron to Enable New Jobs
-&lt;/h3&gt;
-&lt;p&gt;
-	After adding or modifying files in &lt;code&gt;/etc/cron.d/&lt;/code&gt;, restart the cron service:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo systemctl restart cron
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	To check cron status:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;systemctl status cron
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Ensure that the new job file is valid and has the proper permissions. Invalid files or missing users will cause the job to be ignored.
-&lt;/p&gt;
-&lt;h2&gt;
-	Rotating log files with logrotate
-&lt;/h2&gt;
-&lt;p&gt;&lt;code&gt;logrotate&lt;/code&gt; is a utility used on Ubuntu (and other Linux distributions) to manage the automatic rotation, compression, removal, and mailing of log files. It helps prevent logs from consuming too much disk space and keeps log directories organized.
-&lt;/p&gt;
-&lt;p&gt;
-	On Ubuntu, &lt;code&gt;logrotate&lt;/code&gt; is typically run daily via a cron job managed by &lt;code&gt;systemd&lt;/code&gt; timer units.
-&lt;/p&gt;
-&lt;p&gt;
-	Ubuntu uses &lt;code&gt;systemd&lt;/code&gt; to manage scheduled tasks. You can check the timer for logrotate using:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;systemctl status logrotate.timer
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;h3&gt;
-	Defining a Custom Rule
-&lt;/h3&gt;
-&lt;p&gt;
-	To rotate logs for a custom application, create a file in &lt;code&gt;/etc/logrotate.d/&lt;/code&gt;:
-&lt;/p&gt;
-&lt;h4&gt;
-	Example: &lt;code&gt;/etc/logrotate.d/myapp&lt;/code&gt;&lt;/h4&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-conf&quot;&gt;/var/log/myapp/*.log {
-    daily
-    missingok
-    rotate 14
-    compress
-    delaycompress
-    notifempty
-    create 0640 myuser mygroup
-    sharedscripts
-    postrotate
-        systemctl reload myapp.service &amp;gt; /dev/null 2&amp;gt;/dev/null || true
-    endscript
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;h4&gt;
-	Explanation of Options
-&lt;/h4&gt;
-&lt;p&gt;
-	| Option           | Description                                                                 |
-	
-	|------------------|-----------------------------------------------------------------------------|
-	
-	| &lt;code&gt;daily&lt;/code&gt;          | Rotate logs every day                                                       |
-	
-	| &lt;code&gt;missingok&lt;/code&gt;      | Do not show error if log file is missing                                    |
-	
-	| &lt;code&gt;rotate 14&lt;/code&gt;      | Keep 14 old log files before deleting                                       |
-	
-	| &lt;code&gt;compress&lt;/code&gt;       | Compress rotated logs (using gzip by default)                              |
-	
-	| &lt;code&gt;delaycompress&lt;/code&gt;  | Delay compression until the next rotation (useful with apps that keep logs open) |
-	
-	| &lt;code&gt;notifempty&lt;/code&gt;     | Do not rotate empty log files                                               |
-	
-	| &lt;code&gt;create&lt;/code&gt;         | Create a new log file with specified permissions and ownership              |
-	
-	| &lt;code&gt;sharedscripts&lt;/code&gt;  | Run &lt;code&gt;postrotate&lt;/code&gt; script once, even if multiple logs are matched             |
-	
-	| &lt;code&gt;postrotate&lt;/code&gt;     | Script to run after rotation (e.g., to reload services)                     |
-&lt;/p&gt;
-&lt;h3&gt;
-	Testing a Logrotate Rule
-&lt;/h3&gt;
-&lt;p&gt;
-	To simulate and debug log rotation without making changes:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo logrotate -d /etc/logrotate.conf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	To force log rotation:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo logrotate -f /etc/logrotate.conf
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	To test a specific configuration file:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;sudo logrotate -d /etc/logrotate.d/myapp
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	Check &lt;code&gt;/var/lib/logrotate/status&lt;/code&gt; to see the last time files were rotated.
-&lt;/p&gt;
-&lt;h2&gt;
-	Proxmox Hypervisor
-&lt;/h2&gt;
-&lt;p&gt;
-	As a blogger showcasing my private homelab, I can confidently say that Proxmox Hypervisor is a game-changer for anyone looking to dive into virtualization. Being open-source, it not only provides a cost-effective solution but also comes with a thriving community that’s always ready to help and share knowledge. The combination of KVM and LXC allows me to run both virtual machines and containers seamlessly, while its user-friendly web interface makes management a breeze. With features like live migration and built-in backup solutions, I can experiment with different setups without worrying about downtime. Proxmox has truly empowered my homelab journey, making it a solid choice for maximizing my hardware and exploring new possibilities!
-&lt;/p&gt;
-&lt;h2&gt;
-	Backups
-&lt;/h2&gt;
-&lt;p&gt;
-	I’ve implemented a robust 3-2-1 backup strategy using two Synology NAS storage solutions alongside a Proxmox Backup Server for all my VMs running in the Proxmox Hypervisor. This approach ensures that I have three copies of my data, stored on two different types of media, with one copy kept offsite for added security.
-&lt;/p&gt;
-&lt;p&gt;
-	The Proxmox Backup Server allows for incredibly fast snapshot backups, enabling me to capture the state of my VMs almost instantly without significant downtime.
-&lt;/p&gt;
-&lt;p&gt;
-	To ensure the integrity of my backups, I regularly verify checksums, which helps confirm that my data is stable and recoverable.
-&lt;/p&gt;
-&lt;p&gt;
-	In the event of a failure, restoring from these backups is straightforward and efficient, giving me peace of mind that my homelab is well-protected against data loss. This comprehensive backup strategy not only safeguards my projects but also allows me to experiment and innovate without fear!
-&lt;/p&gt;
-&lt;h2&gt;
-	Hardening SSH access
-&lt;/h2&gt;
-&lt;p&gt;
-	Hardening SSH access to my private machines is essential for enhancing security, and there are a few straightforward steps I take to achieve this.
-&lt;/p&gt;
-&lt;p&gt;
-	First, I change the default SSH port from 22 to something less predictable by creating a separate configuration file in the &lt;code&gt;/etc/ssh/sshd_config.d/&lt;/code&gt; directory, which allows me to add my custom settings without cluttering the main &lt;code&gt;sshd_config&lt;/code&gt; file. This modular approach not only keeps my configurations organized but also makes it easier to manage and troubleshoot changes in the future.
-&lt;/p&gt;
-&lt;p&gt;
-	Next, I create a convenient SSH config file at &lt;code&gt;~/.ssh/config&lt;/code&gt; to streamline my connections, adding entries like &lt;code&gt;Host myserver&lt;/code&gt; followed by &lt;code&gt;HostName myserver.example.com&lt;/code&gt; and &lt;code&gt;Port 2222&lt;/code&gt; (or whatever port I chose).
-&lt;/p&gt;
-&lt;p&gt;
-	Most importantly, I configure SSH to use only public key authentication by setting &lt;code&gt;PasswordAuthentication no&lt;/code&gt; in my custom config file. This approach significantly reduces the risk of brute-force attacks, as it requires a private key for access, making it a best practice for securing my homelab environment.
-&lt;/p&gt;
-&lt;h2&gt;
-	Filesystems
-&lt;/h2&gt;
-&lt;h3&gt;
-	Btrfs on Synology NAS
-&lt;/h3&gt;
-&lt;p&gt;
-	In my homelab, I run Btrfs on two Synology NAS machines, taking advantage of its advanced features like snapshotting, built-in RAID, and efficient data compression. Btrfs allows me to create point-in-time snapshots of my data, making it easy to roll back to previous states in case of accidental deletions or corruption. Additionally, its self-healing capabilities ensure data integrity by automatically detecting and repairing errors, providing me with peace of mind.
-&lt;/p&gt;
-&lt;h3&gt;
-	ZFS on Proxmox Host
-&lt;/h3&gt;
-&lt;p&gt;
-	On my Proxmox host, I utilize ZFS on NVMe SSDs, which offers exceptional performance and reliability. ZFS is renowned for its robust data protection features, including checksumming for data integrity and the ability to create snapshots and clones efficiently. The combination of ZFS&apos;s advanced RAID options allows me to choose an appropriate RAID type that balances redundancy and performance, ensuring that my virtual machines are both fast and secure.
-&lt;/p&gt;
-&lt;h3&gt;
-	Redundancy and Reliability
-&lt;/h3&gt;
-&lt;p&gt;
-	By leveraging both Btrfs and ZFS, I have created a resilient storage architecture in my homelab. The RAID configurations on both systems provide redundancy, safeguarding my data against hardware failures while allowing me to enjoy the unique strengths of each filesystem. This thoughtful approach to storage not only enhances performance but also ensures that my data remains safe and accessible, no matter the circumstances.
 &lt;/p&gt;
 		</content>
 	</entry>
