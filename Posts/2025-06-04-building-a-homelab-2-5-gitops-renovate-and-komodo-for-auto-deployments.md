@@ -8,8 +8,6 @@ category: homelab
 slug: building-a-homelab-2-5-gitops-renovate-and-komodo-for-auto-deployments
 ---
 
-# Building a Homelab (2/5): Renovate and Komodo for Auto Deployments (GitOps)  
-
 > If it is not in git it doesn't exist.
 
 Keeping containers updated in a homelab can quickly become a chore — especially when you’re managing multiple services, distributed across devices, and sensitive to downtime. That’s why I adopted a GitOps workflow using [Renovate](https://github.com/renovatebot/renovate) for updates and [Komodo](https://komo.do) to orchestrate my Docker Compose deployments.
