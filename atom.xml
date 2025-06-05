@@ -544,7 +544,7 @@ sudo chown root:root /etc/cron.d/myjob
 	&lt;/li&gt;
 	&lt;li&gt;
 		&lt;p&gt;
-			If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 addres however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
+			If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 address however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
 		&lt;/p&gt;
 	&lt;/li&gt;
 &lt;/ol&gt;
