@@ -8,8 +8,6 @@ category: homelab
 slug: building-a-homelab-1-5-the-big-picture
 ---
 
-# Building a Homelab (1/5): The Big Picture 
-
 > Home is where your lab is.
 
 I’ve always been fascinated by infrastructure — how services run behind the scenes, how networks talk to each other, and how automation can bring order to chaos. That’s what led me to build and maintain a fully self-hosted homelab, not just for tinkering, but for actual day-to-day use.
@@ -29,18 +27,56 @@ Over time, it’s grown into a robust, self-sufficient ecosystem that closely mi
 
 ## 💻 Hardware Overview
 
-| Device                        | Role                        |
-| ----------------------------- | --------------------------- |
-| Draytek Vigor 167             | DSL Modem                   |
-| UniFi Express 7               | Router                      |
-| UniFi Pro Max 16 Switch       | Switch                      |
-| U7 Pro Wall, U7 Lite (2x)     | Access Points               |
-| FritzBox 7490                 | DECT Telephone Base Station |
-| RPI 3 Model B                 | DNS 01                      |
-| RPI 3 Model B+                | DNS 02 Failover             |
-| GMKTEC Nucbox M5 Plus Mini PC | Proxmox Host                |
-| Main NAS                      | Synology DS923+             |
-| Backup NAS                    | Synology DS918              |
+<table>
+  <thead>
+    <tr>
+      <th>Device</th>
+      <th>Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Draytek Vigor 167</td>
+      <td>DSL Modem</td>
+    </tr>
+    <tr>
+      <td>UniFi Express 7</td>
+      <td>Router</td>
+    </tr>
+    <tr>
+      <td>UniFi Pro Max 16 Switch</td>
+      <td>Switch</td>
+    </tr>
+    <tr>
+      <td>U7 Pro Wall, U7 Lite (2x)</td>
+      <td>Access Points</td>
+    </tr>
+    <tr>
+      <td>FritzBox 7490</td>
+      <td>DECT Telephone Base Station</td>
+    </tr>
+    <tr>
+      <td>RPI 3 Model B</td>
+      <td>DNS 01</td>
+    </tr>
+    <tr>
+      <td>RPI 3 Model B+</td>
+      <td>DNS 02 Failover</td>
+    </tr>
+    <tr>
+      <td>GMKTEC Nucbox M5 Plus Mini PC</td>
+      <td>Proxmox Host</td>
+    </tr>
+    <tr>
+      <td>Main NAS</td>
+      <td>Synology DS923+</td>
+    </tr>
+    <tr>
+      <td>Backup NAS</td>
+      <td>Synology DS918</td>
+    </tr>
+  </tbody>
+</table>
 
 ## 🛜 Networking Layout
 
@@ -58,48 +94,163 @@ Most of my services run in Docker and are deployed via Komodo:
 
 ### Proxmox VM srv-prod-01
 
-| Service          | Description                    |
-| ---------------- | ------------------------------ |
-| ArchiveBox       | Bookmark Archival              |
-| Audiobookshelf   | Audiobook Management           |
-| Calibre          | EBook Management               |
-| Dozzle           | Logs Monitoring                |
-| Homeassistant    | Homeautomation, HomeKit Bridge |
-| Homepage         | Home Dashboard                 |
-| Immich           | Photo Library                  |
-| Jellyfin         | Media Server                   |
-| Komodo           | Docker Management              |
-| Komodo Periphery | Docker Management Agent        |
-| Komodo ntfy      | Alerter Bridge                 |
-| Libation         | Audibook Downloader            |
-| Mealie           | Recipe Management              |
-| MeTube           | Video & Audio Downloader       |
-| Miniflux         | RSS                            |
-| ntfy             | Push Service                   |
-| Paperless        | Document Management            |
-| Penpot           | Design Tool                    |
-| SABnzbd          | Usenet Downloader              |
-| Traefik          | Reverse Proxy, SSL, etc.       |
-| Tubesync         | Video & Audio Downloader       |
-| Uptime Kuma      | Monitoring                     |
-| Vaultwarden      | Password Management            |
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ArchiveBox</td>
+      <td>Bookmark Archival</td>
+    </tr>
+    <tr>
+      <td>Audiobookshelf</td>
+      <td>Audiobook Management</td>
+    </tr>
+    <tr>
+      <td>Calibre</td>
+      <td>EBook Management</td>
+    </tr>
+    <tr>
+      <td>Dozzle</td>
+      <td>Logs Monitoring</td>
+    </tr>
+    <tr>
+      <td>Homeassistant</td>
+      <td>Homeautomation, HomeKit Bridge</td>
+    </tr>
+    <tr>
+      <td>Homepage</td>
+      <td>Home Dashboard</td>
+    </tr>
+    <tr>
+      <td>Immich</td>
+      <td>Photo Library</td>
+    </tr>
+    <tr>
+      <td>Jellyfin</td>
+      <td>Media Server</td>
+    </tr>
+    <tr>
+      <td>Komodo</td>
+      <td>Docker Management</td>
+    </tr>
+    <tr>
+      <td>Komodo Periphery</td>
+      <td>Docker Management Agent</td>
+    </tr>
+    <tr>
+      <td>Komodo ntfy</td>
+      <td>Alerter Bridge</td>
+    </tr>
+    <tr>
+      <td>Libation</td>
+      <td>Audibook Downloader</td>
+    </tr>
+    <tr>
+      <td>Mealie</td>
+      <td>Recipe Management</td>
+    </tr>
+    <tr>
+      <td>MeTube</td>
+      <td>Video &amp; Audio Downloader</td>
+    </tr>
+    <tr>
+      <td>Miniflux</td>
+      <td>RSS</td>
+    </tr>
+    <tr>
+      <td>ntfy</td>
+      <td>Push Service</td>
+    </tr>
+    <tr>
+      <td>Paperless</td>
+      <td>Document Management</td>
+    </tr>
+    <tr>
+      <td>Penpot</td>
+      <td>Design Tool</td>
+    </tr>
+    <tr>
+      <td>SABnzbd</td>
+      <td>Usenet Downloader</td>
+    </tr>
+    <tr>
+      <td>Traefik</td>
+      <td>Reverse Proxy, SSL, etc.</td>
+    </tr>
+    <tr>
+      <td>Tubesync</td>
+      <td>Video &amp; Audio Downloader</td>
+    </tr>
+    <tr>
+      <td>Uptime Kuma</td>
+      <td>Monitoring</td>
+    </tr>
+    <tr>
+      <td>Vaultwarden</td>
+      <td>Password Management</td>
+    </tr>
+  </tbody>
+</table>
 
 ### RPI DNS01
 
-| Service           | Description              |
-| ----------------- | ------------------------ |
-| Adguard Home      | DNS Server               |
-| Adguard Home Sync | Adguard Home Config Sync |
-| Dozzle Agent      | Logs Agent               |
-| Komodo Periphery  | Docker Management Agent  |
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Adguard Home</td>
+      <td>DNS Server</td>
+    </tr>
+    <tr>
+      <td>Adguard Home Sync</td>
+      <td>Adguard Home Config Sync</td>
+    </tr>
+    <tr>
+      <td>Dozzle Agent</td>
+      <td>Logs Agent</td>
+    </tr>
+    <tr>
+      <td>Komodo Periphery</td>
+      <td>Docker Management Agent</td>
+    </tr>
+  </tbody>
+</table>
 
 ### RPI DNS02
 
-| Service          | Description             |
-| ---------------- | ----------------------- |
-| Adguard Home     | DNS Server              |
-| Dozzle Agent     | Logs Agent              |
-| Komodo Periphery | Docker Management Agent |
+<table>
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Adguard Home</td>
+      <td>DNS Server</td>
+    </tr>
+    <tr>
+      <td>Dozzle Agent</td>
+      <td>Logs Agent</td>
+    </tr>
+    <tr>
+      <td>Komodo Periphery</td>
+      <td>Docker Management Agent</td>
+    </tr>
+  </tbody>
+</table>
+
 All service configurations are stored in Git, updated automatically by Renovate, and redeployed via Komodo when changes are merged. We will look at the automation bit in part 2 and the deployed services in part 3 of this blog post series.
 
 ## 🔐 Secure Remote Access

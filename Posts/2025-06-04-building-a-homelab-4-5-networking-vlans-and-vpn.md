@@ -1,14 +1,12 @@
 ---
 color: C07309
-date: 2025-06-04T14:15:00Z
+date: 2025-06-04T17:15:00Z
 description: A blog post series about my journey building a homelab
 project: true
 title: Building a homelab (4/5): Networking, VLANs and VPN 
 category: homelab
 slug: building-a-homelab-4-5-networking-vlans-and-vpn
 ---
-
-# Building a Homelab (4/5): Networking, VLANs and VPN 
 
 > Why did the data cross the road? To get to the VLAN on the other side!.
 
