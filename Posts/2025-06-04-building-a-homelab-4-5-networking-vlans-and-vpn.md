@@ -41,7 +41,7 @@ In a previous part I told you that I run my services in my LAN only. However som
 The problem with most internet service providers in Germany nowadays is that you won't get a static IPv4 address any longer. This isn't technically an issue but it leads to a bit more work for us to successfully connect through a VPN connection into our local network. It boils down to two options:
 
 1. Use a DynDNS service to automatically send your dynamic IPv4 address to this service which then can resolve your current public IPv4 address for a given hostname
-2. If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 addres however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
+2. If you do not get an IPv4 address at all (Carrier Grade NAT) the first solution might not work for you when trying to utilize your VPN connection over IPv6 only. You can use a VPS with a static IPv4 address however and tunnel all traffic to your home infrastructure through a site-to-site VPN tunnel.
 
 At the moment I could use option 1, however I already know that the ISP bringing fiber optics to our home will only provide CGNat. To be future proof I opted for option 2 and rented a cheap VPS for 0,50€ / month. 
 
