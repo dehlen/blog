@@ -6,9 +6,66 @@
 	</author>
 	<title type="text">davidvonk.dev</title>
 	<id>https://davidvonk.dev</id>
-	<updated>2025-06-04T18:15:00Z</updated>
+	<updated>2025-07-08T16:53:00Z</updated>
 	<link href="https://davidvonk.dev/atom.xml" rel="self">
 	</link>
+	<entry>
+		<title type="text">I build a TMDB iOS app client</title>
+		<id>https://davidvonk.dev/ios/tmdb-ios-client</id>
+		<link href="https://davidvonk.dev/ios/tmdb-ios-client" rel="alternate">
+		</link>
+		<updated>2025-07-08T16:53:00Z</updated>
+		<summary type="text">
+			Building an iOS TMDB app
+		</summary>
+		<content type="html">
+			&lt;p&gt;
+	Frustrated by the ads and clunky experience of IMDB, I decided to create a more user-friendly alternative: an iOS app that leverages the powerful API of themoviedb.org. This app allows users to search for and gather information on their favorite TV shows, movies, and actors, all while providing a seamless experience.
+	
+	This project not only serves as a replacement for IMDB but also provides me with an up-to-date platform to gain experience with the latest APIs, functioning as a showcase app for anyone interested in seeing my work.
+&lt;/p&gt;
+&lt;h2&gt;
+	Key Features
+&lt;/h2&gt;
+&lt;ul&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Search Functionality: Effortlessly find movies, TV shows, and actors with a simple search interface.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Watchlist: Keep track of what you want to watch by adding movies, TV shows, or even single episodes to your personalized watchlist.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			Beautiful Animations: Built with SwiftUI, the app features stunning animations that enhance the overall user experience.
+		&lt;/p&gt;
+	&lt;/li&gt;
+	&lt;li&gt;
+		&lt;p&gt;
+			iOS and iPadOS Compatibility: Enjoy a tailored experience whether you&apos;re on your iPhone or iPad.
+		&lt;/p&gt;
+	&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;
+	Why SwiftUI?
+&lt;/h2&gt;
+&lt;p&gt;
+	SwiftUI has allowed me to create a visually appealing and responsive app with less code and more functionality. The framework&apos;s declarative syntax makes it easy to implement beautiful animations and transitions, ensuring that users have an engaging experience.
+&lt;/p&gt;
+&lt;h2&gt;
+	Video or didn&apos;t happen
+&lt;/h2&gt;
+&lt;p&gt;
+	Without further ado here is a video that will showcase the app in action, highlighting its animations and user interface. I am happy to receive any feedback on my take.
+&lt;/p&gt;
+&lt;video controls width=&quot;400&quot;&gt;
+	&lt;source src=&quot;/img/tmdb-ios-app/tmdb-ios-app.mov&quot; type=&quot;video/mp4&quot;/&gt;
+&lt;/video&gt;
+		</content>
+	</entry>
 	<entry>
 		<title type="text">Building a homelab (5/5): Everything else</title>
 		<id>https://davidvonk.dev/homelab/building-a-homelab-5-5-everything-else</id>
@@ -2970,157 +3027,6 @@ func findMoveInRepertoire(for side: Repertoire.Side, fen: String) async -&amp;gt
 }
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/figure&gt;
-		</content>
-	</entry>
-	<entry>
-		<title type="text">Writing a chess app (5/9): Database Schema and move encoding</title>
-		<id>https://davidvonk.dev/swift/writing-a-chess-app-5-9-database-schema-and-move-encoding</id>
-		<link href="https://davidvonk.dev/swift/writing-a-chess-app-5-9-database-schema-and-move-encoding" rel="alternate">
-		</link>
-		<updated>2024-10-31T13:52:00Z</updated>
-		<summary type="text">
-			A blog post series detailing my journey of developing a chess app for iOS and macOS
-		</summary>
-		<content type="html">
-			&lt;p&gt;
-	Hello and welcome to the next part of my ongoing blog post series of writing a chess app for iOS and macOS.
-	
-	In this part I&apos;d like to talk about my design decision regarding the database schema.
-	
-	So lets dive in.
-&lt;/p&gt;
-&lt;h2&gt;
-	Database Schema
-&lt;/h2&gt;
-&lt;p&gt;
-	For the database schema I heavily leaned on on the work of &lt;a href=&quot;https://github.com/nguyenpham/ocgdb&quot;&gt;ocgdb&lt;/a&gt;. It is an open database format, is actually quite performant to store and search chess games and is the best excuse to use one of my favourite Swift packages (&lt;a href=&quot;https://github.com/groue/GRDB.swift&quot;&gt;GRDB.swift&lt;/a&gt;). Besides the obvious benefits the open source chess database software &lt;a href=&quot;https://encroissant.org&quot;&gt;En Croissant&lt;/a&gt; also uses the exact same database format and so my choice was being made.
-&lt;/p&gt;
-&lt;p&gt;
-	For reference here is the sqlite schema which I think is pretty self explanatory:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-sql&quot;&gt;CREATE TABLE Info (
-    Name TEXT UNIQUE NOT NULL,
-    Value TEXT
-);
-
-CREATE TABLE Events (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT UNIQUE
-);
-
-CREATE TABLE Sites (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT UNIQUE
-);
-
-CREATE TABLE Players (
-    ID INTEGER PRIMARY KEY,
-    Name TEXT UNIQUE,
-    Elo INTEGER
-);
-
-CREATE TABLE Games (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    EventID INTEGER,
-    SiteID INTEGER,
-    Date TEXT,
-    Round INTEGER,
-    WhiteID INTEGER,
-    WhiteElo INTEGER,
-    BlackID INTEGER,
-    BlackElo INTEGER,
-    Result INTEGER,
-    TimeControl TEXT,
-    ECO TEXT,
-    PlyCount INTEGER,
-    FEN TEXT,
-    Moves BLOB,
-    FOREIGN KEY(EventID) REFERENCES Events,
-    FOREIGN KEY(SiteID) REFERENCES Sites,
-    FOREIGN KEY(WhiteID) REFERENCES Players,
-    FOREIGN KEY(BlackID) REFERENCES Players
-);
-
-CREATE INDEX IF NOT EXISTS games_date_idx ON Games(Date);
-CREATE INDEX IF NOT EXISTS games_white_idx ON Games(WhiteID);
-CREATE INDEX IF NOT EXISTS games_black_idx ON Games(BlackID);
-CREATE INDEX IF NOT EXISTS games_result_idx ON Games(Result);
-CREATE INDEX IF NOT EXISTS games_white_elo_idx ON Games(WhiteElo);
-CREATE INDEX IF NOT EXISTS games_black_elo_idx ON Games(BlackElo);
-CREATE INDEX IF NOT EXISTS games_plycount_idx ON Games(PlyCount);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	If you had a closer look at the schema you might have noticed that the &lt;code&gt;Moves&lt;/code&gt; column is specified as a &lt;code&gt;BLOB&lt;/code&gt;. The idea behind that design decision is discussed in our next chapter.
-&lt;/p&gt;
-&lt;h2&gt;
-	Move Encoding
-&lt;/h2&gt;
-&lt;p&gt;
-	When thinking about how to encode moves into the database several options come to mind. The obvious solution is to store the movetext just as a &lt;code&gt;TEXT&lt;/code&gt; column and move on. I opted for encoding every chess move with only 2 bytes. This not only makes the actual data that is saved pretty small it also makes encoding and decoding moves trivial. Of course this could be optimized even further but weighting performance and ease of use against each other I ultimately found this solution to be the best fit for my needs.
-&lt;/p&gt;
-&lt;p&gt;
-	As we learned at the beginning of this blog post series a chess board has 64 squares and a move can be represented by moving a piece from one square to another square. The piece does not have to be stored itself, since this information is typically retrieved from a FEN string which encodes a chess board quite efficiently. There is a special case when moving a pawn to the backrank of your opponent resulting in promoting your pawn to a queen, knight, bishop or rook. So we need to account for that. If we represent the various promotion options with an integer enum we end up with a single integer ranging from 0-4 to encode a promotion information:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;enum Promotion: Int {
-	case empty
-	case queen
-	case bishop
-	case rook
-	case knight
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	With this in place a move representation can look something like this:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;typealias Square = Int
-
-extension Square {
-	var rank: Int {
-	    value &amp;gt;&amp;gt; 3
-	}
-	
-	var file: Int {
-	    value &amp;amp; 0x7
-	}
-}
-
-struct Move: Hashable, Equatable, Sendable {
-    let from: Square
-    let to: Square
-    let promotion: Promotion
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	There is room for improvement though. You could represent a square with a struct conforming to &lt;code&gt;RawRepresentable&lt;/code&gt; and &lt;code&gt;ExpressibleByIntegerLiteral&lt;/code&gt; to actually not pollute the &lt;code&gt;Int&lt;/code&gt; namespace with our extensions but this is something I haven&apos;t looked into yet. As a bonus I added some code to retrieve the file and rank of a given square.
-&lt;/p&gt;
-&lt;p&gt;
-	Looking at the above representation of a move lets count how much bits we need to actually store this information.
-	
-	We need 6 bits for each square (2^6 = 64) and 2 bits (2^2 = 4) to store the promotion information adding up to 14 bits in total which easily fits in an UInt16 or 2 bytes. For completeness sake here are the respective encoding and decoding functions:
-&lt;/p&gt;
-&lt;figure class=&quot;highlight&quot;&gt;
-	&lt;pre&gt;&lt;code class=&quot;language-swift&quot;&gt;init(encoded: UInt16) {
-    let from = encoded &amp;amp; 63
-    let to = encoded &amp;gt;&amp;gt; 6 &amp;amp; 63
-    let promotion = (encoded &amp;gt;&amp;gt; 12) &amp;amp; 7
-    let promotionRole = Promotion(rawValue: Int(promotion))
-    self.init(from: Square(from), to: Int(to), promotion: promotionRole)
-}
-
-var encoded: UInt16 {
-    UInt16(from) | UInt16(to) &amp;lt;&amp;lt; 6 | (UInt16(promotion.rawValue)) &amp;lt;&amp;lt; 12
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/figure&gt;
-&lt;p&gt;
-	And with that lets move on our next part which will look at spaced repetition training of repertoires.
-&lt;/p&gt;
 		</content>
 	</entry>
 </feed>

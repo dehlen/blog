@@ -52,6 +52,14 @@
 		<changefreq>weekly</changefreq>
 	</url>
 	<url>
+		<loc>https://davidvonk.dev/ios</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>https://davidvonk.dev/ios/tmdb-ios-client</loc>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
 		<loc>https://davidvonk.dev/macos</loc>
 		<changefreq>weekly</changefreq>
 	</url>
