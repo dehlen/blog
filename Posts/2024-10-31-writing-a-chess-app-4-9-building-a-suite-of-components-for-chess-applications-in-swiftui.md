@@ -190,10 +190,9 @@ func resetPieceAnimation() {
 
 And the result looks like this:
 
-<div style="display: flex; justify-content: center; margin: auto">
-    <iframe src="http://www.youtube.com/embed/M3P_FjZRc4Q?yt:stretch=16:9&vq=hd720p&loop=0&color=red&iv_load_policy=3&rel=0&showinfo=0&autohide=0&controls=1" width="560" height="315" allowtransparency="true" frameborder="0">
-    </iframe>
-</div>
+<video controls width="200">
+    <source src="/img/writing-a-chess-app/animations.mp4" type="video/mp4" />
+</video>
 
 
 ## Shapes
