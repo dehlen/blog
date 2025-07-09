@@ -61,9 +61,15 @@
 &lt;p&gt;
 	Without further ado here is a video that will showcase the app in action, highlighting its animations and user interface. I am happy to receive any feedback on my take.
 &lt;/p&gt;
-&lt;video controls width=&quot;400&quot;&gt;
-	&lt;source src=&quot;/img/tmdb-ios-app/tmdb-ios-app.mov&quot; type=&quot;video/mp4&quot;/&gt;
-&lt;/video&gt;
+&lt;div class=&quot;yt-container&quot;&gt;
+    &lt;iframe
+     class=&quot;responsive-iframe&quot;
+     src=&quot;https://www.youtube.com/embed/WvFpnDGObXc&quot;
+     frameborder=&quot;0&quot;
+     allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot;
+     allowfullscreen&gt;
+    &lt;/iframe&gt;
+&lt;/div&gt;
 		</content>
 	</entry>
 	<entry>

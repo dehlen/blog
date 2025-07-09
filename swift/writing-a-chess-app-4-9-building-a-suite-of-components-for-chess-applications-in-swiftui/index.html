@@ -254,6 +254,26 @@ textarea {
 }
 
 /**
+* YT Video
+*/
+.yt-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+}
+
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/**
 * Code
 */
 article code, article pre {
@@ -437,9 +457,15 @@ code:not(figure code), pre:not(figure pre) {
 						<p>
 							When a pawn moves to the opponents backrank it promotes to either a bishop, knight, rook or a queen. I actually quite like how lichess handles this. Most of the chessboard implementations show a modal to choose the promotion piece. However on lichess an inline representation is displayed and I quite like the user experience of that.
 						</p>
-						<video controls width="200">
-							<source src="/img/writing-a-chess-app/promotion.mp4" type="video/mp4"/>
-						</video>
+						<div class="yt-container">
+    <iframe
+     class="responsive-iframe"
+     src="https://www.youtube.com/embed/2ag_BqVTX8Y"
+     frameborder="0"
+     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+     allowfullscreen>
+    </iframe>
+</div>
 						<p>
 							Thanks to SwiftUI displaying this on the board is just a matter of conditionally including the promotion picker view in a ZStack to overlay the board with the picker component.
 						</p>
@@ -516,9 +542,15 @@ func resetPieceAnimation() {
 						<p>
 							And the result looks like this:
 						</p>
-						<video controls width="200">
-							<source src="/img/writing-a-chess-app/animations.mp4" type="video/mp4"/>
-						</video>
+						<div class="yt-container">
+    <iframe
+     class="responsive-iframe"
+     src="https://www.youtube.com/embed/M3P_FjZRc4Q"
+     frameborder="0"
+     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+     allowfullscreen>
+    </iframe>
+</div>
 						<h2>
 							Shapes
 						</h2>

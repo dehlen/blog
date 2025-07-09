@@ -254,6 +254,26 @@ textarea {
 }
 
 /**
+* YT Video
+*/
+.yt-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+}
+
+.responsive-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/**
 * Code
 */
 article code, article pre {
@@ -362,9 +382,15 @@ code:not(figure code), pre:not(figure pre) {
 						<p>
 							Without further ado here is a video that will showcase the app in action, highlighting its animations and user interface. I am happy to receive any feedback on my take.
 						</p>
-						<video controls width="400">
-							<source src="/img/tmdb-ios-app/tmdb-ios-app.mov" type="video/mp4"/>
-						</video>
+						<div class="yt-container">
+    <iframe
+     class="responsive-iframe"
+     src="https://www.youtube.com/embed/WvFpnDGObXc"
+     frameborder="0"
+     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+     allowfullscreen>
+    </iframe>
+</div>
 						<small>Posted
 							<time><time datetime="2025-07-08">2025-07-08</time></time>
 							in
