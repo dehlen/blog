@@ -26,6 +26,4 @@ SwiftUI has allowed me to create a visually appealing and responsive app with le
 
 Without further ado here is a video that will showcase the app in action, highlighting its animations and user interface. I am happy to receive any feedback on my take.
 
-<video controls width="400">
-    <source src="/img/tmdb-ios-app/tmdb-ios-app.mov" type="video/mp4" />
-</video>
+<yt id="WvFpnDGObXc"/>

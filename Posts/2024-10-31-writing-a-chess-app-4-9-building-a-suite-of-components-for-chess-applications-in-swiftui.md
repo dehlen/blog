@@ -115,9 +115,7 @@ func set(fen: String) {
 
 When a pawn moves to the opponents backrank it promotes to either a bishop, knight, rook or a queen. I actually quite like how lichess handles this. Most of the chessboard implementations show a modal to choose the promotion piece. However on lichess an inline representation is displayed and I quite like the user experience of that.
 
-<video controls width="200">
-    <source src="/img/writing-a-chess-app/promotion.mp4" type="video/mp4" />
-</video>
+<yt id="2ag_BqVTX8Y"/>
 
 Thanks to SwiftUI displaying this on the board is just a matter of conditionally including the promotion picker view in a ZStack to overlay the board with the picker component.
 
@@ -190,10 +188,7 @@ func resetPieceAnimation() {
 
 And the result looks like this:
 
-<video controls width="200">
-    <source src="/img/writing-a-chess-app/animations.mp4" type="video/mp4" />
-</video>
-
+<yt id="M3P_FjZRc4Q"/>
 
 ## Shapes
 

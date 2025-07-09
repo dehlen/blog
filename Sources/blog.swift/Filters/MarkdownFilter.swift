@@ -312,7 +312,22 @@ private extension MarkdownParser {
 
         let attributes = Dictionary(properties, uniquingKeysWith: { a, _ in a})
 
-        return .element(name, attributes, children)
+        if name == "yt", let videoID = attributes["id"] {            
+            let embed = """
+            <div class="yt-container">
+                <iframe
+                 class="responsive-iframe"
+                 src="https://www.youtube.com/embed/\(videoID)"
+                 frameborder="0"
+                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                 allowfullscreen>
+                </iframe>
+            </div>
+            """
+            return .raw(embed)
+        } else {
+            return .element(name, attributes, children)
+        }
     }
 
     func visit(text nodePointer: UnsafeMutablePointer<xmlNode>?) -> Node? {
